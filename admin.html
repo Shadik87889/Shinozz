@@ -1,0 +1,5132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SHINOZZ | Advanced Enterprise OS</title>
+
+    <!-- Luxury Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- html2pdf Library for Invoice Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+      :root {
+        --bg-main: #f4f5f7;
+        --bg-card: #ffffff;
+        --text-main: #111111;
+        --text-light: #777777;
+        --border-color: #e2e4e8;
+        --accent: #0a0a0a;
+        --accent-hover: #222222;
+        --accent-light: #f0f0f0;
+        --danger: #d93025;
+        --warning: #f29900;
+        --success: #0d833a;
+        --info: #2196f3;
+        --purple: #9c27b0;
+        --sidebar-width: 280px;
+        --radius: 8px;
+        --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.03);
+        --shadow-md: 0 12px 35px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.1);
+        --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Jost", sans-serif;
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* --- AUTOFILL OVERRIDE --- */
+      input:-webkit-autofill,
+      input:-webkit-autofill:hover,
+      input:-webkit-autofill:focus,
+      input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px white inset !important;
+        -webkit-text-fill-color: var(--text-main) !important;
+        transition: background-color 5000s ease-in-out 0s;
+      }
+
+      /* --- AUTHENTICATION --- */
+      #auth-overlay {
+        position: fixed;
+        inset: 0;
+        background: var(--bg-main);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: var(--transition);
+      }
+      .auth-card {
+        width: 100%;
+        max-width: 440px;
+        padding: 60px 50px;
+        background: #fff;
+        text-align: center;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-lg);
+        border-radius: var(--radius);
+      }
+      .auth-card h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 2.5rem;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+      }
+      .auth-card p {
+        color: var(--text-light);
+        font-size: 0.85rem;
+        margin-bottom: 40px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+      .auth-error {
+        background: rgba(217, 48, 37, 0.05);
+        color: var(--danger);
+        padding: 15px;
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+        display: none;
+        border-left: 3px solid var(--danger);
+        border-radius: 4px;
+        text-align: left;
+      }
+
+      /* --- LOADER --- */
+      #global-loader {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(15px);
+        z-index: 9998;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .loader-line {
+        width: 150px;
+        height: 2px;
+        background: var(--border-color);
+        position: relative;
+        overflow: hidden;
+      }
+      .loader-line::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 40%;
+        background: var(--accent);
+        animation: loading 1s infinite ease-in-out;
+      }
+      @keyframes loading {
+        0% {
+          left: -40%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      /* --- SIDEBAR & OVERLAY --- */
+      #mobile-sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: var(--transition);
+      }
+      #mobile-sidebar-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .sidebar {
+        width: var(--sidebar-width);
+        background: var(--accent);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        padding: 50px 0;
+        z-index: 1000;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+        transition: transform var(--transition);
+        position: relative;
+      }
+      .close-sidebar-btn {
+        display: none;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        padding: 5px;
+        z-index: 10;
+      }
+      .close-sidebar-btn:hover {
+        color: #fff;
+      }
+
+      .brand {
+        font-family: "Playfair Display", serif;
+        font-size: 2.2rem;
+        letter-spacing: 5px;
+        text-align: center;
+        margin-bottom: 60px;
+      }
+      .brand span {
+        display: block;
+        font-family: "Jost", sans-serif;
+        font-size: 0.6rem;
+        letter-spacing: 8px;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 10px;
+      }
+      .nav-menu {
+        list-style: none;
+        flex: 1;
+        padding: 0 20px;
+        overflow-y: auto;
+      }
+      .nav-menu::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-item {
+        padding: 16px 20px;
+        font-size: 0.85rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+      }
+      .nav-item:hover,
+      .nav-item.active {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .nav-item svg {
+        width: 18px;
+        height: 18px;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        fill: none;
+      }
+      .logout-btn {
+        margin: 0 20px;
+        padding: 20px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: var(--transition);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .logout-btn:hover {
+        color: #fff;
+      }
+
+      /* --- MAIN LAYOUT --- */
+      .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+        position: relative;
+      }
+      .topbar {
+        height: 90px;
+        background: rgba(244, 245, 247, 0.85);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 60px;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .topbar h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--accent);
+        letter-spacing: 1px;
+        margin: 0;
+      }
+      .mobile-menu-btn {
+        display: none;
+        cursor: pointer;
+        color: var(--accent);
+      }
+
+      /* Notifications */
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+      }
+      .notification-bell {
+        position: relative;
+        cursor: pointer;
+        color: var(--text-light);
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+      }
+      .notification-bell:hover {
+        color: var(--accent);
+      }
+      .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: var(--danger);
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: bold;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 2px solid var(--bg-main);
+        animation: pulseAlert 2s infinite;
+      }
+      @keyframes pulseAlert {
+        0% {
+          box-shadow: 0 0 0 0 rgba(217, 48, 37, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 6px rgba(217, 48, 37, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(217, 48, 37, 0);
+        }
+      }
+      .notification-dropdown {
+        position: absolute;
+        top: 70px;
+        right: 120px;
+        width: 320px;
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+        opacity: 0;
+        visibility: hidden;
+        transition: var(--transition);
+        transform: translateY(-10px);
+        z-index: 100;
+        overflow: hidden;
+      }
+      .notification-dropdown.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      .notif-header {
+        padding: 15px 20px;
+        background: var(--bg-main);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .notif-body {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .notif-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-color);
+        cursor: pointer;
+        transition: var(--transition);
+        display: block;
+        text-decoration: none;
+        color: var(--text-main);
+      }
+      .notif-item:hover {
+        background: var(--bg-main);
+      }
+      .notif-item:last-child {
+        border-bottom: none;
+      }
+      .notif-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+      .notif-time {
+        font-size: 0.7rem;
+        color: var(--text-light);
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-left: 1px solid var(--border-color);
+        padding-left: 30px;
+      }
+      .user-profile span {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 500;
+      }
+      .avatar {
+        width: 45px;
+        height: 45px;
+        background: #fff;
+        color: var(--accent);
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Playfair Display";
+        font-weight: bold;
+      }
+
+      .content-area {
+        padding: 40px 60px;
+        max-width: 1600px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      .view-section {
+        display: none;
+        animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      .view-section.active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* --- UI COMPONENTS --- */
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        padding: 40px;
+        margin-bottom: 30px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+      }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 35px;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+      .card-title {
+        font-family: "Playfair Display", serif;
+        font-size: 1.8rem;
+        color: var(--accent);
+      }
+
+      .btn {
+        padding: 14px 28px;
+        font-family: "Jost", sans-serif;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        border-radius: 6px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+      .btn-dark {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-dark:hover {
+        background: var(--accent-hover);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+      }
+      .btn-danger {
+        background: var(--danger);
+        color: #fff;
+      }
+      .btn-danger:hover {
+        background: #b7251c;
+        box-shadow: 0 8px 25px rgba(217, 48, 37, 0.2);
+        transform: translateY(-2px);
+      }
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--accent);
+      }
+      .btn-outline:hover {
+        border-color: var(--accent);
+        background: var(--bg-main);
+      }
+      .btn-small {
+        padding: 8px 16px;
+        font-size: 0.7rem;
+      }
+
+      .btn-icon-only {
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background: transparent;
+        color: var(--text-main);
+        cursor: pointer;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn-icon-only:hover {
+        background: var(--bg-main);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .btn-action-sm {
+        width: 32px;
+        height: 32px;
+        background: rgba(0, 0, 0, 0.04);
+        border: none;
+        border-radius: 50%;
+        color: var(--text-main);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        flex-shrink: 0;
+      }
+      .btn-action-sm:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .btn-action-sm.danger {
+        background: rgba(217, 48, 37, 0.08);
+        color: var(--danger);
+      }
+      .btn-action-sm.danger:hover {
+        background: rgba(217, 48, 37, 0.15);
+      }
+
+      /* Advanced Filters & Search */
+      .filter-bar-container {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+        background: var(--bg-main);
+        padding: 15px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+        margin-bottom: 20px;
+      }
+      .search-bar {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 0 15px;
+        width: 300px;
+        transition: border-color 0.3s;
+      }
+      .search-bar:focus-within {
+        border-color: var(--accent);
+      }
+      .search-bar input {
+        border: none;
+        outline: none;
+        padding: 12px 10px;
+        width: 100%;
+        font-family: "Jost";
+        font-size: 0.9rem;
+        background: transparent;
+      }
+      .search-bar svg {
+        color: var(--text-light);
+        width: 18px;
+        flex-shrink: 0;
+      }
+      .filter-select {
+        padding: 12px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        outline: none;
+        font-family: "Jost";
+        font-size: 0.85rem;
+        background: #fff;
+        min-width: 150px;
+      }
+
+      /* Tables & Pagination */
+      .table-container {
+        overflow-x: auto;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+      th {
+        padding: 20px;
+        border-bottom: 2px solid var(--accent);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-light);
+        white-space: nowrap;
+      }
+      td {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.95rem;
+        vertical-align: middle;
+      }
+      tr:hover td {
+        background: var(--bg-main);
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+      }
+      .page-btn {
+        padding: 8px 15px;
+        border: 1px solid var(--border-color);
+        background: #fff;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-family: "Jost";
+        transition: var(--transition);
+      }
+      .page-btn:hover:not(:disabled) {
+        border-color: var(--accent);
+        background: var(--bg-main);
+      }
+      .page-btn.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .page-info {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin: 0 15px;
+      }
+
+      /* Badges & Media */
+      .prod-img-mini {
+        width: 60px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+        flex-shrink: 0;
+      }
+      .status-badge {
+        background: rgba(13, 131, 58, 0.08);
+        color: var(--success);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        display: inline-block;
+        text-align: center;
+        white-space: nowrap;
+      }
+      .status-badge.out {
+        background: rgba(217, 48, 37, 0.08);
+        color: var(--danger);
+      }
+      .status-badge.low {
+        background: rgba(242, 153, 0, 0.1);
+        color: var(--warning);
+      }
+      .state-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 1px solid currentColor;
+        display: inline-block;
+      }
+      .state-badge.active {
+        color: var(--success);
+        background: rgba(13, 131, 58, 0.05);
+      }
+      .state-badge.draft {
+        color: var(--warning);
+        background: rgba(242, 153, 0, 0.05);
+      }
+      .state-badge.archived {
+        color: var(--text-light);
+        background: rgba(0, 0, 0, 0.05);
+      }
+
+      .oms-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .oms-badge.pending {
+        background: rgba(242, 153, 0, 0.1);
+        color: var(--warning);
+      }
+      .oms-badge.processing {
+        background: rgba(33, 150, 243, 0.1);
+        color: var(--info);
+      }
+      .oms-badge.shipped {
+        background: rgba(156, 39, 176, 0.1);
+        color: var(--purple);
+      }
+      .oms-badge.delivered {
+        background: rgba(13, 131, 58, 0.1);
+        color: var(--success);
+      }
+      .oms-badge.cancelled {
+        background: rgba(217, 48, 37, 0.1);
+        color: var(--danger);
+      }
+
+      /* Global Forms */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+      .form-group {
+        margin-bottom: 25px;
+        position: relative;
+      }
+      .form-group.full {
+        grid-column: 1 / -1;
+      }
+      .form-group.third {
+        grid-template-columns: repeat(3, 1fr);
+        display: grid;
+        gap: 30px;
+        grid-column: 1 / -1;
+      }
+      label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 10px;
+        color: var(--text-light);
+        font-weight: 600;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="password"],
+      input[type="number"],
+      input[type="url"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 14px 20px;
+        font-family: "Jost", sans-serif;
+        font-size: 0.95rem;
+        border: 1px solid var(--border-color);
+        background: #fff;
+        border-radius: 6px;
+        outline: none;
+        transition: border-color 0.3s, box-shadow 0.3s;
+        color: var(--text-main);
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.05);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+        line-height: 1.6;
+      }
+
+      select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background: #fff
+          url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>')
+          no-repeat;
+        background-position: right 15px center;
+        background-size: 14px;
+        padding-right: 40px !important;
+        cursor: pointer;
+      }
+
+      /* Modals */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        z-index: 2000;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-overlay.show {
+        display: flex;
+        opacity: 1;
+      }
+
+      /* ==========================================================
+         PREMIUM WORLD-CLASS QUICK VIEW MODAL
+         ========================================================== */
+      .quick-view-card {
+        background: #fff;
+        width: 95%;
+        max-width: 1200px;
+        height: 85vh;
+        border-radius: var(--radius);
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+        position: relative;
+        transform: scale(0.95);
+        transition: transform 0.4s ease;
+        box-shadow: var(--shadow-lg);
+      }
+      .modal-overlay.show .quick-view-card {
+        transform: scale(1);
+      }
+      .qv-left {
+        flex: 1.2;
+        background: #f8f8f8;
+        display: flex;
+        padding: 30px;
+        gap: 20px;
+      }
+      .qv-thumbnails {
+        width: 80px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        overflow-y: auto;
+        max-height: 100%;
+        scrollbar-width: none;
+      }
+      .qv-thumbnails::-webkit-scrollbar {
+        display: none;
+      }
+      .qv-thumb {
+        width: 100%;
+        aspect-ratio: 2/3;
+        object-fit: cover;
+        border-radius: 4px;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+      }
+      .qv-thumb:hover {
+        opacity: 0.8;
+      }
+      .qv-thumb.active {
+        opacity: 1;
+        border-color: var(--accent);
+      }
+      .qv-main-img-box {
+        flex: 1;
+        background: #fff;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .qv-main-img-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .qv-right {
+        flex: 1;
+        padding: 50px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+      .qv-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-light);
+        margin-bottom: 15px;
+      }
+      .qv-title {
+        font-family: "Playfair Display", serif;
+        font-size: 2.2rem;
+        color: var(--accent);
+        line-height: 1.2;
+        margin-bottom: 15px;
+      }
+      .qv-price {
+        font-size: 1.6rem;
+        font-weight: 500;
+        margin-bottom: 25px;
+        color: var(--text-main);
+      }
+      .qv-desc {
+        font-size: 0.95rem;
+        color: var(--text-light);
+        line-height: 1.6;
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .qv-section-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-light);
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+      .qv-color-swatch {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        cursor: help;
+      }
+      .qv-size-box {
+        padding: 8px 16px;
+        border: 1px solid var(--accent);
+        background: #fff;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border-radius: 4px;
+        color: var(--accent);
+      }
+      .qv-material-box {
+        padding: 6px 12px;
+        background: var(--bg-main);
+        border: 1px solid var(--border-color);
+        font-size: 0.8rem;
+        border-radius: 4px;
+        color: var(--text-main);
+      }
+
+      /* Confirm Modal */
+      .confirm-card {
+        background: #fff;
+        width: 90%;
+        max-width: 420px;
+        padding: 40px;
+        border-radius: var(--radius);
+        text-align: center;
+        box-shadow: var(--shadow-lg);
+        transform: scale(0.95);
+        transition: transform 0.4s ease;
+      }
+      .modal-overlay.show .confirm-card {
+        transform: scale(1);
+      }
+      .confirm-card h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.6rem;
+        color: var(--accent);
+        margin-bottom: 15px;
+      }
+      .confirm-card p {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+      .confirm-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+      }
+      .confirm-actions .btn {
+        flex: 1;
+        padding: 14px 20px;
+      }
+
+      /* Order Inspector Styles */
+      .order-inspector-card {
+        background: #fff;
+        width: 95%;
+        max-width: 1000px;
+        max-height: 90vh;
+        border-radius: var(--radius);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        transform: scale(0.95);
+        transition: transform 0.4s ease;
+        box-shadow: var(--shadow-lg);
+      }
+      .modal-overlay.show .order-inspector-card {
+        transform: scale(1);
+      }
+      .oi-header {
+        padding: 30px 40px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--bg-main);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      .oi-title {
+        font-family: "Playfair Display";
+        font-size: 1.8rem;
+        color: var(--accent);
+      }
+      .oi-body {
+        padding: 40px;
+        flex: 1;
+      }
+      .oi-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 40px;
+      }
+      .oi-box {
+        background: var(--bg-main);
+        border: 1px solid var(--border-color);
+        padding: 25px;
+        border-radius: 6px;
+      }
+      .oi-box h4 {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-light);
+        margin-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+      }
+      .oi-box p {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+        line-height: 1.5;
+      }
+      .oi-box strong {
+        font-weight: 600;
+        color: var(--accent);
+      }
+      .oi-items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+      .oi-items-table th {
+        padding: 12px;
+        background: var(--bg-main);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        border: 1px solid var(--border-color);
+      }
+      .oi-items-table td {
+        padding: 15px 12px;
+        border: 1px solid var(--border-color);
+        font-size: 0.9rem;
+      }
+      .oi-financials {
+        width: 300px;
+        margin-left: auto;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 20px;
+        background: var(--bg-main);
+      }
+      .oi-fin-line {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+      }
+      .oi-fin-line.total {
+        border-top: 1px solid var(--border-color);
+        padding-top: 15px;
+        margin-top: 5px;
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .close-modal {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background: var(--bg-main);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border: none;
+        z-index: 20;
+        transition: var(--transition);
+      }
+      .close-modal:hover {
+        background: var(--danger);
+        color: #fff;
+      }
+
+      /* Builder Grid */
+      .builder-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+      }
+      .builder-slot {
+        background: var(--bg-main);
+        border: 1px solid var(--border-color);
+        padding: 30px;
+        border-radius: var(--radius);
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        transition: var(--transition);
+      }
+      .builder-slot:hover {
+        border-color: var(--accent);
+        box-shadow: var(--shadow-sm);
+      }
+      .slot-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--accent);
+        font-weight: 600;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+      }
+
+      /* ==========================================================
+         PRODUCT EDITOR UPGRADES (NEW CSS FIXES)
+         ========================================================== */
+      .editor-tabs {
+        display: flex;
+        gap: 30px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 30px;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+      .editor-tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .editor-tab {
+        padding: 12px 5px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-light);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: var(--transition);
+      }
+      .editor-tab:hover {
+        color: var(--accent);
+      }
+      .editor-tab.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+      }
+      .tab-pane {
+        display: none;
+        animation: fadeIn 0.4s ease;
+        padding-bottom: 20px;
+      }
+      .tab-pane.active {
+        display: block;
+      }
+
+      /* Quick Add Chips for Sizes/Materials */
+      .quick-chip {
+        display: inline-block;
+        padding: 6px 14px;
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-main);
+        cursor: pointer;
+        margin-right: 8px;
+        margin-bottom: 10px;
+        transition: var(--transition);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+      }
+      .quick-chip:hover {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      /* Tags Input Area */
+      .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        min-height: 54px;
+        align-items: center;
+        background: #fff;
+        transition: border-color 0.3s;
+      }
+      .tags-container:focus-within {
+        border-color: var(--accent);
+      }
+      .tag {
+        background: var(--accent);
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .tag span {
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .tag-input {
+        border: none !important;
+        outline: none !important;
+        padding: 5px !important;
+        flex: 1;
+        min-width: 150px;
+        box-shadow: none !important;
+        background: transparent;
+        font-family: "Jost";
+      }
+
+      /* Dynamic List Fixes (Colorways & Media) */
+      .dynamic-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+      .dynamic-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: var(--bg-main);
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        transition: var(--transition);
+      }
+      .dynamic-item:hover {
+        border-color: #ccc;
+        background: #fff;
+      }
+      .dynamic-item input[type="text"],
+      .dynamic-item input[type="url"] {
+        margin-bottom: 0;
+        border: 1px solid #ddd;
+      }
+
+      /* Color Picker Styling */
+      input[type="color"] {
+        -webkit-appearance: none;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        cursor: pointer;
+        padding: 0;
+        background: transparent;
+      }
+      input[type="color"]::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+      input[type="color"]::-webkit-color-swatch {
+        border: none;
+        border-radius: 50%;
+      }
+
+      /* Media Preview Fixes */
+      .img-preview-box {
+        width: 60px;
+        height: 80px;
+        border: 1px dashed #bbb;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #fff;
+        flex-shrink: 0;
+      }
+      .img-preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .primary-radio-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        white-space: nowrap;
+        margin-right: 10px;
+      }
+
+      /* Craftsmanship/Inspector Fixes */
+      .hotspot-form {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        padding: 25px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+      }
+      .hotspot-form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 15px;
+      }
+      .hotspot-marker {
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        background: var(--accent);
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.8rem;
+        font-weight: bold;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        border: 2px solid #fff;
+      }
+
+      .color-header-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-light);
+        font-weight: 600;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        background: var(--accent);
+        color: #fff;
+        padding: 18px 35px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        box-shadow: var(--shadow-lg);
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-left: 4px solid var(--success);
+      }
+      .toast.error {
+        border-left-color: var(--danger);
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      /* Stats Grid */
+      .stat-card {
+        padding: 30px;
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .stat-num {
+        font-size: 2.5rem;
+        font-family: "Playfair Display", serif;
+        color: var(--accent);
+        line-height: 1;
+        margin-bottom: 10px;
+      }
+      .stat-label {
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-size: 0.7rem;
+        color: var(--text-light);
+        font-weight: 600;
+      }
+      hr {
+        border: 0;
+        border-top: 1px solid var(--border-color);
+        margin: 40px 0;
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .form-grid,
+        .form-group.third {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+        .form-grid[style*="grid-template-columns"] {
+          grid-template-columns: 1fr !important;
+        }
+        .oi-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+        .quick-view-card {
+          flex-direction: column;
+          overflow-y: auto;
+        }
+        .qv-left {
+          flex-direction: column-reverse;
+          padding: 20px;
+        }
+        .qv-thumbnails {
+          width: 100%;
+          flex-direction: row;
+        }
+        .qv-thumb {
+          width: 60px;
+        }
+        .qv-right {
+          padding: 30px 20px;
+        }
+        .dynamic-item {
+          flex-wrap: wrap;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          position: fixed;
+          left: 0;
+          top: 0;
+          transform: translateX(-100%);
+          height: 100%;
+          z-index: 1001;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+          box-shadow: var(--shadow-lg);
+        }
+        .topbar-left {
+          gap: 10px;
+        }
+        .mobile-menu-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .close-sidebar-btn {
+          display: block;
+        }
+        .content-area {
+          padding: 20px 15px;
+        }
+        .topbar {
+          padding: 0 15px;
+          height: 75px;
+          justify-content: space-between;
+        }
+        .topbar h1 {
+          font-size: 1.4rem;
+        }
+        .topbar-actions {
+          gap: 15px;
+          margin-right: 0;
+        }
+        .user-profile span {
+          display: none;
+        }
+        .user-profile {
+          padding-left: 15px;
+        }
+        .notification-dropdown {
+          right: 10px;
+          width: 280px;
+        }
+        .oi-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 15px;
+          padding: 20px;
+        }
+        .oi-body {
+          padding: 20px;
+        }
+        .oi-financials {
+          width: 100%;
+        }
+        .oi-items-table {
+          min-width: 500px;
+          display: block;
+          overflow-x: auto;
+        }
+      }
+
+      /* Secret Invoice Capture CSS */
+      #admin-invoice-capture-area {
+        display: none;
+        width: 800px;
+        background: #fff;
+        padding: 50px;
+        font-family: "Jost", sans-serif;
+        color: #111;
+      }
+      .inv-head {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 2px solid #111;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+      }
+      .inv-info {
+        text-align: right;
+        font-size: 0.85rem;
+      }
+      .inv-grid {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 40px;
+        font-size: 0.9rem;
+      }
+      .inv-col h4 {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #777;
+        margin-bottom: 10px;
+      }
+      .inv-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+      .inv-table th {
+        text-align: left;
+        padding: 12px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        border-bottom: 1px solid #ddd;
+      }
+      .inv-table td {
+        padding: 15px 12px;
+        border-bottom: 1px solid #ddd;
+        font-size: 0.9rem;
+      }
+      .inv-totals {
+        width: 350px;
+        margin-left: auto;
+      }
+      .inv-tot-line {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 0.9rem;
+      }
+      .inv-tot-line.grand {
+        border-top: 2px solid #111;
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin-top: 10px;
+        padding-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- AUTHENTICATION -->
+    <div id="auth-overlay">
+      <div class="auth-card">
+        <h1>SHINOZZ</h1>
+        <p>Enterprise OS Initialization</p>
+        <div class="auth-error" id="auth-error-msg"></div>
+        <form id="login-form">
+          <div class="form-group" style="text-align: left;">
+            <input
+              type="email"
+              id="auth-email"
+              placeholder="Administrator Email"
+              required
+            />
+          </div>
+          <div class="form-group" style="text-align: left;">
+            <input
+              type="password"
+              id="auth-pass"
+              placeholder="Secure Password"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            class="btn btn-dark"
+            style="width: 100%; padding: 16px;"
+          >
+            Access System
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div id="global-loader">
+      <div class="loader-line"></div>
+      <div
+        style="
+          font-size: 0.7rem;
+          text-transform: uppercase;
+          letter-spacing: 3px;
+          color: var(--accent);
+          font-weight: 600;
+        "
+      >
+        Synchronizing Database...
+      </div>
+    </div>
+
+    <!-- SIDEBAR & MOBILE OVERLAY -->
+    <div id="mobile-sidebar-overlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar">
+      <div class="close-sidebar-btn" onclick="closeSidebar()">
+        <svg
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          fill="none"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </div>
+      <div class="brand">SHINOZZ<span>ENTERPRISE OS</span></div>
+      <ul class="nav-menu">
+        <li class="nav-item active" data-target="view-dashboard">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect></svg
+          >Overview
+        </li>
+        <li class="nav-item" data-target="view-orders">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+            ></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline></svg
+          >Order Intelligence
+        </li>
+        <li class="nav-item" data-target="view-products">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+            ></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line></svg
+          >Master Catalog
+        </li>
+        <li class="nav-item" data-target="view-customers">
+          <svg viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+          >Clientele
+        </li>
+        <li class="nav-item" data-target="view-attributes">
+          <svg viewBox="0 0 24 24">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline></svg
+          >System Attributes
+        </li>
+        <li class="nav-item" data-target="view-builder">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line></svg
+          >Storefront Builder
+        </li>
+        <li class="nav-item" data-target="view-settings">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+            ></path></svg
+          >System Config
+        </li>
+      </ul>
+      <div class="logout-btn" onclick="logoutAdmin()">End Session</div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="mobile-menu-btn" onclick="openSidebar()">
+            <svg
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              stroke-width="2"
+              fill="none"
+            >
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </div>
+          <h1 id="topbar-title">Overview</h1>
+        </div>
+
+        <div class="topbar-actions">
+          <div style="position: relative;">
+            <div class="notification-bell" onclick="toggleNotifications()">
+              <svg
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+              >
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span
+                class="notification-badge"
+                id="notif-badge"
+                style="display: none;"
+                >0</span
+              >
+            </div>
+            <div class="notification-dropdown" id="notif-dropdown">
+              <div class="notif-header">Recent Pending Orders</div>
+              <div class="notif-body" id="notif-list"></div>
+            </div>
+          </div>
+          <div class="user-profile">
+            <span>Admin OS</span>
+            <div class="avatar">SA</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-area">
+        <!-- DASHBOARD -->
+        <section id="view-dashboard" class="view-section active">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Real-time Intelligence</div>
+            </div>
+            <div
+              class="form-grid"
+              style="
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              "
+            >
+              <div class="stat-card">
+                <div class="stat-num" id="stat-products">0</div>
+                <div class="stat-label">Master Products</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num" id="stat-orders">0</div>
+                <div class="stat-label">Total Orders</div>
+              </div>
+              <div class="stat-card">
+                <div
+                  class="stat-num"
+                  id="stat-revenue"
+                  style="font-size: 2.2rem;"
+                >
+                  ৳0
+                </div>
+                <div class="stat-label">Gross Revenue</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num" id="stat-customers">0</div>
+                <div class="stat-label">Registered Clientele</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num" id="stat-stock">0</div>
+                <div class="stat-label">Inventory Units</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ORDER INTELLIGENCE -->
+        <section id="view-orders" class="view-section">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Order Intelligence Hub</div>
+            </div>
+            <div class="filter-bar-container">
+              <div class="search-bar">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input
+                  type="text"
+                  id="order-search"
+                  placeholder="Search Order ID or Customer..."
+                  oninput="filterOrders()"
+                />
+              </div>
+              <select
+                id="order-filter-status"
+                class="filter-select"
+                onchange="filterOrders()"
+              >
+                <option value="all">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Processing">Processing</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer Info</th>
+                    <th>Date Received</th>
+                    <th>Financials</th>
+                    <th>Fulfillment State</th>
+                    <th style="text-align: right;">Inspect</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-table-body"></tbody>
+              </table>
+              <div class="pagination" id="order-pagination"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SYSTEM CONFIGURATION -->
+        <section id="view-settings" class="view-section">
+          <div class="card" style="max-width: 600px;">
+            <div class="card-header">
+              <div class="card-title">System Configuration</div>
+            </div>
+            <p
+              style="
+                color: var(--text-light);
+                margin-bottom: 30px;
+                font-size: 0.85rem;
+              "
+            >
+              Global parameters applied across the storefront and checkout
+              engine.
+            </p>
+            <form onsubmit="saveStoreConfig(event)">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Inside Dhaka Shipping Fee (৳) *</label>
+                  <input
+                    type="number"
+                    id="config-shipping-inside"
+                    placeholder="e.g. 80"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Outside Dhaka Shipping Fee (৳) *</label>
+                  <input
+                    type="number"
+                    id="config-shipping-outside"
+                    placeholder="e.g. 150"
+                    required
+                  />
+                </div>
+              </div>
+              <div
+                style="
+                  margin-top: 30px;
+                  border-top: 1px solid var(--border-color);
+                  padding-top: 25px;
+                  text-align: right;
+                "
+              >
+                <button type="submit" class="btn btn-dark" id="btn-save-config">
+                  Apply Configuration
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- PRODUCT CATALOG -->
+        <section id="view-products" class="view-section">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Master Catalog</div>
+              <button class="btn btn-dark" onclick="openProductEditor()">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  fill="none"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Create Product
+              </button>
+            </div>
+            <div class="filter-bar-container">
+              <div class="search-bar">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input
+                  type="text"
+                  id="filter-search"
+                  placeholder="Search SKU or Name..."
+                  oninput="filterCatalog()"
+                />
+              </div>
+              <select
+                id="filter-status"
+                class="filter-select"
+                onchange="filterCatalog()"
+              >
+                <option value="all">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="draft">Draft</option>
+                <option value="archived">Archived</option>
+              </select>
+              <select
+                id="filter-category"
+                class="filter-select"
+                onchange="filterCatalog()"
+              ></select>
+              <select
+                id="filter-stock"
+                class="filter-select"
+                onchange="filterCatalog()"
+              >
+                <option value="all">All Inventory</option>
+                <option value="in_stock">In Stock</option>
+                <option value="low_stock">Low Stock Warning</option>
+                <option value="out_stock">Out of Stock</option>
+              </select>
+              <button
+                class="btn btn-outline btn-small"
+                onclick="exportCatalogCSV()"
+                style="margin-left: auto;"
+              >
+                Export CSV
+              </button>
+            </div>
+            <div class="table-container">
+              <table id="products-table">
+                <thead>
+                  <tr>
+                    <th>Visual</th>
+                    <th>Nomenclature & Context</th>
+                    <th>Pricing Dynamics</th>
+                    <th>POS Inventory</th>
+                    <th style="text-align: right;">Operations</th>
+                  </tr>
+                </thead>
+                <tbody id="product-table-body"></tbody>
+              </table>
+              <div class="pagination" id="product-pagination"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CLIENTELE -->
+        <section id="view-customers" class="view-section">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Clientele Database</div>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Client Name</th>
+                    <th>Email Address</th>
+                    <th>Total Orders</th>
+                    <th>Lifetime Value</th>
+                  </tr>
+                </thead>
+                <tbody id="customers-table-body"></tbody>
+              </table>
+              <div class="pagination" id="customer-pagination"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- GLOBAL ATTRIBUTES -->
+        <section id="view-attributes" class="view-section">
+          <p
+            style="
+              color: var(--text-light);
+              margin-bottom: 25px;
+              font-size: 0.9rem;
+              text-transform: uppercase;
+              letter-spacing: 1.5px;
+            "
+          >
+            Global Attribute Management Hub
+          </p>
+          <div class="form-grid">
+            <div class="card" style="margin-bottom: 0;">
+              <div
+                class="card-title"
+                style="font-size: 1.3rem; margin-bottom: 20px;"
+              >
+                Categories
+              </div>
+              <form
+                onsubmit="saveCategoryAttribute(event)"
+                style="
+                  display: flex;
+                  gap: 10px;
+                  margin-bottom: 20px;
+                  flex-wrap: wrap;
+                "
+              >
+                <input
+                  type="text"
+                  id="attr-categories-input"
+                  placeholder="e.g. Sarees"
+                  required
+                  style="padding: 10px; flex: 1; min-width: 150px;"
+                />
+                <input
+                  type="url"
+                  id="attr-categories-img-input"
+                  placeholder="Image URL (Optional)"
+                  style="padding: 10px; flex: 1; min-width: 150px;"
+                />
+                <button type="submit" class="btn btn-dark btn-small">
+                  Add
+                </button>
+              </form>
+              <div class="table-container">
+                <table
+                  style="
+                    border: 1px solid var(--border-color);
+                    border-radius: 4px;
+                    overflow: hidden;
+                    min-width: 100%;
+                  "
+                >
+                  <tbody id="attr-list-categories"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom: 0;">
+              <div
+                class="card-title"
+                style="font-size: 1.3rem; margin-bottom: 20px;"
+              >
+                Sizes
+              </div>
+              <form
+                onsubmit="saveAttribute('sizes', event)"
+                style="display: flex; gap: 10px; margin-bottom: 20px;"
+              >
+                <input
+                  type="text"
+                  id="attr-sizes-input"
+                  placeholder="e.g. XL, 42"
+                  required
+                  style="padding: 10px; flex: 1;"
+                />
+                <button type="submit" class="btn btn-dark btn-small">
+                  Add
+                </button>
+              </form>
+              <div class="table-container">
+                <table
+                  style="
+                    border: 1px solid var(--border-color);
+                    border-radius: 4px;
+                    overflow: hidden;
+                    min-width: 100%;
+                  "
+                >
+                  <tbody id="attr-list-sizes"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom: 0;">
+              <div
+                class="card-title"
+                style="font-size: 1.3rem; margin-bottom: 20px;"
+              >
+                Materials
+              </div>
+              <form
+                onsubmit="saveAttribute('materials', event)"
+                style="display: flex; gap: 10px; margin-bottom: 20px;"
+              >
+                <input
+                  type="text"
+                  id="attr-materials-input"
+                  placeholder="e.g. Pure Silk, Cotton"
+                  required
+                  style="padding: 10px; flex: 1;"
+                />
+                <button type="submit" class="btn btn-dark btn-small">
+                  Add
+                </button>
+              </form>
+              <div class="table-container">
+                <table
+                  style="
+                    border: 1px solid var(--border-color);
+                    border-radius: 4px;
+                    overflow: hidden;
+                    min-width: 100%;
+                  "
+                >
+                  <tbody id="attr-list-materials"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom: 0;">
+              <div
+                class="card-title"
+                style="font-size: 1.3rem; margin-bottom: 20px;"
+              >
+                Global Color Palette
+              </div>
+              <form
+                onsubmit="saveColorAttribute(event)"
+                style="display: flex; gap: 10px; margin-bottom: 20px;"
+              >
+                <input
+                  type="color"
+                  id="attr-color-hex"
+                  value="#000000"
+                  style="
+                    width: 45px;
+                    height: 45px;
+                    padding: 0;
+                    cursor: pointer;
+                    border: none;
+                    background: transparent;
+                  "
+                />
+                <input
+                  type="text"
+                  id="attr-color-name"
+                  placeholder="e.g. Crimson Red"
+                  required
+                  style="padding: 10px; flex: 1;"
+                />
+                <button type="submit" class="btn btn-dark btn-small">
+                  Add
+                </button>
+              </form>
+              <div class="table-container">
+                <table
+                  style="
+                    border: 1px solid var(--border-color);
+                    border-radius: 4px;
+                    overflow: hidden;
+                    min-width: 100%;
+                  "
+                >
+                  <tbody id="attr-list-colors"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TABBED PRODUCT EDITOR -->
+        <section id="view-editor" class="view-section">
+          <button
+            class="btn btn-outline btn-small"
+            style="margin-bottom: 20px;"
+            onclick="switchView('view-products')"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill="none"
+              style="margin-right: 8px;"
+            >
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Return to Catalog
+          </button>
+          <div class="card" style="max-width: 1000px;">
+            <div class="card-header" style="margin-bottom: 30px;">
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+                <div class="card-title" id="editor-title">
+                  Create Master Product
+                </div>
+                <div
+                  id="draft-controls"
+                  style="display: none; align-items: center; gap: 10px;"
+                >
+                  <span
+                    id="draft-time"
+                    style="
+                      font-size: 0.75rem;
+                      color: var(--text-light);
+                      font-weight: 600;
+                      text-transform: uppercase;
+                    "
+                  ></span>
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-small"
+                    onclick="discardDraft()"
+                    style="
+                      padding: 4px 8px;
+                      font-size: 0.65rem;
+                      border-color: var(--danger);
+                      color: var(--danger);
+                    "
+                  >
+                    Discard Unsaved Changes
+                  </button>
+                </div>
+              </div>
+              <select
+                id="prod-status"
+                class="filter-select"
+                style="font-weight: 600; min-width: 130px;"
+              >
+                <option value="active">🟢 Active (Live)</option>
+                <option value="draft">🟠 Draft (Hidden)</option>
+                <option value="archived">⚫ Archived</option>
+              </select>
+            </div>
+            <form id="product-form" onsubmit="saveProduct(event)" novalidate>
+              <input type="hidden" id="prod-id" />
+              <div class="editor-tabs">
+                <div
+                  class="editor-tab active"
+                  onclick="window.switchEditorTab('tab-general', this)"
+                >
+                  1. Core Details
+                </div>
+                <div
+                  class="editor-tab"
+                  onclick="window.switchEditorTab('tab-pricing', this)"
+                >
+                  2. Pricing
+                </div>
+                <div
+                  class="editor-tab"
+                  onclick="window.switchEditorTab('tab-inventory', this)"
+                >
+                  3. Inventory & Attributes
+                </div>
+                <div
+                  class="editor-tab"
+                  onclick="window.switchEditorTab('tab-media', this)"
+                >
+                  4. Media
+                </div>
+                <div
+                  class="editor-tab"
+                  onclick="window.switchEditorTab('tab-narrative', this)"
+                >
+                  5. Narratives
+                </div>
+                <div
+                  class="editor-tab"
+                  onclick="window.switchEditorTab('tab-inspector', this)"
+                >
+                  6. Craftsmanship
+                </div>
+              </div>
+              <div class="tab-content-wrapper" style="min-height: 350px;">
+                <div id="tab-general" class="tab-pane active">
+                  <div class="form-grid">
+                    <div class="form-group full">
+                      <label>Product Title *</label>
+                      <input
+                        type="text"
+                        id="prod-title"
+                        required
+                        placeholder="e.g. Midnight Jamdani Saree"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Category *</label>
+                      <div style="display: flex; gap: 10px;">
+                        <select
+                          id="prod-category"
+                          onchange="handleCategorySelect(this)"
+                          required
+                        ></select>
+                        <input
+                          type="text"
+                          id="prod-category-new"
+                          placeholder="Type new category..."
+                          style="display: none; flex: 1;"
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>Barcode / UPC (Optional)</label>
+                      <input
+                        type="text"
+                        id="prod-barcode"
+                        placeholder="Scan or enter barcode"
+                      />
+                    </div>
+                    <div class="form-group full">
+                      <label>Stock Keeping Unit (SKU)</label>
+                      <input
+                        type="text"
+                        id="prod-sku"
+                        placeholder="e.g. SNZ-JAM-001"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div id="tab-pricing" class="tab-pane">
+                  <div class="form-grid form-group third">
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>Base Price (৳) *</label>
+                      <input
+                        type="number"
+                        id="prod-price"
+                        required
+                        placeholder="12500"
+                        oninput="calculateDiscount()"
+                      />
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>Discount Type</label>
+                      <select
+                        id="prod-discount-type"
+                        onchange="calculateDiscount()"
+                      >
+                        <option value="none">No Discount</option>
+                        <option value="percent">Percentage (%)</option>
+                        <option value="fixed">Fixed Amount (৳)</option>
+                      </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>Discount Value</label>
+                      <input
+                        type="number"
+                        id="prod-discount-val"
+                        placeholder="0"
+                        oninput="calculateDiscount()"
+                      />
+                    </div>
+                    <div
+                      class="form-group full"
+                      id="discount-indicator-wrap"
+                      style="display: none; margin-top: -10px;"
+                    >
+                      <div
+                        id="discount-indicator"
+                        style="
+                          font-size: 0.85rem;
+                          font-weight: bold;
+                          color: var(--danger);
+                          padding: 12px;
+                          background: rgba(217, 48, 37, 0.08);
+                          border-radius: 4px;
+                          border: 1px dashed var(--danger);
+                        "
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="tab-inventory" class="tab-pane">
+                  <div class="form-grid" style="margin-bottom: 30px;">
+                    <div class="form-group">
+                      <label>Current Physical Stock *</label>
+                      <input
+                        type="number"
+                        id="prod-stock"
+                        placeholder="e.g. 50"
+                        required
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Low Stock Alert Threshold *</label>
+                      <input
+                        type="number"
+                        id="prod-stock-alert"
+                        placeholder="e.g. 5"
+                        required
+                      />
+                    </div>
+                    <div class="form-group full">
+                      <label>Available Sizes</label>
+                      <div id="quick-sizes" style="margin-bottom: 10px;"></div>
+                      <div class="tags-container" id="size-tags-container">
+                        <input
+                          type="text"
+                          id="size-input"
+                          class="tag-input"
+                          placeholder="Type custom and press Enter..."
+                        />
+                      </div>
+                      <input type="hidden" id="prod-sizes" />
+                    </div>
+                    <div class="form-group full">
+                      <label>Materials & Fabric Details</label>
+                      <div
+                        id="quick-materials"
+                        style="margin-bottom: 10px;"
+                      ></div>
+                      <div class="tags-container" id="material-tags-container">
+                        <input
+                          type="text"
+                          id="material-input"
+                          class="tag-input"
+                          placeholder="Type custom and press Enter..."
+                        />
+                      </div>
+                      <input type="hidden" id="prod-materials" />
+                    </div>
+                  </div>
+
+                  <label class="color-header-label">
+                    <span
+                      >Colorways
+                      <span
+                        style="
+                          font-size: 0.65rem;
+                          color: var(--success);
+                          text-transform: none;
+                          margin-left: 5px;
+                        "
+                        >(Auto-detects typed names!)</span
+                      ></span
+                    >
+                    <select
+                      id="quick-color-select"
+                      class="filter-select"
+                      style="
+                        padding: 6px 10px;
+                        font-size: 0.75rem;
+                        min-width: 180px;
+                      "
+                      onchange="quickAddColor(this)"
+                    >
+                      <option value="">⚡ Quick Add Global Color...</option>
+                    </select>
+                  </label>
+                  <div id="color-list" class="dynamic-list"></div>
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-small"
+                    onclick="addColorItem()"
+                  >
+                    + Add Custom Colorway
+                  </button>
+                </div>
+
+                <div id="tab-media" class="tab-pane">
+                  <p
+                    style="
+                      font-size: 0.75rem;
+                      color: var(--text-light);
+                      margin-bottom: 20px;
+                      text-transform: uppercase;
+                      letter-spacing: 1px;
+                    "
+                  >
+                    Paste image URLs. Select the radio button to designate the
+                    Primary Photo.
+                  </p>
+                  <div id="img-list" class="dynamic-list"></div>
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-small"
+                    onclick="addDynamicImageItem()"
+                  >
+                    + Add Image Slot
+                  </button>
+                </div>
+
+                <div id="tab-narrative" class="tab-pane">
+                  <div class="form-group full">
+                    <label>The Description</label>
+                    <textarea
+                      id="prod-desc"
+                      placeholder="A masterful expression..."
+                    ></textarea>
+                  </div>
+                  <div class="form-group full">
+                    <label>Details & Care</label>
+                    <textarea
+                      id="prod-care"
+                      placeholder="<ul><li>100% Pure Silk</li></ul>"
+                    ></textarea>
+                  </div>
+                  <div class="form-group full">
+                    <label>Shipping & Returns</label>
+                    <textarea
+                      id="prod-shipping"
+                      placeholder="<p>Domestic Delivery: 3-5 business days...</p>"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div id="tab-inspector" class="tab-pane">
+                  <p
+                    style="
+                      font-size: 0.75rem;
+                      color: var(--text-light);
+                      margin-bottom: 10px;
+                      text-transform: uppercase;
+                      letter-spacing: 1px;
+                    "
+                  >
+                    Select an image to inspect. Click on the image to map detail
+                    coordinates.
+                  </p>
+                  <div
+                    id="inspector-thumb-selector"
+                    style="
+                      display: flex;
+                      gap: 10px;
+                      margin-bottom: 20px;
+                      overflow-x: auto;
+                      padding-bottom: 10px;
+                    "
+                  ></div>
+                  <div
+                    class="inspector-layout"
+                    style="display: flex; gap: 30px; align-items: flex-start;"
+                  >
+                    <div
+                      class="inspector-left"
+                      id="inspector-img-wrap"
+                      style="
+                        flex: 1;
+                        position: relative;
+                        background: var(--bg-main);
+                        border: 1px dashed #ccc;
+                        border-radius: 6px;
+                        overflow: hidden;
+                        cursor: crosshair;
+                      "
+                    >
+                      <img
+                        id="inspector-main-img"
+                        src=""
+                        style="
+                          width: 100%;
+                          display: none;
+                          pointer-events: none;
+                        "
+                      />
+                      <div
+                        id="inspector-placeholder"
+                        style="
+                          padding: 100px 20px;
+                          text-align: center;
+                          color: var(--text-light);
+                          font-size: 0.8rem;
+                          text-transform: uppercase;
+                          pointer-events: none;
+                        "
+                      >
+                        Assign Image URLs in the Media tab first.
+                      </div>
+                      <div
+                        id="inspector-markers-container"
+                        style="
+                          position: absolute;
+                          inset: 0;
+                          pointer-events: none;
+                        "
+                      ></div>
+                    </div>
+                    <div
+                      class="inspector-right"
+                      id="inspector-forms-container"
+                      style="flex: 1; max-height: 600px; overflow-y: auto;"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="
+                  margin-top: 40px;
+                  display: flex;
+                  justify-content: flex-end;
+                  gap: 20px;
+                  padding-top: 30px;
+                  border-top: 1px solid var(--border-color);
+                "
+              >
+                <button type="submit" class="btn btn-dark" id="btn-save-prod">
+                  Commit Configuration to Database
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- STOREFRONT BUILDER -->
+        <section id="view-builder" class="view-section">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Storefront Architecture</div>
+            </div>
+            <p
+              style="
+                color: var(--text-light);
+                margin-bottom: 30px;
+                font-size: 0.8rem;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+              "
+            >
+              Curate the visual hierarchy of the homepage.
+            </p>
+            <h3
+              style="
+                font-family: 'Playfair Display';
+                color: var(--accent);
+                font-size: 1.2rem;
+                margin-bottom: 20px;
+              "
+            >
+              Latest Arrivals (Hero Grid)
+            </h3>
+            <div id="builder-latest" class="builder-grid"></div>
+            <hr />
+            <h3
+              style="
+                font-family: 'Playfair Display';
+                color: var(--accent);
+                font-size: 1.2rem;
+                margin-bottom: 20px;
+              "
+            >
+              Featured Categories (Grid of 3)
+            </h3>
+            <p
+              style="
+                color: var(--text-light);
+                margin-bottom: 20px;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+              "
+            >
+              Select category and assign an image visual for the storefront.
+            </p>
+            <div
+              id="builder-categories"
+              class="builder-grid"
+              style="
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+              "
+            ></div>
+            <hr />
+            <h3
+              style="
+                font-family: 'Playfair Display';
+                color: var(--accent);
+                font-size: 1.2rem;
+                margin-bottom: 20px;
+              "
+            >
+              Curated Edit (Horizontal Reel)
+            </h3>
+            <div id="builder-curated" class="builder-grid"></div>
+            <div
+              style="
+                margin-top: 50px;
+                text-align: right;
+                padding-top: 30px;
+                border-top: 1px solid var(--border-color);
+              "
+            >
+              <button
+                class="btn btn-dark"
+                id="btn-save-layout"
+                onclick="saveHomepageLayout()"
+              >
+                Publish Storefront Live
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- CUSTOM CONFIRM MODAL -->
+    <div class="modal-overlay" id="custom-confirm-modal" style="z-index: 3000;">
+      <div class="confirm-card">
+        <h3 id="confirm-title">Confirm Action</h3>
+        <p id="confirm-message">Are you sure you want to proceed?</p>
+        <div class="confirm-actions">
+          <button class="btn btn-outline" id="confirm-cancel-btn">
+            Cancel
+          </button>
+          <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK VIEW MODAL (Premium Redesign) -->
+    <div class="modal-overlay" id="quick-view-modal">
+      <div class="quick-view-card">
+        <button class="close-modal" onclick="closeModal('quick-view-modal')">
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="qv-left">
+          <div class="qv-thumbnails" id="qv-thumbnails-container"></div>
+          <div class="qv-main-img-box">
+            <img id="qv-main-img" src="" alt="Preview" />
+          </div>
+        </div>
+        <div class="qv-right">
+          <div class="qv-meta">
+            <div class="qv-category" id="qv-category">Category</div>
+            <div class="qv-sku" id="qv-sku">SKU: N/A</div>
+          </div>
+          <div class="qv-title" id="qv-title">Product Title</div>
+          <div class="qv-price" id="qv-price">৳0</div>
+          <div style="margin-bottom: 25px;">
+            <span id="qv-stock-status" class="status-badge">In Stock</span>
+          </div>
+          <div class="qv-desc" id="qv-desc">Description</div>
+          <div class="qv-section-title">Colorways</div>
+          <div
+            style="
+              display: flex;
+              gap: 12px;
+              margin-bottom: 25px;
+              flex-wrap: wrap;
+            "
+            id="qv-colors"
+          ></div>
+          <div class="qv-section-title">Sizes</div>
+          <div
+            style="
+              display: flex;
+              gap: 12px;
+              flex-wrap: wrap;
+              margin-bottom: 25px;
+            "
+            id="qv-sizes"
+          ></div>
+          <div class="qv-section-title">Materials</div>
+          <div
+            style="display: flex; gap: 10px; flex-wrap: wrap;"
+            id="qv-materials"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDER INSPECTOR MODAL -->
+    <div class="modal-overlay" id="order-inspector-modal">
+      <div class="order-inspector-card">
+        <button
+          class="close-modal"
+          onclick="closeModal('order-inspector-modal')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="oi-header">
+          <div>
+            <div class="oi-title" id="oi-order-id">#NR-XXXXXX</div>
+            <div
+              style="
+                font-size: 0.8rem;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin-top: 5px;
+              "
+              id="oi-date"
+            >
+              Date
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <select
+              id="oi-status-select"
+              class="filter-select"
+              style="font-weight: 600; border-color: var(--accent);"
+            >
+              <option value="Pending">Pending</option>
+              <option value="Processing">Processing</option>
+              <option value="Shipped">Shipped</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+            <button
+              class="btn btn-dark btn-small"
+              onclick="updateOrderStatus()"
+            >
+              Save State
+            </button>
+            <button
+              class="btn btn-outline btn-small"
+              onclick="generateOrderInvoice()"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+                style="margin-right: 5px;"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              PDF Invoice
+            </button>
+          </div>
+        </div>
+        <div class="oi-body">
+          <div class="oi-grid">
+            <div class="oi-box">
+              <h4>Customer Information</h4>
+              <p><strong id="oi-cust-name">Name</strong></p>
+              <p>Email: <span id="oi-cust-email">N/A</span></p>
+              <p>Phone: <span id="oi-cust-phone">N/A</span></p>
+              <p style="margin-top: 15px;">
+                <strong>Shipping Address:</strong><br /><span
+                  id="oi-cust-address"
+                  >Address</span
+                >
+              </p>
+            </div>
+            <div class="oi-box">
+              <h4>Payment Verification</h4>
+              <p>Method: <strong id="oi-pay-method">COD</strong></p>
+              <p>TrxID: <span id="oi-pay-trx">N/A</span></p>
+              <p>Sender No: <span id="oi-pay-sender">N/A</span></p>
+            </div>
+          </div>
+          <table class="oi-items-table">
+            <thead>
+              <tr>
+                <th>Item Context</th>
+                <th style="text-align: center;">Qty</th>
+                <th style="text-align: right;">Unit Value</th>
+                <th style="text-align: right;">Total</th>
+              </tr>
+            </thead>
+            <tbody id="oi-items-body"></tbody>
+          </table>
+          <div class="oi-financials">
+            <div class="oi-fin-line">
+              <span>Subtotal</span><span id="oi-fin-sub">৳0</span>
+            </div>
+            <div class="oi-fin-line">
+              <span>Shipping Fee</span><span id="oi-fin-ship">৳0</span>
+            </div>
+            <div class="oi-fin-line total">
+              <span>Grand Total</span><span id="oi-fin-total">৳0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECRET INVOICE HTML FOR HTML2PDF CAPTURE -->
+    <div id="admin-invoice-capture-area">
+      <div class="inv-head">
+        <div>
+          <div style="display: flex; align-items: center;">
+            <img
+              src="Shinozz-official-logo-dark.png"
+              alt="SHINOZZ"
+              style="
+                height: 55px;
+                width: auto;
+                min-width: 180px;
+                object-fit: contain;
+                display: block;
+              "
+            />
+          </div>
+          <div
+            style="
+              font-size: 0.85rem;
+              text-transform: uppercase;
+              letter-spacing: 4px;
+              color: #777;
+              margin-top: 15px;
+            "
+          >
+            Official Receipt / Tax Invoice
+          </div>
+        </div>
+        <div class="inv-info">
+          <strong style="font-size: 1.2rem; color: #111;" id="pdf-id"
+            >#NR-XXXXXX</strong
+          ><br /><span id="pdf-date" style="color: #555;">Date</span>
+        </div>
+      </div>
+      <div class="inv-grid">
+        <div class="inv-col">
+          <h4>Billed To</h4>
+          <p>
+            <strong
+              style="font-weight: 600; color: #111; font-size: 1rem;"
+              id="pdf-name"
+              >Name</strong
+            ><br /><span id="pdf-phone">Phone</span><br /><span id="pdf-address"
+              >Address</span
+            >
+          </p>
+        </div>
+        <div class="inv-col" style="text-align: right;">
+          <h4>Payment Method</h4>
+          <p id="pdf-pay" style="font-weight: 600;">Cash on Delivery</p>
+        </div>
+      </div>
+      <table class="inv-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th style="text-align: center;">Qty</th>
+            <th style="text-align: right;">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="pdf-items"></tbody>
+      </table>
+      <div class="inv-totals">
+        <div class="inv-tot-line">
+          <span>Subtotal</span><span id="pdf-sub">৳0</span>
+        </div>
+        <div class="inv-tot-line">
+          <span>Shipping</span><span id="pdf-ship">৳0</span>
+        </div>
+        <div class="inv-tot-line grand">
+          <span>Grand Total</span><span id="pdf-total">৳0</span>
+        </div>
+        <div
+          class="inv-tot-line"
+          style="color: var(--success); font-weight: 600; margin-top: 10px;"
+        >
+          <span>Amount Paid</span><span id="pdf-paid">৳0</span>
+        </div>
+        <div
+          class="inv-tot-line"
+          style="color: var(--danger); font-weight: 600;"
+        >
+          <span>Amount Due</span><span id="pdf-due">৳0</span>
+        </div>
+      </div>
+      <div
+        style="
+          text-align: center;
+          margin-top: 60px;
+          font-size: 0.85rem;
+          color: #777;
+          font-style: italic;
+        "
+      >
+        Thank you for shopping with SHINOZZ. This is a computer generated
+        invoice.
+      </div>
+    </div>
+
+    <div class="toast" id="toast"><span id="toast-msg">Success</span></div>
+
+    <!-- FIREBASE & LOGIC -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        getDocs,
+        doc,
+        setDoc,
+        deleteDoc,
+        getDoc,
+        updateDoc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyB_km98m8zCgkFtdHqDmeV7P8S302swJBg",
+        authDomain: "softshilpo-ecommerce-project.firebaseapp.com",
+        projectId: "softshilpo-ecommerce-project",
+        storageBucket: "softshilpo-ecommerce-project.firebasestorage.app",
+        messagingSenderId: "616850288094",
+        appId: "1:616850288094:web:70eaf6549b433cabeec14f",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      // Databases
+      let productsDB = [];
+      let filteredDB = [];
+      let customersDB = [];
+      let ordersDB = [];
+      let filteredOrdersDB = [];
+      let storeConfig = { shippingInside: 80, shippingOutside: 150 };
+
+      let layoutDB = {
+        latest: ["", "", "", ""],
+        curated: ["", "", "", ""],
+        categories: [
+          { name: "", img: "" },
+          { name: "", img: "" },
+          { name: "", img: "" },
+        ],
+      };
+
+      let attributesDB = {
+        categories: [
+          { name: "Sarees", img: "" },
+          { name: "Pret-A-Porter", img: "" },
+        ],
+        sizes: ["XS", "S", "M", "L", "XL"],
+        materials: ["Pure Silk", "Cotton"],
+        colors: [{ name: "Black", hex: "#000000" }],
+      };
+
+      let currentSizeTags = [];
+      let currentMaterialTags = [];
+      let currentHotspots = [];
+      let isPopulating = false;
+      let activeInspectorImgUrl = "";
+
+      let prodCurrentPage = 1;
+      let custCurrentPage = 1;
+      let orderCurrentPage = 1;
+      const itemsPerPage = 8;
+      let activeOrderId = null;
+
+      const closeSVG = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
+      function showLoader() {
+        document.getElementById("global-loader").style.display = "flex";
+      }
+      function hideLoader() {
+        document.getElementById("global-loader").style.display = "none";
+      }
+      function showToast(msg, isError = false) {
+        const t = document.getElementById("toast");
+        document.getElementById("toast-msg").innerText = msg;
+        if (isError) t.classList.add("error");
+        else t.classList.remove("error");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 3500);
+      }
+
+      window.switchEditorTab = (tabId, el) => {
+        document
+          .querySelectorAll(".editor-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-pane")
+          .forEach((p) => p.classList.remove("active"));
+        if (el) el.classList.add("active");
+        const pane = document.getElementById(tabId);
+        if (pane) pane.classList.add("active");
+
+        if (tabId === "tab-inspector") {
+          window.refreshInspectorImage();
+        }
+      };
+
+      window.customConfirm = (
+        message,
+        title = "Confirm Action",
+        btnText = "Confirm",
+        isDanger = false,
+      ) => {
+        return new Promise((resolve) => {
+          const modal = document.getElementById("custom-confirm-modal");
+          document.getElementById("confirm-title").innerText = title;
+          document.getElementById("confirm-message").innerText = message;
+          const okBtn = document.getElementById("confirm-ok-btn");
+          okBtn.innerText = btnText;
+          if (isDanger) okBtn.className = "btn btn-danger";
+          else okBtn.className = "btn btn-dark";
+          const cleanup = () => {
+            modal.classList.remove("show");
+            okBtn.removeEventListener("click", onOk);
+            cancelBtn.removeEventListener("click", onCancel);
+          };
+          const onOk = () => {
+            cleanup();
+            resolve(true);
+          };
+          const onCancel = () => {
+            cleanup();
+            resolve(false);
+          };
+          okBtn.addEventListener("click", onOk);
+          const cancelBtn = document.getElementById("confirm-cancel-btn");
+          cancelBtn.addEventListener("click", onCancel);
+          modal.classList.add("show");
+        });
+      };
+
+      window.closeModal = (modalId) => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.classList.remove("show");
+        }
+      };
+
+      window.openQuickView = (id) => {
+        const p = productsDB.find((x) => x.id === id);
+        if (!p) return;
+
+        document.getElementById("qv-category").innerText = p.category || "N/A";
+        document.getElementById("qv-sku").innerText = `SKU: ${p.sku || "N/A"}`;
+        document.getElementById("qv-title").innerText = p.title || "Untitled";
+
+        let priceHtml = `৳${(p.price || 0).toLocaleString()}`;
+        if (p.finalPrice && p.finalPrice < p.price) {
+          priceHtml = `<del style="color:#aaa; font-size:0.75rem; margin-right:8px;">৳${p.price.toLocaleString()}</del> ৳${p.finalPrice.toLocaleString()}`;
+        }
+        document.getElementById("qv-price").innerHTML = priceHtml;
+
+        let sQty = Number(p.stock) || 0;
+        let sAlert = Number(p.stockAlert) || 0;
+        let stockBadge = document.getElementById("qv-stock-status");
+        if (sQty <= 0) {
+          stockBadge.className = "status-badge out";
+          stockBadge.innerText = "Out of Stock";
+        } else if (sQty <= sAlert) {
+          stockBadge.className = "status-badge low";
+          stockBadge.innerText = `Low Stock (${sQty})`;
+        } else {
+          stockBadge.className = "status-badge";
+          stockBadge.innerText = `In Stock (${sQty})`;
+        }
+
+        document.getElementById("qv-desc").innerHTML =
+          p.desc || "No description provided.";
+
+        const colorsContainer = document.getElementById("qv-colors");
+        if (p.colors && p.colors.length > 0) {
+          colorsContainer.innerHTML = p.colors
+            .map(
+              (c) =>
+                `<div class="qv-color-swatch" style="background: ${c.hex};" title="${c.name}"></div>`,
+            )
+            .join("");
+        } else {
+          colorsContainer.innerHTML = `<span style="font-size:0.8rem; color:var(--text-light);">None</span>`;
+        }
+
+        const sizesContainer = document.getElementById("qv-sizes");
+        if (p.sizes) {
+          sizesContainer.innerHTML = p.sizes
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s)
+            .map((s) => `<div class="qv-size-box">${s}</div>`)
+            .join("");
+        } else {
+          sizesContainer.innerHTML = `<span style="font-size:0.8rem; color:var(--text-light);">None</span>`;
+        }
+
+        const materialsContainer = document.getElementById("qv-materials");
+        if (p.materials) {
+          materialsContainer.innerHTML = p.materials
+            .split(",")
+            .map((m) => m.trim())
+            .filter((m) => m)
+            .map((m) => `<div class="qv-material-box">${m}</div>`)
+            .join("");
+        } else {
+          materialsContainer.innerHTML = `<span style="font-size:0.8rem; color:var(--text-light);">None</span>`;
+        }
+
+        const thumbContainer = document.getElementById(
+          "qv-thumbnails-container",
+        );
+        const mainImg = document.getElementById("qv-main-img");
+        thumbContainer.innerHTML = "";
+
+        if (p.images && p.images.length > 0) {
+          mainImg.src = p.images[0];
+          p.images.forEach((img, idx) => {
+            const t = document.createElement("img");
+            t.src = img;
+            t.className = idx === 0 ? "qv-thumb active" : "qv-thumb";
+            t.onclick = () => {
+              mainImg.src = img;
+              thumbContainer
+                .querySelectorAll(".qv-thumb")
+                .forEach((th) => th.classList.remove("active"));
+              t.classList.add("active");
+            };
+            thumbContainer.appendChild(t);
+          });
+        } else {
+          mainImg.src = "https://via.placeholder.com/500x750?text=No+Image";
+        }
+
+        document.getElementById("quick-view-modal").classList.add("show");
+      };
+
+      function colorNameToHex(color) {
+        const ctx = document.createElement("canvas").getContext("2d");
+        ctx.fillStyle = color;
+        return ctx.fillStyle;
+      }
+      function isValidHex(hex) {
+        return /^#[0-9A-F]{6}$/i.test(hex);
+      }
+      function formatDate(ts) {
+        if (!ts) return "N/A";
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      window.openSidebar = () => {
+        document.querySelector(".sidebar").classList.add("open");
+        document.getElementById("mobile-sidebar-overlay").classList.add("show");
+      };
+      window.closeSidebar = () => {
+        document.querySelector(".sidebar").classList.remove("open");
+        document
+          .getElementById("mobile-sidebar-overlay")
+          .classList.remove("show");
+      };
+
+      // Auth
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          document.getElementById("auth-overlay").style.opacity = "0";
+          setTimeout(
+            () =>
+              (document.getElementById("auth-overlay").style.display = "none"),
+            400,
+          );
+          await fetchData();
+          initRealtimeOrders();
+          const savedView =
+            localStorage.getItem("shinozz_active_view") || "view-dashboard";
+          if (savedView === "view-editor") switchView("view-products");
+          else switchView(savedView);
+        } else {
+          document.getElementById("auth-overlay").style.display = "flex";
+          setTimeout(
+            () => (document.getElementById("auth-overlay").style.opacity = "1"),
+            50,
+          );
+        }
+      });
+
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const errBox = document.getElementById("auth-error-msg");
+          try {
+            errBox.style.display = "none";
+            e.target.querySelector("button").innerText = "Authenticating...";
+            await signInWithEmailAndPassword(
+              auth,
+              document.getElementById("auth-email").value,
+              document.getElementById("auth-pass").value,
+            );
+          } catch (error) {
+            errBox.innerText = "Invalid Credentials. Access Denied.";
+            errBox.style.display = "block";
+            e.target.querySelector("button").innerText = "Access System";
+          }
+        });
+      window.logoutAdmin = async () => {
+        localStorage.removeItem("shinozz_active_view");
+        await signOut(auth);
+        window.location.reload();
+      };
+
+      // View Switcher
+      window.switchView = (viewId) => {
+        closeSidebar();
+        document
+          .querySelectorAll(".view-section")
+          .forEach((v) => v.classList.remove("active"));
+        document.getElementById(viewId).classList.add("active");
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        let nav = document.querySelector(`.nav-item[data-target="${viewId}"]`);
+        if (nav) nav.classList.add("active");
+        const titles = {
+          "view-dashboard": "Overview",
+          "view-orders": "Order Intelligence",
+          "view-products": "Master Catalog",
+          "view-customers": "Clientele Database",
+          "view-attributes": "System Attributes",
+          "view-builder": "Storefront Builder",
+          "view-editor": "Product Intelligence Engine",
+          "view-settings": "System Config",
+        };
+        document.getElementById("topbar-title").innerText =
+          titles[viewId] || "Overview";
+        if (viewId !== "view-editor")
+          localStorage.setItem("shinozz_active_view", viewId);
+        if (viewId === "view-products") filterCatalog();
+        if (viewId === "view-orders") filterOrders();
+        if (viewId === "view-dashboard") updateDashboardStats();
+        if (viewId === "view-builder") renderBuilder();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
+      document
+        .querySelectorAll(".nav-item")
+        .forEach((item) =>
+          item.addEventListener("click", () =>
+            switchView(item.getAttribute("data-target")),
+          ),
+        );
+
+      async function fetchData() {
+        showLoader();
+        try {
+          productsDB = [];
+          const querySnapshot = await getDocs(collection(db, "products"));
+          querySnapshot.forEach((doc) =>
+            productsDB.push({ id: doc.id, ...doc.data() }),
+          );
+          filteredDB = [...productsDB];
+
+          const layoutSnap = await getDoc(doc(db, "settings", "layout"));
+          if (layoutSnap.exists()) {
+            const lData = layoutSnap.data();
+            layoutDB.latest = Array.isArray(lData.latest)
+              ? lData.latest
+              : ["", "", "", ""];
+            layoutDB.curated = Array.isArray(lData.curated)
+              ? lData.curated
+              : ["", "", "", ""];
+            layoutDB.categories = Array.isArray(lData.categories)
+              ? lData.categories
+              : [
+                  { name: "", img: "" },
+                  { name: "", img: "" },
+                  { name: "", img: "" },
+                ];
+          }
+
+          const configSnap = await getDoc(doc(db, "settings", "store_config"));
+          if (configSnap.exists()) {
+            storeConfig = configSnap.data();
+            const sci = document.getElementById("config-shipping-inside");
+            const sco = document.getElementById("config-shipping-outside");
+            if (sci)
+              sci.value =
+                storeConfig.shippingInside !== undefined
+                  ? storeConfig.shippingInside
+                  : 80;
+            if (sco)
+              sco.value =
+                storeConfig.shippingOutside !== undefined
+                  ? storeConfig.shippingOutside
+                  : 150;
+          } else {
+            const sci = document.getElementById("config-shipping-inside");
+            const sco = document.getElementById("config-shipping-outside");
+            if (sci) sci.value = 80;
+            if (sco) sco.value = 150;
+          }
+
+          const attrSnap = await getDoc(
+            doc(db, "settings", "global_attributes"),
+          );
+          if (attrSnap.exists()) {
+            attributesDB = { ...attributesDB, ...attrSnap.data() };
+            if (Array.isArray(attributesDB.categories)) {
+              attributesDB.categories = attributesDB.categories.map((c) =>
+                typeof c === "string" ? { name: c, img: "" } : c,
+              );
+            }
+          }
+
+          try {
+            customersDB = [];
+            const custSnap = await getDocs(collection(db, "users"));
+            custSnap.forEach((doc) =>
+              customersDB.push({ id: doc.id, ...doc.data() }),
+            );
+          } catch (e) {}
+
+          updateDashboardStats();
+          refreshGlobalAttributesUI();
+          filterCatalog();
+          renderCustomersTable();
+          renderBuilder();
+        } catch (e) {
+          showToast("Database Sync Failed", true);
+        }
+        hideLoader();
+      }
+
+      function updateDashboardStats() {
+        const elProd = document.getElementById("stat-products");
+        if (elProd) elProd.innerText = productsDB.length;
+        const elCust = document.getElementById("stat-customers");
+        if (elCust) elCust.innerText = customersDB.length;
+        const elStock = document.getElementById("stat-stock");
+        if (elStock)
+          elStock.innerText = productsDB.reduce(
+            (acc, p) => acc + (Number(p.stock) || 0),
+            0,
+          );
+        const elOrders = document.getElementById("stat-orders");
+        if (elOrders) elOrders.innerText = ordersDB.length;
+        const elRev = document.getElementById("stat-revenue");
+        if (elRev) {
+          const totalRevenue = ordersDB
+            .filter((o) => o.status !== "Cancelled")
+            .reduce((acc, o) => acc + (o.financials?.total || 0), 0);
+          elRev.innerText = `৳${totalRevenue.toLocaleString()}`;
+        }
+      }
+
+      function initRealtimeOrders() {
+        const ordersRef = collection(db, "orders");
+        onSnapshot(ordersRef, (snapshot) => {
+          ordersDB = [];
+          snapshot.forEach((doc) => {
+            ordersDB.push({ id: doc.id, ...doc.data() });
+          });
+          ordersDB.sort((a, b) => {
+            const timeA = a.createdAt?.seconds || 0;
+            const timeB = b.createdAt?.seconds || 0;
+            return timeB - timeA;
+          });
+          updateNotificationUI();
+          updateDashboardStats();
+          if (
+            document.getElementById("view-orders").classList.contains("active")
+          ) {
+            filterOrders();
+          }
+        });
+      }
+
+      window.toggleNotifications = () => {
+        document.getElementById("notif-dropdown").classList.toggle("show");
+      };
+      document.addEventListener("click", function (event) {
+        const bell = document.querySelector(".notification-bell");
+        const drop = document.getElementById("notif-dropdown");
+        if (
+          bell &&
+          !bell.contains(event.target) &&
+          !drop.contains(event.target)
+        ) {
+          drop.classList.remove("show");
+        }
+      });
+
+      function updateNotificationUI() {
+        const pendingOrders = ordersDB.filter((o) => o.status === "Pending");
+        const badge = document.getElementById("notif-badge");
+        const list = document.getElementById("notif-list");
+        if (pendingOrders.length > 0) {
+          badge.style.display = "flex";
+          badge.innerText =
+            pendingOrders.length > 9 ? "9+" : pendingOrders.length;
+        } else {
+          badge.style.display = "none";
+        }
+        list.innerHTML = "";
+        if (pendingOrders.length === 0) {
+          list.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-light); font-size: 0.8rem;">No pending orders.</div>`;
+          return;
+        }
+        pendingOrders.slice(0, 5).forEach((o) => {
+          const shortId = "NR-" + o.id.toUpperCase().substring(0, 8);
+          const time = formatDate(o.createdAt);
+          list.innerHTML += `<a href="#" class="notif-item" onclick="switchView('view-orders'); openOrderInspector('${
+            o.id
+          }'); toggleNotifications(); return false;"><div class="notif-title">New Order: ${shortId}</div><div class="notif-time">${
+            o.customer.firstName
+          } • ৳${(
+            o.financials?.total || 0
+          ).toLocaleString()}</div><div class="notif-time" style="margin-top:2px;">${time}</div></a>`;
+        });
+      }
+
+      window.filterOrders = () => {
+        const q = document.getElementById("order-search").value.toLowerCase();
+        const status = document.getElementById("order-filter-status").value;
+        filteredOrdersDB = ordersDB.filter((o) => {
+          const shortId = "nr-" + o.id.toLowerCase().substring(0, 8);
+          let matchQ =
+            shortId.includes(q) ||
+            (o.customer.firstName + " " + o.customer.lastName)
+              .toLowerCase()
+              .includes(q) ||
+            o.customer.phone.includes(q);
+          let matchStatus = status === "all" || o.status === status;
+          return matchQ && matchStatus;
+        });
+        orderCurrentPage = 1;
+        renderOrdersTable();
+      };
+      window.changeOrderPage = (p) => {
+        orderCurrentPage = p;
+        renderOrdersTable();
+      };
+
+      function renderOrdersTable() {
+        const start = (orderCurrentPage - 1) * itemsPerPage;
+        const paginated = filteredOrdersDB.slice(start, start + itemsPerPage);
+        const tbody = document.getElementById("orders-table-body");
+        tbody.innerHTML = "";
+        if (filteredOrdersDB.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px; color: var(--text-light);">No orders found.</td></tr>`;
+          document.getElementById("order-pagination").innerHTML = "";
+          return;
+        }
+        paginated.forEach((o) => {
+          const shortId = "NR-" + o.id.toUpperCase().substring(0, 8);
+          const time = formatDate(o.createdAt);
+          const statClass = o.status ? o.status.toLowerCase() : "pending";
+          const badge = `<span class="oms-badge ${statClass}">${o.status}</span>`;
+          tbody.innerHTML += `<tr><td><strong style="font-family:monospace; font-size:1rem;">${shortId}</strong></td><td><strong style="font-size:1rem; font-family:'Playfair Display';">${
+            o.customer.firstName
+          } ${
+            o.customer.lastName
+          }</strong><br><span style="font-size:0.75rem; color:var(--text-light);">${
+            o.customer.phone
+          }</span></td><td><span style="font-size:0.85rem; color:var(--text-light);">${time}</span></td><td><strong>৳${(
+            o.financials?.total || 0
+          ).toLocaleString()}</strong><br><span style="font-size:0.7rem; color:var(--text-light); text-transform:uppercase;">${
+            o.payment.method === "cod" ? "COD" : "Prepaid"
+          }</span></td><td>${badge}</td><td style="text-align: right;"><button class="btn-icon-only" onclick="openOrderInspector('${
+            o.id
+          }')"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button></td></tr>`;
+        });
+        renderPagination(
+          filteredOrdersDB.length,
+          orderCurrentPage,
+          "order-pagination",
+          "changeOrderPage",
+        );
+      }
+
+      window.openOrderInspector = (id) => {
+        const o = ordersDB.find((x) => x.id === id);
+        if (!o) return;
+        activeOrderId = id;
+        const shortId = "NR-" + o.id.toUpperCase().substring(0, 8);
+        document.getElementById("oi-order-id").innerText = `#${shortId}`;
+        document.getElementById("oi-date").innerText = `Received: ${formatDate(
+          o.createdAt,
+        )}`;
+        document.getElementById("oi-status-select").value =
+          o.status || "Pending";
+        document.getElementById(
+          "oi-cust-name",
+        ).innerText = `${o.customer.firstName} ${o.customer.lastName}`;
+        document.getElementById("oi-cust-email").innerText =
+          o.customer.email || "N/A";
+        document.getElementById("oi-cust-phone").innerText = o.customer.phone;
+        document.getElementById("oi-cust-address").innerText = `City: ${
+          o.customer.city
+        }, Thana: ${o.customer.thana || "N/A"}, Postal Code: ${
+          o.customer.zip !== "N/A" ? o.customer.zip : "N/A"
+        }, Full Address: ${o.customer.address}`;
+
+        const isCod = o.payment.method === "cod";
+        document.getElementById("oi-pay-method").innerText = isCod
+          ? "Cash on Delivery"
+          : "Mobile Banking";
+        document.getElementById("oi-pay-trx").innerText =
+          o.payment.trxId || "N/A";
+        document.getElementById("oi-pay-sender").innerText =
+          o.payment.sendingNumber || "N/A";
+
+        const tbody = document.getElementById("oi-items-body");
+        tbody.innerHTML = "";
+
+        if (o.items && o.items.length) {
+          o.items.forEach((item) => {
+            const prod = productsDB.find((p) => p.id === item.id);
+            const sku = prod && prod.sku ? prod.sku : "N/A";
+            const imgUrl =
+              item.img || "https://via.placeholder.com/60x80?text=No+Image";
+
+            tbody.innerHTML += `<tr>
+              <td>
+                <div style="display:flex; align-items:center; gap:15px;">
+                  <img src="${imgUrl}" alt="${
+              item.title
+            }" style="width: 50px; height: 65px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color); flex-shrink: 0;" />
+                  <div>
+                    <strong style="font-family:'Playfair Display'; font-size:1.05rem;">${
+                      item.title
+                    }</strong><br>
+                    <span style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase; line-height: 1.4; display: inline-block; margin-top: 4px;">
+                      Color: ${item.color} | Size: ${item.size}<br>
+                      SKU: ${sku} | ID: ${item.id}
+                    </span>
+                  </div>
+                </div>
+              </td>
+              <td style="text-align:center;">${item.qty}</td>
+              <td style="text-align:right;">৳${item.price.toLocaleString()}</td>
+              <td style="text-align:right; font-weight:600;">৳${(
+                item.price * item.qty
+              ).toLocaleString()}</td>
+            </tr>`;
+          });
+        }
+
+        const grandTotal = o.financials.total;
+        const paid = isCod ? 0 : grandTotal;
+        const due = isCod ? grandTotal : 0;
+
+        document.getElementById(
+          "oi-fin-sub",
+        ).innerText = `৳${o.financials.subtotal.toLocaleString()}`;
+        document.getElementById(
+          "oi-fin-ship",
+        ).innerText = `৳${o.financials.shipping.toLocaleString()}`;
+        document.getElementById(
+          "oi-fin-total",
+        ).innerText = `৳${grandTotal.toLocaleString()}`;
+
+        // PDF Generation Injectors
+        document.getElementById("pdf-id").innerText = `#${shortId}`;
+        document.getElementById("pdf-date").innerText = formatDate(o.createdAt);
+        document.getElementById(
+          "pdf-name",
+        ).innerText = `${o.customer.firstName} ${o.customer.lastName}`;
+        document.getElementById("pdf-phone").innerText = o.customer.phone;
+        document.getElementById("pdf-address").innerText = `City: ${
+          o.customer.city
+        }, Thana: ${o.customer.thana || "N/A"}, Postal Code: ${
+          o.customer.zip !== "N/A" ? o.customer.zip : "N/A"
+        }, Full Address: ${o.customer.address}`;
+        document.getElementById("pdf-pay").innerText = isCod
+          ? "Cash on Delivery"
+          : "Prepaid (Mobile Banking)";
+
+        const ptbody = document.getElementById("pdf-items");
+        ptbody.innerHTML = "";
+        if (o.items && o.items.length) {
+          o.items.forEach((item) => {
+            const prod = productsDB.find((p) => p.id === item.id);
+            const sku = prod && prod.sku ? prod.sku : "N/A";
+            ptbody.innerHTML += `<tr>
+              <td style="padding: 15px 12px; border-bottom: 1px solid #ddd;">
+                <div style="font-family:'Playfair Display'; font-weight:600; font-size:1.1rem; color:#111;">${
+                  item.title
+                }</div>
+                <div style="font-size:0.75rem; color:#777; margin-top: 4px;">
+                  Color: ${item.color} | Size: ${item.size}<br>
+                  SKU: ${sku} | ID: ${item.id}
+                </div>
+              </td>
+              <td style="text-align:center; vertical-align:middle; padding: 15px 12px; border-bottom: 1px solid #ddd;">${
+                item.qty
+              }</td>
+              <td style="text-align:right; vertical-align:middle; padding: 15px 12px; border-bottom: 1px solid #ddd;">৳${(
+                item.price * item.qty
+              ).toLocaleString()}</td>
+            </tr>`;
+          });
+        }
+
+        document.getElementById(
+          "pdf-sub",
+        ).innerText = `৳${o.financials.subtotal.toLocaleString()}`;
+        document.getElementById(
+          "pdf-ship",
+        ).innerText = `৳${o.financials.shipping.toLocaleString()}`;
+        document.getElementById(
+          "pdf-total",
+        ).innerText = `৳${grandTotal.toLocaleString()}`;
+        document.getElementById(
+          "pdf-paid",
+        ).innerText = `৳${paid.toLocaleString()}`;
+        document.getElementById(
+          "pdf-due",
+        ).innerText = `৳${due.toLocaleString()}`;
+
+        document.getElementById("order-inspector-modal").classList.add("show");
+      };
+
+      window.updateOrderStatus = async () => {
+        if (!activeOrderId) return;
+        const newStatus = document.getElementById("oi-status-select").value;
+        showLoader();
+        try {
+          await updateDoc(doc(db, "orders", activeOrderId), {
+            status: newStatus,
+          });
+          showToast("Fulfillment State Updated");
+        } catch (e) {
+          showToast("Failed to update status", true);
+        }
+        hideLoader();
+      };
+
+      window.generateOrderInvoice = () => {
+        if (!activeOrderId) return;
+
+        // Show loader to indicate processing
+        showLoader();
+
+        const o = ordersDB.find((x) => x.id === activeOrderId);
+        const shortId = "NR-" + o.id.toUpperCase().substring(0, 8);
+        const originalElement = document.getElementById(
+          "admin-invoice-capture-area",
+        );
+
+        // Create a hidden wrapper off-screen to prevent UI flashing or breaking layout
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "fixed";
+        wrapper.style.left = "-9999px";
+        wrapper.style.top = "-9999px";
+
+        // Clone the invoice template and make it visible inside the wrapper
+        const clone = originalElement.cloneNode(true);
+        clone.id = "temp-invoice-clone";
+        clone.style.display = "block";
+
+        wrapper.appendChild(clone);
+        document.body.appendChild(wrapper);
+
+        const opt = {
+          margin: 0.5,
+          filename: `SHINOZZ_Invoice_${shortId}.pdf`,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, allowTaint: true },
+          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+        };
+
+        // Allow 1 second for any dynamic images inside the clone to fully load
+        setTimeout(() => {
+          try {
+            html2pdf()
+              .set(opt)
+              .from(clone)
+              .save()
+              .then(() => {
+                document.body.removeChild(wrapper);
+                hideLoader();
+                showToast("Invoice Generated Successfully!");
+              })
+              .catch((e) => {
+                console.error("html2pdf generation error:", e);
+                document.body.removeChild(wrapper);
+                hideLoader();
+                showToast("Failed to generate PDF. Check console.", true);
+              });
+          } catch (e) {
+            console.error("html2pdf initialization error:", e);
+            document.body.removeChild(wrapper);
+            hideLoader();
+            showToast("Library error. Please try again.", true);
+          }
+        }, 1000);
+      };
+
+      window.saveStoreConfig = async (e) => {
+        e.preventDefault();
+        const shipInside = document.getElementById("config-shipping-inside")
+          .value;
+        const shipOutside = document.getElementById("config-shipping-outside")
+          .value;
+        const btn = document.getElementById("btn-save-config");
+        btn.innerText = "Applying...";
+        try {
+          await setDoc(
+            doc(db, "settings", "store_config"),
+            {
+              shippingInside: Number(shipInside),
+              shippingOutside: Number(shipOutside),
+            },
+            { merge: true },
+          );
+          showToast("Configuration Applied");
+          storeConfig.shippingInside = Number(shipInside);
+          storeConfig.shippingOutside = Number(shipOutside);
+        } catch (err) {
+          showToast("Update Failed", true);
+        }
+        btn.innerText = "Apply Configuration";
+      };
+
+      async function syncAttributesDB() {
+        try {
+          await setDoc(doc(db, "settings", "global_attributes"), attributesDB);
+          refreshGlobalAttributesUI();
+          renderBuilder();
+        } catch (e) {
+          showToast("Failed to save attribute", true);
+        }
+      }
+      function refreshGlobalAttributesUI() {
+        const renderTextList = (type) =>
+          attributesDB[type]
+            .map(
+              (val, i) =>
+                `<tr><td><strong>${val}</strong></td><td style="text-align: right;"><button class="btn-action-sm danger" style="margin-left:auto;" onclick="deleteAttribute('${type}', ${i})">${closeSVG}</button></td></tr>`,
+            )
+            .join("");
+        document.getElementById(
+          "attr-list-categories",
+        ).innerHTML = attributesDB.categories
+          .map(
+            (c, i) =>
+              `<tr><td style="display:flex; align-items:center; gap:15px;"><div style="width:40px; height:40px; border-radius:4px; background:var(--bg-main); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">${
+                c.img
+                  ? `<img src="${c.img}" style="width:100%; height:100%; object-fit:cover;">`
+                  : `<span style="font-size:10px; color:#aaa;">No Img</span>`
+              }</div><strong>${
+                c.name
+              }</strong></td><td style="text-align: right;"><button class="btn-action-sm danger" style="margin-left:auto;" onclick="deleteCategoryAttribute(${i})">${closeSVG}</button></td></tr>`,
+          )
+          .join("");
+        document.getElementById("attr-list-sizes").innerHTML = renderTextList(
+          "sizes",
+        );
+        document.getElementById(
+          "attr-list-materials",
+        ).innerHTML = renderTextList("materials");
+        document.getElementById(
+          "attr-list-colors",
+        ).innerHTML = attributesDB.colors
+          .map(
+            (c, i) =>
+              `<tr><td style="display:flex; align-items:center; gap:10px;"><div style="width:20px; height:20px; border-radius:50%; background:${c.hex}; border:1px solid #ccc; flex-shrink:0;"></div> <strong>${c.name}</strong></td><td style="text-align: right;"><button class="btn-action-sm danger" style="margin-left:auto;" onclick="deleteAttribute('colors', ${i})">${closeSVG}</button></td></tr>`,
+          )
+          .join("");
+        let catFilter = '<option value="all">All Categories</option>',
+          catEdit = '<option value="">Select Category...</option>';
+        attributesDB.categories.forEach((c) => {
+          catFilter += `<option value="${c.name}">${c.name}</option>`;
+          catEdit += `<option value="${c.name}">${c.name}</option>`;
+        });
+        catEdit += `<option value="_new" style="font-weight:bold; color:var(--accent);">➕ Create New Category</option>`;
+        document.getElementById("filter-category").innerHTML = catFilter;
+        document.getElementById("prod-category").innerHTML = catEdit;
+
+        // Render Quick Chips for the Editor
+        document.getElementById(
+          "quick-sizes",
+        ).innerHTML = attributesDB.sizes
+          .map(
+            (s) =>
+              `<span class="quick-chip" onclick="addTagFromQuick('${s}', 'size')">+ ${s}</span>`,
+          )
+          .join("");
+        document.getElementById(
+          "quick-materials",
+        ).innerHTML = attributesDB.materials
+          .map(
+            (m) =>
+              `<span class="quick-chip" onclick="addTagFromQuick('${m}', 'material')">+ ${m}</span>`,
+          )
+          .join("");
+        document.getElementById("quick-color-select").innerHTML =
+          `<option value="">⚡ Quick Add Global Color...</option>` +
+          attributesDB.colors
+            .map((c, i) => `<option value="${i}">${c.name}</option>`)
+            .join("");
+      }
+      window.saveCategoryAttribute = (e) => {
+        e.preventDefault();
+        const nameInput = document.getElementById("attr-categories-input");
+        const imgInput = document.getElementById("attr-categories-img-input");
+        const name = nameInput.value.trim();
+        const img = imgInput.value.trim();
+        if (!name || attributesDB.categories.find((c) => c.name === name))
+          return showToast("Invalid or duplicate", true);
+        attributesDB.categories.push({ name, img });
+        nameInput.value = "";
+        imgInput.value = "";
+        syncAttributesDB();
+        showToast("Category Added");
+      };
+      window.deleteCategoryAttribute = async (index) => {
+        if (
+          !(await customConfirm(
+            "Delete this category attribute?",
+            "System Alert",
+            "Delete",
+            true,
+          ))
+        )
+          return;
+        attributesDB.categories.splice(index, 1);
+        syncAttributesDB();
+        showToast("Deleted");
+      };
+      window.saveAttribute = (type, e) => {
+        e.preventDefault();
+        const input = document.getElementById(`attr-${type}-input`);
+        const val = input.value.trim();
+        if (!val || attributesDB[type].includes(val))
+          return showToast("Invalid or duplicate", true);
+        attributesDB[type].push(val);
+        input.value = "";
+        syncAttributesDB();
+        showToast("Added Successfully");
+      };
+      window.saveColorAttribute = (e) => {
+        e.preventDefault();
+        const name = document.getElementById("attr-color-name").value.trim();
+        const hex = document.getElementById("attr-color-hex").value;
+        if (!name) return;
+        attributesDB.colors.push({ name, hex });
+        document.getElementById("attr-color-name").value = "";
+        syncAttributesDB();
+        showToast("Color Added");
+      };
+      window.deleteAttribute = async (type, index) => {
+        if (
+          !(await customConfirm(
+            "Delete this global attribute?",
+            "System Alert",
+            "Delete",
+            true,
+          ))
+        )
+          return;
+        attributesDB[type].splice(index, 1);
+        syncAttributesDB();
+        showToast("Deleted");
+      };
+      window.handleCategorySelect = (select) => {
+        const input = document.getElementById("prod-category-new");
+        if (select.value === "_new") {
+          select.style.display = "none";
+          input.style.display = "block";
+          input.focus();
+        }
+      };
+
+      function renderPagination(
+        totalItems,
+        currentPage,
+        containerId,
+        callbackName,
+      ) {
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const container = document.getElementById(containerId);
+        if (totalPages <= 1) {
+          container.innerHTML = "";
+          return;
+        }
+        container.innerHTML = `<button class="page-btn" ${
+          currentPage === 1 ? "disabled" : ""
+        } onclick="${callbackName}(${
+          currentPage - 1
+        })">Prev</button><span class="page-info">Page ${currentPage} of ${totalPages}</span><button class="page-btn" ${
+          currentPage === totalPages ? "disabled" : ""
+        } onclick="${callbackName}(${currentPage + 1})">Next</button>`;
+      }
+      window.changeCustPage = (p) => {
+        custCurrentPage = p;
+        renderCustomersTable();
+      };
+      function renderCustomersTable() {
+        const start = (custCurrentPage - 1) * itemsPerPage;
+        const paginated = customersDB.slice(start, start + itemsPerPage);
+        const tbody = document.getElementById("customers-table-body");
+        tbody.innerHTML = "";
+        paginated.forEach((c) => {
+          tbody.innerHTML += `<tr><td><strong style="font-family:'Playfair Display'; font-size: 1.1rem;">${
+            c.name
+          }</strong></td><td style="color:var(--text-light);">${
+            c.email
+          }</td><td>${c.orders || 0}</td><td><strong>৳${(
+            c.ltv || 0
+          ).toLocaleString()}</strong></td></tr>`;
+        });
+        renderPagination(
+          customersDB.length,
+          custCurrentPage,
+          "customer-pagination",
+          "changeCustPage",
+        );
+      }
+
+      window.filterCatalog = () => {
+        const q = document.getElementById("filter-search").value.toLowerCase();
+        const status = document.getElementById("filter-status").value;
+        const cat = document.getElementById("filter-category").value;
+        const stockFilter = document.getElementById("filter-stock").value;
+        filteredDB = productsDB.filter((p) => {
+          let matchQ =
+            p.title.toLowerCase().includes(q) ||
+            (p.sku && p.sku.toLowerCase().includes(q));
+          let matchStatus =
+            status === "all" || (p.status || "active") === status;
+          let matchCat = cat === "all" || p.category === cat;
+          let sQty = Number(p.stock) || 0;
+          let sAlert = Number(p.stockAlert) || 0;
+          let matchStock = true;
+          if (stockFilter === "out_stock") matchStock = sQty <= 0;
+          else if (stockFilter === "low_stock")
+            matchStock = sQty > 0 && sQty <= sAlert;
+          else if (stockFilter === "in_stock") matchStock = sQty > sAlert;
+          return matchQ && matchStatus && matchCat && matchStock;
+        });
+        prodCurrentPage = 1;
+        renderProductsTable();
+      };
+      window.changeProdPage = (p) => {
+        prodCurrentPage = p;
+        renderProductsTable();
+      };
+      function renderProductsTable() {
+        const start = (prodCurrentPage - 1) * itemsPerPage;
+        const paginated = filteredDB.slice(start, start + itemsPerPage);
+        const tbody = document.getElementById("product-table-body");
+        tbody.innerHTML = "";
+        if (filteredDB.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-light);">No products found matching criteria.</td></tr>`;
+          document.getElementById("product-pagination").innerHTML = "";
+          return;
+        }
+        paginated.forEach((p) => {
+          let priceHtml = `৳${(p.price || 0).toLocaleString()}`;
+          if (p.finalPrice && p.finalPrice < p.price)
+            priceHtml = `<del style="color:#aaa; font-size:0.8rem;">৳${p.price.toLocaleString()}</del><br><strong style="color:var(--accent); font-size:1.1rem;">৳${p.finalPrice.toLocaleString()}</strong>`;
+          let img =
+            p.images && p.images[0]
+              ? p.images[0]
+              : "https://via.placeholder.com/60x80?text=NA";
+          let sQty = Number(p.stock) || 0;
+          let sAlert = Number(p.stockAlert) || 0;
+          let stockBadge = "";
+          if (sQty <= 0)
+            stockBadge = `<span class="status-badge out">Out of Stock</span>`;
+          else if (sQty <= sAlert)
+            stockBadge = `<span class="status-badge low">Low Stock (${sQty})</span>`;
+          else
+            stockBadge = `<span class="status-badge">In Stock (${sQty})</span>`;
+          let statBadge = `<span class="state-badge ${p.status || "active"}">${
+            p.status || "active"
+          }</span>`;
+          tbody.innerHTML += `<tr><td><img src="${img}" class="prod-img-mini" loading="lazy"></td><td><strong style="font-size:1.1rem; font-family:'Playfair Display';">${
+            p.title
+          }</strong> ${statBadge}<br><span style="font-size:0.7rem; color:var(--text-light); text-transform:uppercase; letter-spacing:1px;">SKU: ${
+            p.sku || "N/A"
+          } | ${
+            p.category
+          }</span></td><td>${priceHtml}</td><td>${stockBadge}</td><td style="text-align: right; white-space: nowrap;"><button class="btn-icon-only" title="Quick View" onclick="openQuickView('${
+            p.id
+          }')"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button><button class="btn-icon-only" title="Edit" onclick="editProduct('${
+            p.id
+          }')" style="margin: 0 5px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button><button class="btn-icon-only" title="Delete" onclick="deleteProduct('${
+            p.id
+          }')" style="color: var(--danger); border-color: rgba(217,48,37,0.3);"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></td></tr>`;
+        });
+        renderPagination(
+          filteredDB.length,
+          prodCurrentPage,
+          "product-pagination",
+          "changeProdPage",
+        );
+      }
+      window.exportCatalogCSV = () => {
+        if (filteredDB.length === 0)
+          return showToast("No products to export", true);
+        let csv =
+          "ID,Status,SKU,Barcode,Title,Category,BasePrice,FinalPrice,StockQty,LowStockAlert\n";
+        filteredDB.forEach((p) => {
+          csv += `${p.id},${p.status || "active"},${p.sku || ""},${
+            p.barcode || ""
+          },"${p.title}",${p.category},${p.price},${p.finalPrice || p.price},${
+            p.stock || 0
+          },${p.stockAlert || 0}\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "SHINOZZ_Catalog.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast("Data Exported");
+      };
+
+      window.calculateDiscount = () => {
+        const price =
+          parseFloat(document.getElementById("prod-price").value) || 0;
+        const type = document.getElementById("prod-discount-type").value;
+        const val =
+          parseFloat(document.getElementById("prod-discount-val").value) || 0;
+        const wrap = document.getElementById("discount-indicator-wrap");
+        const ind = document.getElementById("discount-indicator");
+        if (price > 0 && type !== "none" && val > 0) {
+          let finalPrice =
+            type === "percent" ? price - price * (val / 100) : price - val;
+          ind.innerText = `${
+            type === "percent" ? val + "%" : "৳" + val
+          } OFF Applied. Final Price: ৳${Math.round(
+            finalPrice,
+          ).toLocaleString()}`;
+          wrap.style.display = "block";
+        } else wrap.style.display = "none";
+      };
+
+      let draftTimeout;
+      window.triggerDraftSave = () => {
+        if (
+          isPopulating ||
+          !document.getElementById("view-editor").classList.contains("active")
+        )
+          return;
+        clearTimeout(draftTimeout);
+        draftTimeout = setTimeout(() => {
+          const id = document.getElementById("prod-id").value;
+          let finalCategory = document.getElementById("prod-category").value;
+          let categoryIsNew = finalCategory === "_new";
+          if (categoryIsNew)
+            finalCategory = document
+              .getElementById("prod-category-new")
+              .value.trim();
+          let primaryUrl = "";
+          let secondaryUrls = [];
+          document
+            .getElementById("img-list")
+            .querySelectorAll(".dynamic-item")
+            .forEach((item) => {
+              const url = item.querySelector(".dyn-val").value.trim();
+              if (url) {
+                if (
+                  item.querySelector(".img-primary-radio").checked &&
+                  !primaryUrl
+                )
+                  primaryUrl = url;
+                else secondaryUrls.push(url);
+              }
+            });
+          let finalImages = [];
+          if (primaryUrl) finalImages.push(primaryUrl);
+          finalImages = finalImages.concat(secondaryUrls);
+          const colors = Array.from(
+            document
+              .getElementById("color-list")
+              .querySelectorAll(".dynamic-item"),
+          )
+            .map((div) => {
+              return {
+                name: div.querySelector(".color-name").value.trim(),
+                hex: div.querySelector(".color-hex").value,
+              };
+            })
+            .filter((c) => c.name);
+          const draft = {
+            status: document.getElementById("prod-status").value,
+            title: document.getElementById("prod-title").value,
+            sku: document.getElementById("prod-sku").value,
+            barcode: document.getElementById("prod-barcode").value,
+            category: finalCategory,
+            categoryIsNew: categoryIsNew,
+            price: document.getElementById("prod-price").value,
+            discountType: document.getElementById("prod-discount-type").value,
+            discountValue: document.getElementById("prod-discount-val").value,
+            stock: document.getElementById("prod-stock").value,
+            stockAlert: document.getElementById("prod-stock-alert").value,
+            sizes: document.getElementById("prod-sizes").value,
+            materials: document.getElementById("prod-materials").value,
+            desc: document.getElementById("prod-desc").value,
+            care: document.getElementById("prod-care").value,
+            shipping: document.getElementById("prod-shipping").value,
+            images: finalImages,
+            colors: colors,
+            hotspots: currentHotspots,
+          };
+          localStorage.setItem(
+            "shinozz_prod_draft_" + (id || "new"),
+            JSON.stringify(draft),
+          );
+          document.getElementById("draft-controls").style.display = "flex";
+          const d = new Date();
+          document.getElementById("draft-time").innerText =
+            "Unsaved changes auto-saved at " +
+            d.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            });
+        }, 1200);
+      };
+      document
+        .getElementById("product-form")
+        .addEventListener("input", window.triggerDraftSave);
+      document
+        .getElementById("product-form")
+        .addEventListener("change", window.triggerDraftSave);
+
+      window.refreshInspectorImage = () => {
+        const urls = [];
+        let primaryUrl = "";
+        document
+          .getElementById("img-list")
+          .querySelectorAll(".dynamic-item")
+          .forEach((item) => {
+            const url = item.querySelector(".dyn-val").value.trim();
+            if (url) {
+              urls.push(url);
+              if (item.querySelector(".img-primary-radio").checked) {
+                primaryUrl = url;
+              }
+            }
+          });
+        const thumbSelector = document.getElementById(
+          "inspector-thumb-selector",
+        );
+        const imgEl = document.getElementById("inspector-main-img");
+        const placeholder = document.getElementById("inspector-placeholder");
+        if (urls.length === 0) {
+          thumbSelector.innerHTML = "";
+          imgEl.src = "";
+          imgEl.style.display = "none";
+          placeholder.style.display = "block";
+          activeInspectorImgUrl = "";
+          window.renderHotspots();
+          return;
+        }
+        if (!activeInspectorImgUrl || !urls.includes(activeInspectorImgUrl)) {
+          activeInspectorImgUrl = primaryUrl || urls[0];
+        }
+        thumbSelector.innerHTML = urls
+          .map(
+            (url) =>
+              `<img src="${url}" onclick="window.selectInspectorImage('${url}')" style="width: 55px; height: 75px; object-fit: cover; cursor: pointer; border: 2px solid ${
+                url === activeInspectorImgUrl ? "var(--accent)" : "transparent"
+              }; border-radius: 4px; opacity: ${
+                url === activeInspectorImgUrl ? "1" : "0.5"
+              }; transition: 0.3s; flex-shrink: 0;" />`,
+          )
+          .join("");
+        imgEl.src = activeInspectorImgUrl;
+        imgEl.style.display = "block";
+        placeholder.style.display = "none";
+        window.renderHotspots();
+      };
+      window.selectInspectorImage = (url) => {
+        activeInspectorImgUrl = url;
+        window.refreshInspectorImage();
+      };
+      document
+        .getElementById("inspector-img-wrap")
+        .addEventListener("click", function (e) {
+          const img = document.getElementById("inspector-main-img");
+          if (img.style.display === "none" || !activeInspectorImgUrl) return;
+          if (e.target.classList.contains("hotspot-marker")) return;
+          const rect = this.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          currentHotspots.push({
+            x: x.toFixed(2),
+            y: y.toFixed(2),
+            title: "",
+            content: "",
+            macroImg: "",
+            targetImg: activeInspectorImgUrl,
+          });
+          window.renderHotspots();
+          window.triggerDraftSave();
+        });
+      window.updateHotspot = (idx, field, val) => {
+        if (currentHotspots[idx]) {
+          currentHotspots[idx][field] = val;
+          window.triggerDraftSave();
+        }
+      };
+      window.removeHotspot = (idx) => {
+        currentHotspots.splice(idx, 1);
+        window.renderHotspots();
+        window.triggerDraftSave();
+      };
+      window.renderHotspots = () => {
+        const markersContainer = document.getElementById(
+          "inspector-markers-container",
+        );
+        const formsContainer = document.getElementById(
+          "inspector-forms-container",
+        );
+        markersContainer.innerHTML = "";
+        formsContainer.innerHTML = "";
+        let displayIdx = 1;
+        currentHotspots.forEach((hs, originalIdx) => {
+          if (!hs.targetImg && activeInspectorImgUrl) {
+            hs.targetImg = activeInspectorImgUrl;
+          }
+          if (hs.targetImg !== activeInspectorImgUrl) return;
+          const marker = document.createElement("div");
+          marker.className = "hotspot-marker";
+          marker.style.left = `${hs.x}%`;
+          marker.style.top = `${hs.y}%`;
+          marker.innerText = displayIdx;
+          markersContainer.appendChild(marker);
+          const form = document.createElement("div");
+          form.className = "hotspot-form";
+          form.innerHTML = `<div class="hotspot-form-header"><span>Hotspot 0${displayIdx} (X:${hs.x}%, Y:${hs.y}%)</span><button type="button" class="btn-action-sm danger" onclick="removeHotspot(${originalIdx})">${closeSVG}</button></div><input type="text" placeholder="Detail Title (e.g. Intricate Handwoven Border)" value="${hs.title}" oninput="updateHotspot(${originalIdx}, 'title', this.value)" style="margin-bottom: 10px; font-size: 0.8rem; padding: 10px;" /><textarea placeholder="Write an artistic description about this specific detail..." oninput="updateHotspot(${originalIdx}, 'content', this.value)" style="margin-bottom: 10px; font-size: 0.8rem; padding: 10px; min-height:60px;">${hs.content}</textarea><input type="url" placeholder="Macro Image URL (Extreme Close-up)" value="${hs.macroImg}" oninput="updateHotspot(${originalIdx}, 'macroImg', this.value)" style="font-size: 0.8rem; padding: 10px;" />`;
+          formsContainer.appendChild(form);
+          displayIdx++;
+        });
+      };
+
+      // DYNAMIC ITEM GENERATION (WITH FLEXBOX CSS FIXES APPLIED)
+      window.addColorItem = (name = "", hex = "#000000") => {
+        if (!isValidHex(hex)) hex = "#000000";
+        const div = document.createElement("div");
+        div.className = "dynamic-item";
+        div.innerHTML = `
+          <div style="width:36px; height:36px; border-radius:50%; background-color:${hex}; border:1px solid #ccc; flex-shrink:0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);" class="color-preview"></div>
+          <input type="text" placeholder="e.g. Red, Navy, #FF0000" value="${name}" class="color-name" style="flex:1;">
+          <input type="color" value="${hex}" class="color-hex">
+          <button type="button" class="btn-action-sm danger" onclick="this.parentElement.remove(); window.triggerDraftSave();">${closeSVG}</button>
+        `;
+        div.querySelector(".color-hex").addEventListener("input", (e) => {
+          div.querySelector(".color-preview").style.backgroundColor =
+            e.target.value;
+        });
+        div.querySelector(".color-name").addEventListener("input", (e) => {
+          let val = e.target.value.trim();
+          if (!val) return;
+          let convertedHex = colorNameToHex(val);
+          if (
+            (isValidHex(convertedHex) && convertedHex !== "#000000") ||
+            val.toLowerCase() === "black"
+          ) {
+            div.querySelector(".color-hex").value = convertedHex;
+            div.querySelector(
+              ".color-preview",
+            ).style.backgroundColor = convertedHex;
+          }
+        });
+        document.getElementById("color-list").appendChild(div);
+        window.triggerDraftSave();
+      };
+      window.quickAddColor = (sel) => {
+        const idx = sel.value;
+        if (idx === "") return;
+        const col = attributesDB.colors[idx];
+        window.addColorItem(col.name, col.hex);
+        sel.value = "";
+      };
+
+      window.addDynamicImageItem = (val = "", isPrimary = false) => {
+        const div = document.createElement("div");
+        div.className = "dynamic-item";
+        const moveBox = document.createElement("div");
+        moveBox.style.display = "flex";
+        moveBox.style.flexDirection = "column";
+        moveBox.style.gap = "4px";
+        moveBox.innerHTML = `<button type="button" class="btn-action-sm" onclick="this.closest('.dynamic-item').previousElementSibling && this.closest('.dynamic-item').parentNode.insertBefore(this.closest('.dynamic-item'), this.closest('.dynamic-item').previousElementSibling); window.triggerDraftSave();" style="height:20px; font-size:10px;">▲</button><button type="button" class="btn-action-sm" onclick="this.closest('.dynamic-item').nextElementSibling && this.closest('.dynamic-item').parentNode.insertBefore(this.closest('.dynamic-item').nextElementSibling, this.closest('.dynamic-item')); window.triggerDraftSave();" style="height:20px; font-size:10px;">▼</button>`;
+        const imgBox = document.createElement("div");
+        imgBox.className = "img-preview-box";
+        const img = document.createElement("img");
+        if (val) {
+          img.src = val;
+          img.style.display = "block";
+          imgBox.style.border = "none";
+        }
+        imgBox.appendChild(img);
+        const input = document.createElement("input");
+        input.type = "url";
+        input.placeholder = "Paste URL";
+        input.value = val;
+        input.className = "dyn-val";
+        input.style.flex = "1";
+        input.oninput = (e) => {
+          if (e.target.value) {
+            img.src = e.target.value;
+            img.style.display = "block";
+            imgBox.style.border = "none";
+          } else {
+            img.style.display = "none";
+            imgBox.style.border = "1px dashed #ccc";
+          }
+          if (
+            document
+              .getElementById("tab-inspector")
+              .classList.contains("active")
+          ) {
+            window.refreshInspectorImage();
+          }
+        };
+        const radioLabel = document.createElement("label");
+        radioLabel.className = "primary-radio-label";
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "primary-img";
+        radio.className = "img-primary-radio";
+        if (isPrimary) radio.checked = true;
+        radio.onchange = () => {
+          if (
+            document
+              .getElementById("tab-inspector")
+              .classList.contains("active")
+          ) {
+            window.refreshInspectorImage();
+          }
+          window.triggerDraftSave();
+        };
+        radioLabel.appendChild(radio);
+        radioLabel.appendChild(document.createTextNode("Primary"));
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-action-sm danger";
+        btn.innerHTML = closeSVG;
+        btn.onclick = () => {
+          div.remove();
+          if (
+            document
+              .getElementById("tab-inspector")
+              .classList.contains("active")
+          ) {
+            window.refreshInspectorImage();
+          }
+          window.triggerDraftSave();
+        };
+        div.appendChild(moveBox);
+        div.appendChild(imgBox);
+        div.appendChild(input);
+        div.appendChild(radioLabel);
+        div.appendChild(btn);
+        document.getElementById("img-list").appendChild(div);
+        if (document.querySelectorAll(".img-primary-radio").length === 1) {
+          radio.checked = true;
+          if (
+            document
+              .getElementById("tab-inspector")
+              .classList.contains("active")
+          ) {
+            window.refreshInspectorImage();
+          }
+        }
+        window.triggerDraftSave();
+      };
+
+      function initTags(inputId, containerId, hiddenId, arrRef) {
+        const inp = document.getElementById(inputId);
+        const cont = document.getElementById(containerId);
+        const hid = document.getElementById(hiddenId);
+        const render = () => {
+          cont.querySelectorAll(".tag").forEach((t) => t.remove());
+          arrRef.forEach((tag, i) => {
+            const span = document.createElement("div");
+            span.className = "tag";
+            span.innerHTML = `${tag} <span onclick="window.removeTagRef('${hiddenId}', ${i})">${closeSVG}</span>`;
+            cont.insertBefore(span, inp);
+          });
+          hid.value = arrRef.join(", ");
+          window.triggerDraftSave();
+        };
+        inp.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            const val = inp.value.trim().replace(",", "");
+            if (val && !arrRef.includes(val)) {
+              arrRef.push(val);
+              render();
+            }
+            inp.value = "";
+          }
+        });
+        return render;
+      }
+      const renderSizeTags = initTags(
+        "size-input",
+        "size-tags-container",
+        "prod-sizes",
+        currentSizeTags,
+      );
+      const renderMaterialTags = initTags(
+        "material-input",
+        "material-tags-container",
+        "prod-materials",
+        currentMaterialTags,
+      );
+      window.removeTagRef = (type, index) => {
+        if (type === "prod-sizes") {
+          currentSizeTags.splice(index, 1);
+          renderSizeTags();
+        }
+        if (type === "prod-materials") {
+          currentMaterialTags.splice(index, 1);
+          renderMaterialTags();
+        }
+      };
+      window.addTagFromQuick = (val, type) => {
+        if (type === "size" && !currentSizeTags.includes(val)) {
+          currentSizeTags.push(val);
+          renderSizeTags();
+        }
+        if (type === "material" && !currentMaterialTags.includes(val)) {
+          currentMaterialTags.push(val);
+          renderMaterialTags();
+        }
+      };
+
+      window.populateEditor = (p, isDraft = false) => {
+        document.getElementById("prod-status").value = p.status || "active";
+        document.getElementById("prod-title").value = p.title || "";
+        document.getElementById("prod-sku").value = p.sku || "";
+        document.getElementById("prod-barcode").value = p.barcode || "";
+        const catSelect = document.getElementById("prod-category");
+        const catInput = document.getElementById("prod-category-new");
+        if (isDraft && p.categoryIsNew) {
+          catSelect.value = "_new";
+          catSelect.style.display = "none";
+          catInput.style.display = "block";
+          catInput.value = p.category || "";
+        } else if (
+          p.category &&
+          attributesDB.categories.find((c) => c.name === p.category)
+        ) {
+          catSelect.value = p.category;
+          catSelect.style.display = "block";
+          catInput.style.display = "none";
+        } else if (p.category) {
+          catSelect.value = "_new";
+          catSelect.style.display = "none";
+          catInput.style.display = "block";
+          catInput.value = p.category;
+        } else {
+          catSelect.value = "";
+          catSelect.style.display = "block";
+          catInput.style.display = "none";
+        }
+        document.getElementById("prod-price").value = p.price || "";
+        document.getElementById("prod-discount-type").value =
+          p.discountType || "none";
+        document.getElementById("prod-discount-val").value =
+          p.discountValue || "";
+        document.getElementById("prod-stock").value = p.stock || "";
+        document.getElementById("prod-stock-alert").value = p.stockAlert || "";
+        document.getElementById("prod-desc").value = p.desc || "";
+        document.getElementById("prod-care").value = p.care || "";
+        document.getElementById("prod-shipping").value = p.shipping || "";
+        window.calculateDiscount();
+        currentSizeTags.length = 0;
+        if (p.sizes)
+          currentSizeTags.push(
+            ...p.sizes
+              .split(",")
+              .map((s) => s.trim())
+              .filter((s) => s),
+          );
+        renderSizeTags();
+        currentMaterialTags.length = 0;
+        if (p.materials)
+          currentMaterialTags.push(
+            ...p.materials
+              .split(",")
+              .map((s) => s.trim())
+              .filter((s) => s),
+          );
+        renderMaterialTags();
+        document.getElementById("img-list").innerHTML = "";
+        if (p.images && p.images.length > 0)
+          p.images.forEach((img, i) =>
+            window.addDynamicImageItem(img, i === 0),
+          );
+        else window.addDynamicImageItem("", true);
+        document.getElementById("color-list").innerHTML = "";
+        if (p.colors && p.colors.length > 0)
+          p.colors.forEach((c) => window.addColorItem(c.name, c.hex));
+        currentHotspots = p.hotspots
+          ? JSON.parse(JSON.stringify(p.hotspots))
+          : [];
+        let defaultImg = p.images && p.images.length > 0 ? p.images[0] : "";
+        currentHotspots.forEach((hs) => {
+          if (!hs.targetImg) hs.targetImg = defaultImg;
+        });
+        if (
+          document.getElementById("tab-inspector").classList.contains("active")
+        ) {
+          window.refreshInspectorImage();
+        }
+        window.renderHotspots();
+      };
+
+      window.discardDraft = async () => {
+        if (
+          !(await customConfirm(
+            "Discard these unsaved changes? They will be permanently lost.",
+            "Discard Draft",
+            "Discard",
+            true,
+          ))
+        )
+          return;
+        isPopulating = true;
+        const id = document.getElementById("prod-id").value;
+        localStorage.removeItem("shinozz_prod_draft_" + (id || "new"));
+        if (id) {
+          const p = productsDB.find((x) => x.id === id);
+          if (p) window.populateEditor(p, false);
+        } else {
+          document.getElementById("product-form").reset();
+          document.getElementById("prod-category-new").style.display = "none";
+          document.getElementById("prod-category").style.display = "block";
+          document.getElementById("img-list").innerHTML = "";
+          document.getElementById("color-list").innerHTML = "";
+          document.getElementById("discount-indicator-wrap").style.display =
+            "none";
+          currentSizeTags.length = 0;
+          renderSizeTags();
+          currentMaterialTags.length = 0;
+          renderMaterialTags();
+          window.addDynamicImageItem("", true);
+          currentHotspots = [];
+          window.renderHotspots();
+        }
+        document.getElementById("draft-controls").style.display = "none";
+        showToast("Unsaved Changes Discarded");
+        isPopulating = false;
+      };
+
+      window.openProductEditor = () => {
+        isPopulating = true;
+        document.getElementById("product-form").reset();
+        document.getElementById("prod-id").value = "";
+        document.getElementById("editor-title").innerText =
+          "Create Master Product";
+        const draftStr = localStorage.getItem("shinozz_prod_draft_new");
+        if (draftStr) {
+          try {
+            const draft = JSON.parse(draftStr);
+            window.populateEditor(draft, true);
+            document.getElementById("draft-controls").style.display = "flex";
+            document.getElementById("draft-time").innerText =
+              "Unsaved Draft Restored";
+            showToast("Unsaved Draft Restored");
+          } catch (e) {}
+        }
+        if (!draftStr) {
+          document.getElementById("prod-category-new").style.display = "none";
+          document.getElementById("prod-category").style.display = "block";
+          document.getElementById("img-list").innerHTML = "";
+          document.getElementById("color-list").innerHTML = "";
+          document.getElementById("discount-indicator-wrap").style.display =
+            "none";
+          currentSizeTags.length = 0;
+          renderSizeTags();
+          currentMaterialTags.length = 0;
+          renderMaterialTags();
+          window.addDynamicImageItem("", true);
+          currentHotspots = [];
+          window.renderHotspots();
+          document.getElementById("draft-controls").style.display = "none";
+        }
+        window.switchView("view-editor");
+        window.switchEditorTab(
+          "tab-general",
+          document.querySelector(".editor-tab"),
+        );
+        isPopulating = false;
+      };
+
+      window.editProduct = (id) => {
+        isPopulating = true;
+        const p = productsDB.find((x) => x.id === id);
+        if (!p) {
+          isPopulating = false;
+          return;
+        }
+        document.getElementById("prod-id").value = p.id;
+        const draftStr = localStorage.getItem("shinozz_prod_draft_" + id);
+        if (draftStr) {
+          try {
+            const draft = JSON.parse(draftStr);
+            window.populateEditor(draft, true);
+            document.getElementById("draft-controls").style.display = "flex";
+            document.getElementById("draft-time").innerText =
+              "Unsaved Draft Restored";
+            showToast("Unsaved Draft Restored");
+          } catch (e) {
+            window.populateEditor(p, false);
+            document.getElementById("draft-controls").style.display = "none";
+          }
+        } else {
+          window.populateEditor(p, false);
+          document.getElementById("draft-controls").style.display = "none";
+        }
+        document.getElementById("editor-title").innerText =
+          "Configure: " + p.title;
+        window.switchView("view-editor");
+        window.switchEditorTab(
+          "tab-general",
+          document.querySelector(".editor-tab"),
+        );
+        isPopulating = false;
+      };
+
+      window.saveProduct = async (e) => {
+        e.preventDefault();
+        const form = document.getElementById("product-form");
+        if (!form.checkValidity()) {
+          const invalidElements = form.querySelectorAll(":invalid");
+          for (let el of invalidElements) {
+            if (el.id === "prod-category" && el.style.display === "none")
+              continue;
+            const tabPane = el.closest(".tab-pane");
+            if (tabPane) {
+              const tabId = tabPane.id;
+              const tabBtn = document.querySelector(
+                `.editor-tab[onclick*="${tabId}"]`,
+              );
+              if (tabBtn) window.switchEditorTab(tabId, tabBtn);
+            }
+            el.focus();
+            let fieldName = "A required field";
+            const label = el.closest(".form-group")
+              ? el.closest(".form-group").querySelector("label")
+              : null;
+            if (label)
+              fieldName = label.innerText
+                .split("\n")[0]
+                .replace("*", "")
+                .trim();
+            else if (el.placeholder) fieldName = el.placeholder;
+            showToast(`Missing: ${fieldName}`, true);
+            return;
+          }
+        }
+        const btn = document.getElementById("btn-save-prod");
+        btn.innerText = "Synchronizing...";
+        btn.disabled = true;
+        let finalCategory = document.getElementById("prod-category").value;
+        if (finalCategory === "_new") {
+          finalCategory = document
+            .getElementById("prod-category-new")
+            .value.trim();
+          if (!finalCategory) {
+            const tabBtn = document.querySelector(
+              `.editor-tab[onclick*="tab-general"]`,
+            );
+            if (tabBtn) window.switchEditorTab("tab-general", tabBtn);
+            document.getElementById("prod-category-new").focus();
+            showToast("Missing: Category Name", true);
+            btn.innerText = "Commit Configuration to Database";
+            btn.disabled = false;
+            return;
+          }
+          if (!attributesDB.categories.find((c) => c.name === finalCategory)) {
+            attributesDB.categories.push({ name: finalCategory, img: "" });
+            await syncAttributesDB();
+          }
+        }
+        let primaryUrl = "";
+        let secondaryUrls = [];
+        document
+          .getElementById("img-list")
+          .querySelectorAll(".dynamic-item")
+          .forEach((item) => {
+            const url = item.querySelector(".dyn-val").value.trim();
+            if (url) {
+              if (
+                item.querySelector(".img-primary-radio").checked &&
+                !primaryUrl
+              )
+                primaryUrl = url;
+              else secondaryUrls.push(url);
+            }
+          });
+        let finalImages = [];
+        if (primaryUrl) finalImages.push(primaryUrl);
+        finalImages = finalImages.concat(secondaryUrls);
+        const colors = Array.from(
+          document
+            .getElementById("color-list")
+            .querySelectorAll(".dynamic-item"),
+        )
+          .map((div) => {
+            return {
+              name: div.querySelector(".color-name").value.trim(),
+              hex: div.querySelector(".color-hex").value,
+            };
+          })
+          .filter((c) => c.name);
+        const price = Number(document.getElementById("prod-price").value);
+        const dType = document.getElementById("prod-discount-type").value;
+        const dVal =
+          Number(document.getElementById("prod-discount-val").value) || null;
+        let finalPrice = price;
+        if (dType === "percent" && dVal > 0 && dVal <= 100)
+          finalPrice = price - price * (dVal / 100);
+        else if (dType === "fixed" && dVal > 0 && dVal < price)
+          finalPrice = price - dVal;
+        const idField = document.getElementById("prod-id").value;
+        const newId = idField || "prod_" + Date.now().toString();
+        const prodData = {
+          status: document.getElementById("prod-status").value,
+          title: document.getElementById("prod-title").value,
+          sku: document.getElementById("prod-sku").value,
+          barcode: document.getElementById("prod-barcode").value,
+          category: finalCategory,
+          price: price,
+          discountType: dType,
+          discountValue: dVal,
+          finalPrice: Math.round(finalPrice),
+          stock: Number(document.getElementById("prod-stock").value) || 0,
+          stockAlert:
+            Number(document.getElementById("prod-stock-alert").value) || 0,
+          sizes: document.getElementById("prod-sizes").value,
+          materials: document.getElementById("prod-materials").value,
+          desc: document.getElementById("prod-desc").value,
+          care: document.getElementById("prod-care").value,
+          shipping: document.getElementById("prod-shipping").value,
+          images: finalImages,
+          colors: colors,
+          hotspots: currentHotspots,
+          updatedAt: new Date().toISOString(),
+        };
+        try {
+          await setDoc(doc(db, "products", newId), prodData);
+          const index = productsDB.findIndex((x) => x.id === newId);
+          if (index === -1) productsDB.unshift({ id: newId, ...prodData });
+          else productsDB[index] = { id: newId, ...prodData };
+          localStorage.removeItem("shinozz_prod_draft_" + (idField || "new"));
+          document.getElementById("draft-controls").style.display = "none";
+          filterCatalog();
+          renderBuilder();
+          showToast("Product Synchronized");
+          window.switchView("view-products");
+        } catch (err) {
+          showToast("Error saving product.", true);
+        }
+        btn.innerText = "Commit Configuration to Database";
+        btn.disabled = false;
+      };
+
+      window.deleteProduct = async (id) => {
+        if (
+          await customConfirm(
+            "Eradicate this product permanently?",
+            "Eradicate Product",
+            "Eradicate",
+            true,
+          )
+        ) {
+          showLoader();
+          try {
+            await deleteDoc(doc(db, "products", id));
+            productsDB = productsDB.filter((x) => x.id !== id);
+            localStorage.removeItem("shinozz_prod_draft_" + id);
+            filterCatalog();
+            updateDashboardStats();
+            renderBuilder();
+            showToast("Eradicated");
+          } catch (error) {
+            showToast("Deletion Failed", true);
+          }
+          hideLoader();
+        }
+      };
+
+      window.updateBuilderCatPreview = (selectElem) => {
+        const previewDiv = selectElem.nextElementSibling;
+        const catName = selectElem.value;
+        const catObj = attributesDB.categories.find((c) => c.name === catName);
+        const imgUrl = catObj && catObj.img ? catObj.img : "";
+        if (imgUrl)
+          previewDiv.innerHTML = `<img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover; border-radius: 4px;">`;
+        else
+          previewDiv.innerHTML = `<svg viewBox="0 0 24 24" width="32" height="32" stroke="#ccc" stroke-width="1" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`;
+      };
+      function renderBuilder() {
+        const activeProds = productsDB.filter(
+          (p) => p.status === "active" || !p.status,
+        );
+        const buildSelect = (className, selectedId) => {
+          let opts = `<option value="">-- Unassigned --</option>`;
+          activeProds.forEach((p) => {
+            const isSelected = p.id === selectedId ? "selected" : "";
+            opts += `<option value="${p.id}" ${isSelected}>${p.title} (SKU: ${
+              p.sku || "N/A"
+            })</option>`;
+          });
+          return `<select class="${className} filter-select" style="width:100%; border:1px solid var(--border-color);">${opts}</select>`;
+        };
+        let latestHtml = "",
+          curatedHtml = "";
+        for (let i = 0; i < 4; i++) {
+          latestHtml += `<div class="builder-slot"><span class="slot-label">Hero Slot 0${
+            i + 1
+          }</span>${buildSelect("latest-sel", layoutDB.latest[i] || "")}</div>`;
+          curatedHtml += `<div class="builder-slot"><span class="slot-label">Reel Slot 0${
+            i + 1
+          }</span>${buildSelect(
+            "curated-sel",
+            layoutDB.curated[i] || "",
+          )}</div>`;
+        }
+        document.getElementById("builder-latest").innerHTML = latestHtml;
+        document.getElementById("builder-curated").innerHTML = curatedHtml;
+        let catHtml = "";
+        for (let i = 0; i < 3; i++) {
+          let catData =
+            layoutDB.categories && layoutDB.categories[i]
+              ? layoutDB.categories[i]
+              : { name: "", img: "" };
+          let catAttr = attributesDB.categories.find(
+            (c) => c.name === catData.name,
+          );
+          let previewImg = catAttr && catAttr.img ? catAttr.img : catData.img;
+          let opts = `<option value="">-- Select Category --</option>`;
+          attributesDB.categories.forEach((c) => {
+            opts += `<option value="${c.name}" ${
+              c.name === catData.name ? "selected" : ""
+            }>${c.name}</option>`;
+          });
+          catHtml += `<div class="builder-slot"><span class="slot-label">Category Slot 0${
+            i + 1
+          }</span><select class="cat-name-sel filter-select" onchange="updateBuilderCatPreview(this)" style="width:100%; border:1px solid var(--border-color); margin-bottom: 10px;">${opts}</select><div class="builder-cat-preview" style="width:100%; height:180px; background:var(--bg-main); border-radius:4px; overflow:hidden; border:1px dashed #ccc; display:flex; align-items:center; justify-content:center;">${
+            previewImg
+              ? `<img src="${previewImg}" style="width:100%; height:100%; object-fit:cover;">`
+              : `<svg viewBox="0 0 24 24" width="32" height="32" stroke="#ccc" stroke-width="1" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`
+          }</div></div>`;
+        }
+        document.getElementById("builder-categories").innerHTML = catHtml;
+      }
+      window.saveHomepageLayout = async () => {
+        const btn = document.getElementById("btn-save-layout");
+        btn.innerText = "Publishing...";
+        btn.disabled = true;
+        layoutDB.latest = Array.from(
+          document.querySelectorAll(".latest-sel"),
+        ).map((s) => s.value);
+        layoutDB.curated = Array.from(
+          document.querySelectorAll(".curated-sel"),
+        ).map((s) => s.value);
+        const catNames = document.querySelectorAll(".cat-name-sel");
+        layoutDB.categories = [];
+        for (let i = 0; i < 3; i++) {
+          const cName = catNames[i].value;
+          const catObj = attributesDB.categories.find((c) => c.name === cName);
+          layoutDB.categories.push({
+            name: cName,
+            img: catObj && catObj.img ? catObj.img : "",
+          });
+        }
+        try {
+          await setDoc(doc(db, "settings", "layout"), layoutDB);
+          showToast("Storefront Architecture Live");
+        } catch (error) {
+          showToast("Publish Failed", true);
+        }
+        btn.innerText = "Publish Storefront Live";
+        btn.disabled = false;
+      };
+    </script>
+  </body>
+</html>

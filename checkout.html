@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Checkout | Shinooz</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- html2pdf Library for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+      :root {
+        --bg-color: #ffffff;
+        --bg-alt: #f8f8f8;
+        --text-main: #111111;
+        --text-light: #777777;
+        --border-color: #eaeaea;
+        --error-color: #d32f2f;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body,
+      html {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family: "Jost", sans-serif;
+        font-weight: 300;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      header {
+        padding: 25px 5%;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+      }
+      .back-link {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-light);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: color 0.3s;
+      }
+      .back-link:hover {
+        color: var(--text-main);
+      }
+      .back-link svg {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.5;
+      }
+      .logo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        text-decoration: none;
+      }
+      .logo img {
+        height: 45px;
+        width: auto;
+        object-fit: contain;
+      }
+      .secure-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-light);
+      }
+      .secure-badge svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+      }
+
+      .checkout-wrapper {
+        display: flex;
+        min-height: calc(100vh - 85px);
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      .checkout-form-section {
+        flex: 1.2;
+        padding: 60px 8%;
+      }
+      .section-title {
+        font-family: "Playfair Display", serif;
+        font-size: 1.8rem;
+        font-weight: 400;
+        margin-bottom: 30px;
+      }
+      .section-title i {
+        font-style: italic;
+        color: var(--text-light);
+      }
+
+      .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .form-group {
+        position: relative;
+        flex: 1;
+        margin-bottom: 25px;
+      }
+      .form-input {
+        width: 100%;
+        padding: 15px 0 10px 0;
+        font-family: "Jost", sans-serif;
+        font-size: 1rem;
+        font-weight: 400; /* Improved readability */
+        color: var(--text-main);
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        outline: none;
+        transition: border-color 0.3s;
+        border-radius: 0;
+        -webkit-appearance: none;
+      }
+      .form-label {
+        position: absolute;
+        top: 15px;
+        left: 0;
+        font-size: 0.9rem;
+        font-weight: 400; /* Improved readability */
+        color: #555; /* Improved readability */
+        pointer-events: none;
+        transition: all 0.3s ease;
+      }
+      .form-input:focus,
+      .form-input:not(:placeholder-shown) {
+        border-bottom-color: var(--text-main);
+      }
+      .form-input:focus ~ .form-label,
+      .form-input:not(:placeholder-shown) ~ .form-label {
+        top: -10px;
+        font-size: 0.75rem;
+        color: var(--text-main);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .input-hint {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 400; /* Improved readability */
+        color: #444; /* Improved readability */
+        margin-top: 8px;
+        letter-spacing: 0.5px;
+      }
+
+      .payment-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 40px;
+      }
+      .payment-option {
+        border: 1px solid var(--border-color);
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .payment-option-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .payment-title {
+        font-size: 1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .radio-circle {
+        width: 20px;
+        height: 20px;
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.3s;
+      }
+      .radio-inner {
+        width: 10px;
+        height: 10px;
+        background: #fff;
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .payment-option.active {
+        border-color: var(--text-main);
+        background: #fafafa;
+      }
+      .payment-option.active .radio-circle {
+        background: var(--text-main);
+        border-color: var(--text-main);
+      }
+      .payment-option.active .radio-inner {
+        opacity: 1;
+      }
+      .payment-details {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease, margin-top 0.4s ease;
+        opacity: 0;
+      }
+      .payment-option.active .payment-details {
+        max-height: 300px;
+        margin-top: 20px;
+        opacity: 1;
+      }
+      .mobile-money-instructions {
+        font-size: 0.85rem;
+        color: var(--text-main);
+        font-weight: 400;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: #fff;
+        border: 1px dashed var(--border-color);
+      }
+
+      .checkout-btn {
+        width: 100%;
+        padding: 20px;
+        background: var(--text-main);
+        color: #fff;
+        font-family: "Jost", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 500;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+        border-radius: 0;
+      }
+      .checkout-btn:hover {
+        background: #2a2a2a;
+      }
+
+      .checkout-summary-section {
+        flex: 0.8;
+        background: var(--bg-alt);
+        padding: 60px 5%;
+        border-left: 1px solid var(--border-color);
+      }
+      .summary-box {
+        position: sticky;
+        top: 40px;
+      }
+      .summary-item {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .summary-img-wrapper {
+        position: relative;
+        width: 65px;
+        height: 90px;
+        background: #fff;
+        border: 1px solid var(--border-color);
+      }
+      .summary-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .summary-qty-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: var(--text-main);
+        color: #fff;
+        font-size: 0.7rem;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+      }
+      .summary-item-info {
+        flex: 1;
+      }
+      .summary-item-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+      .summary-item-variant {
+        font-size: 0.75rem;
+        color: var(--text-light);
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+      .summary-item-price {
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+      .summary-totals {
+        border-top: 1px solid var(--border-color);
+        margin-top: 30px;
+        padding-top: 20px;
+      }
+      .summary-line {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        font-size: 0.95rem; /* Increased size slightly */
+        color: #444; /* Darkened for better contrast */
+        font-weight: 400; /* Solidified weight */
+      }
+      .summary-total-line {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+        font-size: 1.3rem;
+        font-weight: 500; /* Solidified weight */
+        color: var(--text-main);
+      }
+
+      .mobile-summary-toggle {
+        display: none;
+      }
+
+      /* --- ELEGANT INVOICE & SUCCESS FLOW --- */
+      .success-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(248, 248, 248, 0.98);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+        padding: 40px 20px;
+        overflow-y: auto;
+      }
+      .success-modal.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .success-initial-view {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        max-width: 550px;
+        margin: auto;
+        padding: 50px 40px;
+        background: #fff;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+      }
+
+      .invoice-view {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+
+      .invoice-card {
+        background: #fff;
+        width: 100%;
+        max-width: 650px;
+        padding: 50px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        border-radius: 4px;
+        margin-bottom: 30px;
+        position: relative;
+      }
+
+      .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 2px solid var(--text-main);
+        padding-bottom: 25px;
+        margin-bottom: 30px;
+      }
+      .invoice-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .invoice-brand img {
+        height: 45px;
+        width: auto;
+        min-width: 150px; /* Forces width so it doesn't collapse */
+        object-fit: contain;
+        display: block;
+        margin-bottom: 12px;
+      }
+      .invoice-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--text-light);
+        margin-top: 10px;
+      }
+      .invoice-meta {
+        text-align: right;
+        font-size: 0.85rem;
+        color: var(--text-main);
+      }
+      .invoice-meta strong {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 5px;
+        font-size: 1rem;
+      }
+
+      .invoice-details-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 40px;
+        font-size: 0.9rem;
+      }
+      .invoice-col h4 {
+        font-family: "Jost";
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-light);
+        margin-bottom: 10px;
+      }
+      .invoice-col p {
+        line-height: 1.6;
+      }
+      .inv-status-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border: 1px solid var(--text-main);
+        font-weight: 500;
+        font-size: 0.75rem;
+        margin-top: 10px;
+        letter-spacing: 1.5px;
+      }
+
+      .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+      .invoice-table th {
+        text-align: left;
+        padding: 15px 10px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-light);
+        border-bottom: 1px solid var(--border-color);
+      }
+      .invoice-table td {
+        padding: 15px 10px;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.9rem;
+        vertical-align: middle;
+      }
+      .invoice-table .item-desc {
+        font-weight: 500;
+        font-family: "Playfair Display", serif;
+        font-size: 1.1rem;
+      }
+      .invoice-table .item-meta {
+        font-size: 0.75rem;
+        color: var(--text-light);
+        text-transform: uppercase;
+      }
+
+      .invoice-totals-box {
+        width: 320px;
+        margin-left: auto;
+      }
+      .invoice-tot-line {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        font-size: 0.95rem; /* Increased slightly */
+        color: var(--text-main);
+        font-weight: 400; /* Solidified weight */
+      }
+      .invoice-tot-line.grand {
+        border-top: 2px solid var(--text-main);
+        font-size: 1.2rem;
+        font-weight: 600; /* Solidified weight */
+        margin-top: 10px;
+        padding-top: 15px;
+      }
+
+      .invoice-footer {
+        text-align: center;
+        margin-top: 50px;
+        font-size: 0.8rem;
+        color: var(--text-light);
+        font-style: italic;
+      }
+
+      .success-actions {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 15px;
+      }
+      .btn-pdf {
+        background: var(--text-main);
+        color: #fff;
+        padding: 15px 35px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        border: 1px solid var(--text-main);
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .btn-pdf:hover {
+        background: #2a2a2a;
+      }
+      .btn-return {
+        background: transparent;
+        color: var(--text-main);
+        padding: 15px 35px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        border: 1px solid var(--text-main);
+        text-decoration: none;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .btn-return:hover {
+        background: var(--bg-alt);
+      }
+
+      /* Loader Overlay */
+      #global-loader {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.3s;
+        backdrop-filter: blur(5px);
+      }
+      #global-loader.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--border-color);
+        border-top-color: var(--text-main);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 950px) {
+        .checkout-wrapper {
+          flex-direction: column-reverse;
+        }
+        .checkout-summary-section {
+          border-left: none;
+          border-bottom: 1px solid var(--border-color);
+          padding: 30px 5%;
+          background: #fff;
+        }
+        .checkout-form-section {
+          padding: 40px 5%;
+        }
+        .logo {
+          position: static;
+          transform: none;
+        }
+        .secure-badge span {
+          display: none;
+        }
+        .mobile-summary-toggle {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: var(--bg-alt);
+          padding: 20px 5%;
+          border-bottom: 1px solid var(--border-color);
+          cursor: pointer;
+          font-size: 0.9rem;
+          color: var(--text-main);
+        }
+        .mobile-summary-toggle svg {
+          width: 16px;
+          height: 16px;
+          transition: transform 0.3s;
+        }
+        .checkout-summary-section {
+          display: none;
+        }
+        .checkout-summary-section.expanded {
+          display: block;
+        }
+        .mobile-summary-toggle.expanded svg {
+          transform: rotate(180deg);
+        }
+      }
+      @media (max-width: 600px) {
+        .invoice-card {
+          padding: 30px 20px;
+        }
+        .invoice-header {
+          flex-direction: column;
+          gap: 20px;
+          text-align: left;
+        }
+        .invoice-meta {
+          text-align: left;
+        }
+        .invoice-details-row {
+          flex-direction: column;
+          gap: 20px;
+        }
+        .invoice-totals-box {
+          width: 100%;
+        }
+        .success-actions {
+          flex-direction: column;
+          width: 100%;
+          max-width: 300px;
+        }
+        .btn-pdf,
+        .btn-return {
+          justify-content: center;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Global Loader -->
+    <div id="global-loader">
+      <div class="spinner"></div>
+      <div
+        style="
+          margin-top: 15px;
+          font-size: 0.8rem;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+        "
+      >
+        Processing...
+      </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+      <a href="shop" class="back-link"
+        ><svg viewBox="0 0 24 24">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Return to Shop</a
+      >
+      <a href="home" class="logo">
+        <img src="Shinozz-official-logo-dark.png" alt="SHINOZZ" />
+      </a>
+      <div class="secure-badge">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg
+        ><span>Secure Checkout</span>
+      </div>
+    </header>
+
+    <!-- Mobile Summary Toggle -->
+    <div class="mobile-summary-toggle" id="mobile-summary-toggle">
+      <span style="display: flex; align-items: center; gap: 8px;"
+        ><svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path
+            d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+          ></path>
+        </svg>
+        Show Order Summary</span
+      >
+      <span id="mobile-total-display">৳ 0</span>
+    </div>
+
+    <!-- Main Checkout -->
+    <main class="checkout-wrapper">
+      <div class="checkout-form-section">
+        <h2 class="section-title">Delivery <i>Information</i></h2>
+        <form id="checkout-form">
+          <div class="form-group">
+            <input type="email" id="email" class="form-input" placeholder=" " />
+            <label for="email" class="form-label"
+              >Email Address (Optional)</label
+            >
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input
+                type="text"
+                id="fname"
+                class="form-input"
+                placeholder=" "
+                required
+              />
+              <label for="fname" class="form-label">First Name *</label>
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                id="lname"
+                class="form-input"
+                placeholder=" "
+              />
+              <label for="lname" class="form-label">Last Name (Optional)</label>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 35px;">
+            <input
+              type="tel"
+              id="phone"
+              class="form-input"
+              placeholder=" "
+              required
+            />
+            <label for="phone" class="form-label">Phone Number *</label>
+            <span class="input-hint"
+              >* You will receive a phone call on this number to confirm your
+              order.</span
+            >
+          </div>
+          <div class="form-group">
+            <input
+              type="text"
+              id="address"
+              class="form-input"
+              placeholder=" "
+              required
+            />
+            <label for="address" class="form-label"
+              >Full Delivery Address *</label
+            >
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input
+                type="text"
+                id="city"
+                class="form-input"
+                placeholder=" "
+                required
+              />
+              <label for="city" class="form-label">City / District *</label>
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                id="thana"
+                class="form-input"
+                placeholder=" "
+                required
+              />
+              <label for="thana" class="form-label">Thana / Upazila *</label>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 40px;">
+            <input type="text" id="zip" class="form-input" placeholder=" " />
+            <label for="zip" class="form-label">Postal Code (Optional)</label>
+          </div>
+
+          <h2 class="section-title" style="margin-top: 40px;">
+            Delivery <i>Area</i>
+          </h2>
+          <div class="payment-methods" style="margin-bottom: 30px;">
+            <div
+              class="payment-option active"
+              onclick="selectShipping('inside')"
+              id="opt-ship-inside"
+            >
+              <div class="payment-option-header">
+                <div class="payment-title">
+                  Inside Dhaka
+                  <span
+                    id="label-ship-inside"
+                    style="
+                      color: var(--text-light);
+                      font-size: 0.85rem;
+                      margin-left: 8px;
+                    "
+                    >(৳ 80)</span
+                  >
+                </div>
+                <div class="radio-circle"><div class="radio-inner"></div></div>
+              </div>
+            </div>
+            <div
+              class="payment-option"
+              onclick="selectShipping('outside')"
+              id="opt-ship-outside"
+            >
+              <div class="payment-option-header">
+                <div class="payment-title">
+                  Outside Dhaka
+                  <span
+                    id="label-ship-outside"
+                    style="
+                      color: var(--text-light);
+                      font-size: 0.85rem;
+                      margin-left: 8px;
+                    "
+                    >(৳ 150)</span
+                  >
+                </div>
+                <div class="radio-circle"><div class="radio-inner"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <h2 class="section-title" style="margin-top: 40px;">
+            Payment <i>Method</i>
+          </h2>
+          <div class="payment-methods">
+            <div
+              class="payment-option active"
+              onclick="selectPayment('cod')"
+              id="opt-cod"
+            >
+              <div class="payment-option-header">
+                <div class="payment-title">Cash on Delivery (COD)</div>
+                <div class="radio-circle"><div class="radio-inner"></div></div>
+              </div>
+              <div class="payment-details">
+                <div style="font-size: 0.85rem; color: var(--text-light);">
+                  Pay in cash directly to the courier upon delivery.
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="payment-option"
+              onclick="selectPayment('mobile')"
+              id="opt-mobile"
+            >
+              <div class="payment-option-header">
+                <div class="payment-title">Mobile Banking (bKash / Nagad)</div>
+                <div class="radio-circle"><div class="radio-inner"></div></div>
+              </div>
+              <div class="payment-details">
+                <div class="mobile-money-instructions">
+                  1. Go to your bKash/Nagad app.<br />
+                  2. Select <strong>Send Money</strong> or
+                  <strong>Make Payment</strong>.<br />
+                  3. Send total amount to
+                  <strong>+8801750087889</strong>.<br />
+                  4. Enter the Transaction ID (TrxID) and your sending number
+                  below to verify.
+                </div>
+                <div class="form-row">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <input
+                      type="text"
+                      id="bkash-num"
+                      class="form-input"
+                      placeholder=" "
+                    />
+                    <label for="bkash-num" class="form-label"
+                      >Sending Number</label
+                    >
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <input
+                      type="text"
+                      id="trx-id"
+                      class="form-input"
+                      placeholder=" "
+                    />
+                    <label for="trx-id" class="form-label"
+                      >Transaction ID</label
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="checkout-btn" id="place-order-btn">
+            Place Order
+          </button>
+        </form>
+      </div>
+
+      <div class="checkout-summary-section" id="summary-section">
+        <div class="summary-box">
+          <div id="checkout-items-container"></div>
+          <div class="summary-totals">
+            <div class="summary-line">
+              <span>Subtotal</span><span id="summ-subtotal">৳ 0</span>
+            </div>
+            <div class="summary-line">
+              <span>Delivery</span><span id="summ-shipping">Loading...</span>
+            </div>
+            <div class="summary-total-line">
+              <span>Total</span><span id="summ-total">৳ 0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Success Modal Flow -->
+    <div class="success-modal" id="success-modal">
+      <!-- INITIAL SUCCESS SCREEN -->
+      <div class="success-initial-view" id="success-initial-view">
+        <svg
+          viewBox="0 0 24 24"
+          width="60"
+          height="60"
+          stroke="#2e7d32"
+          stroke-width="1.5"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          style="margin-bottom: 20px;"
+        >
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <h2
+          style="
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 400;
+            margin-bottom: 15px;
+          "
+        >
+          Order Successful!
+        </h2>
+        <p
+          style="
+            color: var(--text-light);
+            margin-bottom: 35px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+          "
+        >
+          Thank you for your purchase. Your order
+          <strong
+            id="success-order-id"
+            style="color: var(--text-main); font-weight: 500;"
+            >#NR-XXXXXX</strong
+          >
+          has been received.<br />We will contact you shortly to confirm the
+          delivery.
+        </p>
+
+        <div
+          style="
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+          "
+        >
+          <button
+            class="btn-pdf"
+            onclick="showInvoiceView()"
+            style="flex: 1; min-width: 200px; justify-content: center;"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              stroke="currentColor"
+              stroke-width="2"
+              fill="none"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              ></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            View Invoice
+          </button>
+          <a
+            href="shop"
+            class="btn-return"
+            style="flex: 1; min-width: 200px; justify-content: center;"
+            >Continue Shopping</a
+          >
+        </div>
+      </div>
+
+      <!-- INVOICE SCREEN (Hidden Initially) -->
+      <div class="invoice-view" id="invoice-view">
+        <div class="invoice-card" id="invoice-capture-area">
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="Shinozz-official-logo-dark.png" alt="SHINOZZ" />
+              <div class="invoice-title">Official Receipt</div>
+            </div>
+            <div class="invoice-meta">
+              <strong id="inv-order-id">#NR-XXXXXX</strong>
+              <span id="inv-date">Date: N/A</span>
+            </div>
+          </div>
+
+          <div class="invoice-details-row">
+            <div class="invoice-col">
+              <h4>Billed To</h4>
+              <p>
+                <strong style="font-weight: 500;" id="inv-name"
+                  >Customer Name</strong
+                ><br />
+                <span id="inv-phone">Phone</span><br />
+                <span id="inv-address">Address</span><br />
+                <span id="inv-city">City</span>
+              </p>
+            </div>
+            <div class="invoice-col" style="text-align: right;">
+              <h4>Payment Method</h4>
+              <p id="inv-payment">Cash on Delivery</p>
+              <div id="inv-status-badge" class="inv-status-badge">
+                STATUS: PENDING
+              </div>
+            </div>
+          </div>
+
+          <table class="invoice-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th style="text-align: center;">Qty</th>
+                <th style="text-align: right;">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="inv-items-body">
+              <!-- Items injected here -->
+            </tbody>
+          </table>
+
+          <div class="invoice-totals-box">
+            <div class="invoice-tot-line">
+              <span>Subtotal</span>
+              <span id="inv-subtotal">৳ 0</span>
+            </div>
+            <div class="invoice-tot-line">
+              <span>Delivery</span>
+              <span id="inv-shipping">৳ 0</span>
+            </div>
+            <div class="invoice-tot-line grand">
+              <span>Total</span>
+              <span id="inv-total">৳ 0</span>
+            </div>
+            <div
+              class="invoice-tot-line"
+              style="
+                margin-top: 15px;
+                border-top: 1px dashed #ddd;
+                padding-top: 15px;
+              "
+            >
+              <span>Amount Paid</span>
+              <span id="inv-paid" style="font-weight: 500; color: #2e7d32;"
+                >৳ 0</span
+              >
+            </div>
+            <div class="invoice-tot-line">
+              <span>Amount Due</span>
+              <span id="inv-due" style="font-weight: 500; color: #d32f2f;"
+                >৳ 0</span
+              >
+            </div>
+          </div>
+
+          <div class="invoice-footer">
+            Thank you for shopping with Shinooz. We hope you love your purchase.
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="success-actions">
+          <button class="btn-return" onclick="showSuccessInitial()">
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              stroke="currentColor"
+              stroke-width="2"
+              fill="none"
+            >
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back
+          </button>
+          <button class="btn-pdf" onclick="downloadInvoicePDF()">
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              stroke="currentColor"
+              stroke-width="2"
+              fill="none"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download PDF
+          </button>
+        </div>
+      </div>
+      <!-- END INVOICE SCREEN -->
+    </div>
+
+    <!-- FIREBASE MODULE -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        doc,
+        getDoc,
+        serverTimestamp,
+      } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyB_km98m8zCgkFtdHqDmeV7P8S302swJBg",
+        authDomain: "softshilpo-ecommerce-project.firebaseapp.com",
+        projectId: "softshilpo-ecommerce-project",
+        storageBucket: "softshilpo-ecommerce-project.firebasestorage.app",
+        messagingSenderId: "616850288094",
+        appId: "1:616850288094:web:70eaf6549b433cabeec14f",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      // DOM Elements
+      const loader = document.getElementById("global-loader");
+
+      // Load Cart Data
+      let cartItems = [];
+      const savedCart = localStorage.getItem("SHINOZZ_cart");
+      if (savedCart) cartItems = JSON.parse(savedCart);
+
+      if (cartItems.length === 0) {
+        window.location.href = "shop";
+      }
+
+      let subtotal = 0;
+      let shippingRates = { inside: 80, outside: 150 };
+      let currentShippingZone = "inside";
+      let shipping = shippingRates.inside;
+      let total = 0;
+
+      window.updateTotals = function () {
+        total = subtotal + shipping;
+        document.getElementById(
+          "summ-subtotal",
+        ).innerText = `৳ ${subtotal.toLocaleString()}`;
+        document.getElementById(
+          "summ-shipping",
+        ).innerText = `৳ ${shipping.toLocaleString()}`;
+        document.getElementById(
+          "summ-total",
+        ).innerText = `৳ ${total.toLocaleString()}`;
+        document.getElementById(
+          "mobile-total-display",
+        ).innerText = `৳ ${total.toLocaleString()}`;
+      };
+
+      window.selectShipping = function (zone) {
+        currentShippingZone = zone;
+        shipping = shippingRates[zone];
+        if (zone === "inside") {
+          document.getElementById("opt-ship-inside").classList.add("active");
+          document
+            .getElementById("opt-ship-outside")
+            .classList.remove("active");
+        } else {
+          document.getElementById("opt-ship-outside").classList.add("active");
+          document.getElementById("opt-ship-inside").classList.remove("active");
+        }
+        updateTotals();
+      };
+
+      // Initialize Checkout Page
+      async function initCheckout() {
+        loader.classList.add("show");
+
+        // 1. Fetch Dynamic Shipping Cost
+        try {
+          const configSnap = await getDoc(doc(db, "settings", "store_config"));
+          if (configSnap.exists()) {
+            const data = configSnap.data();
+            if (data.shippingInside !== undefined)
+              shippingRates.inside = Number(data.shippingInside);
+            if (data.shippingOutside !== undefined)
+              shippingRates.outside = Number(data.shippingOutside);
+          }
+        } catch (err) {
+          console.warn("Could not fetch shipping rates. Using defaults.", err);
+        }
+
+        document.getElementById(
+          "label-ship-inside",
+        ).innerText = `(৳ ${shippingRates.inside})`;
+        document.getElementById(
+          "label-ship-outside",
+        ).innerText = `(৳ ${shippingRates.outside})`;
+        shipping = shippingRates[currentShippingZone];
+
+        // 2. Render Cart Items in Summary
+        const container = document.getElementById("checkout-items-container");
+        container.innerHTML = "";
+
+        cartItems.forEach((item) => {
+          subtotal += item.price * item.qty;
+          const el = document.createElement("div");
+          el.className = "summary-item";
+          el.innerHTML = `
+            <div class="summary-img-wrapper">
+              <img src="${item.img}" alt="${item.title}">
+              <div class="summary-qty-badge">${item.qty}</div>
+            </div>
+            <div class="summary-item-info">
+              <div class="summary-item-title">${item.title}</div>
+              <div class="summary-item-variant">${item.color} / ${
+            item.size
+          }</div>
+            </div>
+            <div class="summary-item-price">৳ ${(
+              item.price * item.qty
+            ).toLocaleString()}</div>
+          `;
+          container.appendChild(el);
+        });
+
+        // 3. Calculate Totals
+        updateTotals();
+
+        loader.classList.remove("show");
+      }
+
+      initCheckout();
+
+      // Mobile Toggle logic
+      const mobileToggle = document.getElementById("mobile-summary-toggle");
+      const summarySection = document.getElementById("summary-section");
+      mobileToggle.addEventListener("click", () => {
+        mobileToggle.classList.toggle("expanded");
+        summarySection.classList.toggle("expanded");
+      });
+
+      // Payment Method Toggle logic
+      let currentPaymentMethod = "cod";
+      window.selectPayment = function (method) {
+        currentPaymentMethod = method;
+        if (method === "cod") {
+          document.getElementById("opt-cod").classList.add("active");
+          document.getElementById("opt-mobile").classList.remove("active");
+          document.getElementById("bkash-num").required = false;
+          document.getElementById("trx-id").required = false;
+        } else {
+          document.getElementById("opt-mobile").classList.add("active");
+          document.getElementById("opt-cod").classList.remove("active");
+          document.getElementById("bkash-num").required = true;
+          document.getElementById("trx-id").required = true;
+        }
+      };
+
+      // Handle Checkout Form Submission
+      document
+        .getElementById("checkout-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById("place-order-btn");
+          btn.innerText = "PROCESSING SECURELY...";
+          btn.style.pointerEvents = "none";
+          loader.classList.add("show");
+
+          try {
+            const lastNameVal =
+              document.getElementById("lname").value.trim() || "N/A";
+
+            const orderData = {
+              customer: {
+                email: document.getElementById("email").value || "N/A",
+                firstName: document.getElementById("fname").value,
+                lastName: lastNameVal,
+                phone: document.getElementById("phone").value,
+                address: document.getElementById("address").value,
+                city: document.getElementById("city").value,
+                thana: document.getElementById("thana").value,
+                zip: document.getElementById("zip").value || "N/A",
+              },
+              payment: {
+                method: currentPaymentMethod,
+                sendingNumber:
+                  document.getElementById("bkash-num").value || "N/A",
+                trxId: document.getElementById("trx-id").value || "N/A",
+              },
+              items: cartItems,
+              financials: {
+                subtotal: subtotal,
+                shipping: shipping,
+                shippingZone: currentShippingZone,
+                total: total,
+              },
+              status: "Pending",
+              createdAt: serverTimestamp(),
+            };
+
+            // 1. Save to Firebase
+            const docRef = await addDoc(collection(db, "orders"), orderData);
+            const finalOrderId =
+              "NR-" + docRef.id.toUpperCase().substring(0, 8);
+
+            // 2. Populate Success Screen & Invoice UI
+            document.getElementById(
+              "success-order-id",
+            ).innerText = `#${finalOrderId}`;
+            document.getElementById(
+              "inv-order-id",
+            ).innerText = `#${finalOrderId}`;
+
+            const options = {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            };
+            document.getElementById(
+              "inv-date",
+            ).innerText = `Date: ${new Date().toLocaleDateString(
+              "en-US",
+              options,
+            )}`;
+
+            document.getElementById("inv-name").innerText =
+              lastNameVal !== "N/A"
+                ? `${orderData.customer.firstName} ${lastNameVal}`
+                : orderData.customer.firstName;
+            document.getElementById("inv-phone").innerText =
+              orderData.customer.phone;
+            document.getElementById("inv-address").innerText =
+              orderData.customer.address;
+            document.getElementById("inv-city").innerText = `${
+              orderData.customer.city
+            }, ${orderData.customer.thana} ${
+              orderData.customer.zip !== "N/A"
+                ? "- " + orderData.customer.zip
+                : ""
+            }`;
+
+            // Configure Payment Info and Dynamic Status on Invoice
+            const statusBadge = document.getElementById("inv-status-badge");
+            const paidDisplay = document.getElementById("inv-paid");
+            const dueDisplay = document.getElementById("inv-due");
+
+            if (currentPaymentMethod === "cod") {
+              document.getElementById("inv-payment").innerText =
+                "Cash on Delivery";
+              statusBadge.innerText = "STATUS: UNPAID";
+              statusBadge.style.color = "#d32f2f";
+              statusBadge.style.borderColor = "#d32f2f";
+              paidDisplay.innerText = "৳ 0";
+              dueDisplay.innerText = `৳ ${total.toLocaleString()}`;
+            } else {
+              document.getElementById("inv-payment").innerText =
+                "Mobile Banking (Pre-paid)";
+              statusBadge.innerText = "STATUS: PAID";
+              statusBadge.style.color = "#2e7d32";
+              statusBadge.style.borderColor = "#2e7d32";
+              paidDisplay.innerText = `৳ ${total.toLocaleString()}`;
+              dueDisplay.innerText = "৳ 0";
+            }
+
+            // Inject Items into Invoice Table
+            const tbody = document.getElementById("inv-items-body");
+            tbody.innerHTML = "";
+            cartItems.forEach((item) => {
+              tbody.innerHTML += `
+              <tr>
+                <td>
+                  <div class="item-desc">${item.title}</div>
+                  <div class="item-meta">Color: ${item.color} | Size: ${
+                item.size
+              }</div>
+                </td>
+                <td style="text-align: center;">${item.qty}</td>
+                <td style="text-align: right; font-weight: 500;">৳ ${(
+                  item.price * item.qty
+                ).toLocaleString()}</td>
+              </tr>
+            `;
+            });
+
+            document.getElementById(
+              "inv-subtotal",
+            ).innerText = `৳ ${subtotal.toLocaleString()}`;
+            document.getElementById(
+              "inv-shipping",
+            ).innerText = `৳ ${shipping.toLocaleString()}`;
+            document.getElementById(
+              "inv-total",
+            ).innerText = `৳ ${total.toLocaleString()}`;
+
+            // Save final ID globally for PDF naming
+            window.finalOrderId = finalOrderId;
+
+            // 3. Clear Cart
+            localStorage.removeItem("SHINOZZ_cart");
+
+            // 4. Show Success Modal & Initial Screen
+            loader.classList.remove("show");
+            document.getElementById("success-modal").classList.add("active");
+            showSuccessInitial();
+            window.scrollTo(0, 0);
+          } catch (error) {
+            loader.classList.remove("show");
+            console.error("Order Failed:", error);
+            alert(
+              "We encountered a security issue processing your order. Please check Firebase rules or try again.",
+            );
+            btn.innerText = "Place Order";
+            btn.style.pointerEvents = "auto";
+          }
+        });
+
+      // Success Modal UI Toggles
+      window.showInvoiceView = function () {
+        document.getElementById("success-initial-view").style.display = "none";
+        document.getElementById("invoice-view").style.display = "flex";
+      };
+
+      window.showSuccessInitial = function () {
+        document.getElementById("invoice-view").style.display = "none";
+        document.getElementById("success-initial-view").style.display = "flex";
+      };
+
+      // PDF Generation Function utilizing html2pdf.js
+      window.downloadInvoicePDF = function () {
+        const element = document.getElementById("invoice-capture-area");
+
+        // Hide shadows momentarily so the PDF prints perfectly flat and clean
+        element.style.boxShadow = "none";
+
+        const opt = {
+          margin: 0.5,
+          filename: `Shinooz_Invoice_${window.finalOrderId}.pdf`,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+        };
+
+        // Generate PDF
+        html2pdf()
+          .set(opt)
+          .from(element)
+          .save()
+          .then(() => {
+            // Restore shadow after PDF generation
+            element.style.boxShadow = "0 15px 40px rgba(0,0,0,0.08)";
+          });
+      };
+    </script>
+  </body>
+</html>
