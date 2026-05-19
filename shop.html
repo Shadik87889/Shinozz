@@ -7,6 +7,10 @@
       The Collection | SHINOZZ | Premium Women's Ethnic & Couture Wear
     </title>
     <meta
+      name="google-site-verification"
+      content="uS_qaHiBLCGhYMA1prFMbzCH61Vuj1alnQRr6fDT4ZU"
+    />
+    <meta
       name="description"
       content="Shop the official SHINOZZ Collection. Discover masterfully crafted luxury sarees, designer salwar suits, and unstitched editorial couture. Elevating women's fashion in Bangladesh with authentic heritage and modern silhouettes."
     />
@@ -2823,6 +2827,67 @@
       window.openQuickAdd = function (productId) {
         const p = allProducts.find((x) => x.id === productId);
         if (!p) return;
+
+        // Initialize activeQAProduct with basic product details to fix null reference error
+        activeQAProduct = {
+          id: p.id,
+          title: p.title,
+          price: p.finalPrice || p.price,
+          img:
+            p.images && p.images[0]
+              ? p.images[0]
+              : "https://via.placeholder.com/500x750?text=No+Image",
+          color: p.colors && p.colors[0] ? p.colors[0].name : "Standard",
+          size: "",
+          qty: 1,
+        };
+
+        activeQAMaxStock = Number(p.stock) || 0;
+        const outOfStock = activeQAMaxStock <= 0;
+
+        // Populate dynamic modal UI details to make the workspace functional
+        document.getElementById("qa-title-target").innerText = p.title;
+        document.getElementById("qa-price-target").innerHTML = getPriceHtml(p);
+
+        // Populate images and interactive thumbnail galleries
+        qaImages = p.images || [];
+        currentQAImgIdx = 0;
+        const thumbContainer = document.getElementById(
+          "qa-thumbnails-container",
+        );
+        thumbContainer.innerHTML = "";
+        if (qaImages.length > 0) {
+          qaImgTarget.src = qaImages[0];
+          thumbContainer.innerHTML = qaImages
+            .map(
+              (img, idx) =>
+                `<img src="${img}" class="qa-thumb ${
+                  idx === 0 ? "active" : ""
+                }" onclick="window.selectQAImage('${img}', ${idx})" alt="Thumb">`,
+            )
+            .join("");
+        }
+
+        // Populate matching colors
+        const colorsContainer = document.getElementById("qa-colors");
+        colorsContainer.innerHTML = "";
+        if (p.colors && p.colors.length > 0) {
+          colorsContainer.innerHTML = p.colors
+            .map(
+              (c, idx) =>
+                `<button class="color-btn ${
+                  idx === 0 ? "active" : ""
+                }" style="background-color: ${c.hex};" data-val="${
+                  c.name
+                }" title="${
+                  c.name
+                }" onclick="window.selectQAColor(this)"></button>`,
+            )
+            .join("");
+        } else {
+          colorsContainer.innerHTML =
+            '<span style="font-size:0.85rem; color:var(--text-light);">Standard</span>';
+        }
 
         if (typeof fbq !== "undefined") {
           fbq("track", "ViewContent", {
