@@ -1598,20 +1598,29 @@
                 item_price: item.price,
               }));
 
-            // REPLACE your current purchase trigger with this structure:
-            fbq('track', 'Purchase', {
-              value: totalOrderValue,
-              currency: 'BDT',
-              content_type: 'product',
-              contents: cartItemsArray,
-              num_items: totalItemCount,
-              order_id: window.finalOrderId,
-              // ADD THIS BLOCK TO FIX YOUR MATCH QUALITY SCORE:
-              user_data: {
-                em: document.getElementById('email').value.toLowerCase().trim(), // Ensure these IDs match your form inputs
-                ph: document.getElementById('phone').value.trim()
-              }
-            }, { eventID: purchaseEventID });
+              // REPLACE your current purchase trigger with this structure:
+              fbq(
+                "track",
+                "Purchase",
+                {
+                  value: totalOrderValue,
+                  currency: "BDT",
+                  content_type: "product",
+                  contents: cartItemsArray,
+                  num_items: totalItemCount,
+                  order_id: window.finalOrderId,
+                  // ADD THIS BLOCK TO FIX YOUR MATCH QUALITY SCORE:
+                  user_data: {
+                    em: document
+                      .getElementById("email")
+                      .value.toLowerCase()
+                      .trim(), // Ensure these IDs match your form inputs
+                    ph: document.getElementById("phone").value.trim(),
+                  },
+                },
+                { eventID: purchaseEventID },
+              );
+            }
             // ----------------------------------------------------
 
             // 3. Clear Cart
