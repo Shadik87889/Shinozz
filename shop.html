@@ -3,7 +3,122 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Collection | Shinozz</title>
+    <title>
+      The Collection | SHINOZZ | Premium Women's Ethnic & Couture Wear
+    </title>
+    <meta
+      name="description"
+      content="Shop the official SHINOZZ Collection. Discover masterfully crafted luxury sarees, designer salwar suits, and unstitched editorial couture. Elevating women's fashion in Bangladesh with authentic heritage and modern silhouettes."
+    />
+    <meta
+      name="keywords"
+      content="SHINOZZ, Shinozz Fashion, advanced editorial couture, women's ethnic wear Bangladesh, premium Garara set, Sharara suit online, designer Kurti BD, premium Jamdani sarees, authentic Muslin, Dhaka Muslin, cotton unstitched, Salwar Suits, 3 piece collection BD, luxury 3 piece design, designer Lehenga Dhaka, bridal Lehenga price, party wear gown, premium Abaya collection, luxury Hijab, Burqa design 2026, Modest fashion BD, Organza Saree, Silk Saree collection, Chiffon Saree, floral Co-ord sets women, luxury modern heritage fashion, designer wear Dhaka, boutique clothing brand bd, luxury traditional dresses, online shopping Bangladesh, Kanjeevaram Saree BD, শিনোজ ফ্যাশন, মেয়েদের এক্সক্লুসিভ পোশাক, গারারা সুট, শারারা ড্রেস, কুর্তি ডিজাইন, অরিজিনাল ঢাকাই জামদানি, মসলিন শাড়ি, সুতির থ্রি পিস, রেডিমেড থ্রি পিস, লেহেঙ্গা ডিজাইন, বিয়ের শাড়ি, গায়ে হলুদের পোশাক, পার্টি ড্রেস, বোরকা ডিজাইন, হিজাব কালেকশন, ম্যাক্সি ড্রেস, সুতি কাপড়, ঈদ কালেকশন ২০২৬, meyeder dress collection, garara kapor bd, sharara dress price, kurti design 2026, 3 piece design 2026, three piece price in bd, jamdani saree er dam, biyer saree price, borkha design bd, lehenga price in bangladesh, party dress for girls, cotton 3 piece online, best Saree Shop in Dhaka, online kaporer dokan, cash on delivery BD, Shadik Hossain Talukder, Shihab"
+    />
+
+    <!-- Canonical URL to prevent duplicate content issues -->
+    <link rel="canonical" href="https://shinozz.com/shop" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://www.facebook.com/profile.php?id=61589514398719"
+    />
+    <meta
+      property="og:title"
+      content="The Collection | SHINOZZ | Advanced Editorial Couture"
+    />
+    <meta
+      property="og:description"
+      content="Explore the latest in luxury ethnic wear. Designed in Dhaka, worn worldwide."
+    />
+    <meta
+      property="og:image"
+      content="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1200"
+    />
+
+    <!-- Advanced Twitter Cards for Complete Social Graph SEO -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="The Collection | SHINOZZ | Advanced Editorial Couture"
+    />
+    <meta
+      name="twitter:description"
+      content="Explore the latest in luxury ethnic wear. Designed in Dhaka, worn worldwide."
+    />
+    <meta
+      name="twitter:image"
+      content="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1200"
+    />
+
+    <link rel="icon" type="image/png" href="shinozz-official-fav.png" />
+    <link rel="apple-touch-icon" href="shinozz-official-fav.png" />
+    <meta name="theme-color" content="#111111" />
+
+    <script>
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod
+            ? n.callMethod.apply(n, arguments)
+            : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = "2.0";
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(
+        window,
+        document,
+        "script",
+        "https://connect.facebook.net/en_US/fbevents.js",
+      );
+
+      // SENIOR PIXEL ARCHITECTURE: Advanced Matching Preparation
+      // (When user logs in, pass their email/phone here to lower Cost Per Acquisition)
+      fbq("init", "YOUR_FACEBOOK_PIXEL_ID", {
+        // em: 'customer@email.com',
+        // ph: '1234567890'
+      });
+      fbq("track", "PageView");
+      // Category Specific Event for Shop Page
+      fbq("trackCustom", "ViewCategory", {
+        content_name: "The Full Collection",
+      });
+    </script>
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display: none;"
+        src="https://www.facebook.com/tr?id=YOUR_FACEBOOK_PIXEL_ID&ev=PageView&noscript=1"
+    /></noscript>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "The Collection | SHINOZZ",
+        "description": "Premium collection of ethnic and modern women's couture.",
+        "url": "https://shinozz.com/shop",
+        "publisher": {
+          "@type": "Organization",
+          "name": "SHINOZZ",
+          "logo": "https://shinozz.com/Shinozz-official-logo-dark.png",
+          "sameAs": [
+            "https://www.facebook.com/profile.php?id=61589514398719",
+            "https://www.instagram.com/shinozz.official/"
+          ]
+        }
+      }
+    </script>
 
     <!-- Luxury Typography Collection -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -2602,6 +2717,7 @@
       });
 
       // Live Search Filtering
+      let searchPixelTimeout; // Variable to hold our debounce timer
       searchInput.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase().trim();
         searchGrid.innerHTML = "";
@@ -2644,6 +2760,17 @@
             </a>
           `;
         });
+
+        // SENIOR UPGRADE: High-Intent Search Tracking for Facebook Ads (Debounced)
+        clearTimeout(searchPixelTimeout);
+        searchPixelTimeout = setTimeout(() => {
+          if (query.length > 2 && typeof fbq !== "undefined") {
+            fbq("track", "Search", {
+              search_string: query,
+              content_category: "Shop Search",
+            });
+          }
+        }, 1200); // Waits 1.2s after they stop typing to fire pixel
       });
 
       // --- QUICK ADD & CART SYSTEM ---
@@ -2697,60 +2824,15 @@
         const p = allProducts.find((x) => x.id === productId);
         if (!p) return;
 
-        activeQAMaxStock = Number(p.stock) || 0;
-        const outOfStock = activeQAMaxStock <= 0;
-
-        activeQAProduct = {
-          id: p.id,
-          title: p.title,
-          price: p.finalPrice || p.price,
-          img:
-            p.images && p.images.length > 0
-              ? p.images[0]
-              : "https://via.placeholder.com/500x750?text=No+Image",
-          size: "",
-          color: "",
-          qty: 1,
-        };
-
-        document.getElementById("qa-title-target").innerText = p.title;
-        document.getElementById("qa-price-target").innerHTML = getPriceHtml(p);
-
-        const thumbContainer = document.getElementById(
-          "qa-thumbnails-container",
-        );
-        thumbContainer.innerHTML = "";
-        qaImages =
-          p.images && p.images.length > 0 ? p.images : [activeQAProduct.img];
-        currentQAImgIdx = 0;
-
-        qaImages.forEach((src, idx) => {
-          const img = document.createElement("img");
-          img.src = src;
-          img.className = "qa-thumb";
-          img.onclick = () => window.selectQAImage(src, idx);
-          thumbContainer.appendChild(img);
-        });
-        window.selectQAImage(qaImages[0], 0);
-
-        const colorsContainer = document.getElementById("qa-colors");
-        const colorsArr = p.colors || [];
-        if (colorsArr.length > 0) {
-          colorsContainer.innerHTML = colorsArr
-            .map(
-              (c, i) =>
-                `<div class="color-btn ${
-                  i === 0 ? "active" : ""
-                }" style="background: ${c.hex};" data-val="${
-                  c.name
-                }" onclick="window.selectQAColor(this)"></div>`,
-            )
-            .join("");
-          activeQAProduct.color = colorsArr[0].name;
-        } else {
-          colorsContainer.innerHTML =
-            '<span style="font-size:0.8rem; color:#777;">Standard Edition</span>';
-          activeQAProduct.color = "Standard";
+        if (typeof fbq !== "undefined") {
+          fbq("track", "ViewContent", {
+            content_ids: [p.id],
+            content_type: "product",
+            content_name: p.title,
+            content_category: p.category,
+            value: p.finalPrice || p.price,
+            currency: "BDT",
+          });
         }
 
         const sizesContainer = document.getElementById("qa-sizes");
@@ -2873,6 +2955,21 @@
 
       function processAddToCart() {
         let uniqueId = `${activeQAProduct.id}-${activeQAProduct.size}-${activeQAProduct.color}`;
+
+        // SENIOR UPGRADE: DPA (Dynamic Product Ads) Compliant AddToCart
+        if (typeof fbq !== "undefined") {
+          fbq("track", "AddToCart", {
+            content_ids: [activeQAProduct.id],
+            contents: [
+              { id: activeQAProduct.id, quantity: activeQAProduct.qty },
+            ], // Critical for accurate DPA
+            content_type: "product",
+            content_name: activeQAProduct.title,
+            value: activeQAProduct.price * activeQAProduct.qty,
+            currency: "BDT",
+          });
+        }
+
         let existingItem = cartState.items.find(
           (item) => item.cartId === uniqueId,
         );
@@ -2914,6 +3011,32 @@
       });
 
       checkoutBtn.addEventListener("click", () => {
+        let totalVal = cartState.items.reduce(
+          (acc, item) => acc + item.price * item.qty,
+          0,
+        );
+
+        // SENIOR UPGRADE: DPA Compliant InitiateCheckout array mapping
+        let fbContents = cartState.items.map((item) => ({
+          id: item.id,
+          quantity: item.qty,
+        }));
+        let fbContentIds = cartState.items.map((item) => item.id);
+        let fbTotalItems = cartState.items.reduce(
+          (acc, item) => acc + item.qty,
+          0,
+        );
+
+        if (typeof fbq !== "undefined") {
+          fbq("track", "InitiateCheckout", {
+            content_ids: fbContentIds,
+            contents: fbContents,
+            content_type: "product",
+            num_items: fbTotalItems,
+            value: totalVal,
+            currency: "BDT",
+          });
+        }
         window.location.href = "checkout";
       });
 

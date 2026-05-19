@@ -5,6 +5,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product Details | Shinozz</title>
 
+    <!-- LUXURY SEO & OPEN GRAPH (PRODUCT FOCUSED) -->
+    <meta
+      name="description"
+      content="Discover premium women's couture and ethnic wear at Shinozz. Shop the latest collection of exclusive luxury fashion."
+      id="meta-description"
+    />
+    <meta
+      name="keywords"
+      content="SHINOZZ, Shinozz Fashion, advanced editorial couture, women's ethnic wear Bangladesh, premium Garara set, Sharara suit online, designer Kurti BD, premium Jamdani sarees, authentic Muslin, Dhaka Muslin, cotton unstitched, Salwar Suits, 3 piece collection BD, luxury 3 piece design, designer Lehenga Dhaka, bridal Lehenga price, party wear gown, premium Abaya collection, luxury Hijab, Burqa design 2026, Modest fashion BD, Organza Saree, Silk Saree collection, Chiffon Saree, floral Co-ord sets women, luxury modern heritage fashion, designer wear Dhaka, boutique clothing brand bd, luxury traditional dresses, online shopping Bangladesh, Kanjeevaram Saree BD, শিনোজ ফ্যাশন, মেয়েদের এক্সক্লুসিভ পোশাক, গারারা সুট, শারারা ড্রেস, কুর্তি ডিজাইন, অরিজিনাল ঢাকাই জামদানি, মসলিন শাড়ি, সুতির থ্রি পিস, রেডিমেড থ্রি পিস, লেহেঙ্গা ডিজাইন, বিয়ের শাড়ি, গায়ে হলুদের পোশাক, পার্টি ড্রেস, বোরকা ডিজাইন, হিজাব কালেকশন, ম্যাক্সি ড্রেস, সুতি কাপড়, ঈদ কালেকশন ২০২৬, meyeder dress collection, garara kapor bd, sharara dress price, kurti design 2026, 3 piece design 2026, three piece price in bd, jamdani saree er dam, biyer saree price, borkha design bd, lehenga price in bangladesh, party dress for girls, cotton 3 piece online, best Saree Shop in Dhaka, online kaporer dokan, cash on delivery BD, Shadik Hossain Talukder, Shihab"
+    />
+
+    <!-- Open Graph (Dynamic Facebook / WhatsApp Previews) -->
+    <meta
+      property="og:title"
+      content="Product Details | Shinozz"
+      id="og-title"
+    />
+    <meta
+      property="og:description"
+      content="Shop exclusive luxury fashion at Shinozz."
+      id="og-desc"
+    />
+    <meta
+      property="og:image"
+      content="https://via.placeholder.com/1200x630?text=Shinozz+Couture"
+      id="og-image"
+    />
+    <meta property="og:url" content="https://shinozz.com/details" />
+    <meta property="og:type" content="product" />
+    <meta property="product:price:currency" content="BDT" />
+    <meta property="product:price:amount" content="0" id="og-price" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- PREMIUM FAVICON SET -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="shinozz-official-fav.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="shinozz-official-fav.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="shinozz-official-fav.png"
+    />
+    <meta name="theme-color" content="#111111" />
+
+    <!-- DYNAMIC JSON-LD PRODUCT SCHEMA -->
+    <script type="application/ld+json" id="product-schema">
+      {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": "Loading...",
+        "image": "",
+        "description": "Exclusive Shinozz product.",
+        "brand": {
+          "@type": "Organization",
+          "name": "SHINOZZ",
+          "url": "https://shinozz.com",
+          "sameAs": [
+            "https://www.facebook.com/profile.php?id=61589514398719",
+            "https://www.instagram.com/shinozz.official/"
+          ]
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": "https://shinozz.com/details",
+          "priceCurrency": "BDT",
+          "price": "0",
+          "availability": "https://schema.org/InStock"
+        }
+      }
+    </script>
+
+    <!-- META PIXEL BASE CODE (ADVANCED MATCHING PREPARED) -->
+    <script>
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod
+            ? n.callMethod.apply(n, arguments)
+            : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = "2.0";
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(
+        window,
+        document,
+        "script",
+        "https://connect.facebook.net/en_US/fbevents.js",
+      );
+
+      // Advanced Matching Ready
+      var advancedMatching = {
+        // em: 'user@email.com',
+        // ph: '1234567890'
+      };
+      fbq("init", "YOUR_FACEBOOK_PIXEL_ID", advancedMatching);
+      fbq("track", "PageView");
+    </script>
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display: none;"
+        src="https://www.facebook.com/tr?id=YOUR_FACEBOOK_PIXEL_ID&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- END META PIXEL BASE CODE -->
+
     <!-- Luxury Typography Collection -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -2341,6 +2464,26 @@
         checkoutBtn = document.getElementById("checkout-btn");
 
       checkoutBtn.addEventListener("click", () => {
+        // ADVANCED PIXEL: INITIATE CHECKOUT
+        if (typeof fbq !== "undefined" && cartState.items.length > 0) {
+          let totalValue = cartState.items.reduce(
+            (sum, item) => sum + item.price * item.qty,
+            0,
+          );
+          let contentArray = cartState.items.map((item) => ({
+            id: item.id,
+            quantity: item.qty,
+            item_price: item.price,
+          }));
+
+          fbq("track", "InitiateCheckout", {
+            content_type: "product",
+            contents: contentArray,
+            num_items: cartState.items.reduce((sum, item) => sum + item.qty, 0),
+            value: totalValue,
+            currency: "BDT",
+          });
+        }
         window.location.href = "checkout";
       });
 
@@ -2380,6 +2523,18 @@
           }
         } else {
           cartState.items.push({ ...productState, cartId: uniqueId });
+        }
+
+        // ADVANCED PIXEL: ADD TO CART
+        if (typeof fbq !== "undefined") {
+          fbq("track", "AddToCart", {
+            content_type: "product",
+            content_ids: [productState.id],
+            content_name: productState.title,
+            value: productState.price * productState.qty,
+            currency: "BDT",
+            num_items: productState.qty,
+          });
         }
 
         saveCart();
@@ -2467,6 +2622,24 @@
       buyBtn.addEventListener("click", () => {
         if (buyBtn.disabled) return;
         buyBtn.innerText = "REDIRECTING...";
+
+        // ADVANCED PIXEL: DIRECT BUY INITIATE CHECKOUT
+        if (typeof fbq !== "undefined") {
+          fbq("track", "InitiateCheckout", {
+            content_type: "product",
+            contents: [
+              {
+                id: productState.id,
+                quantity: productState.qty,
+                item_price: productState.price,
+              },
+            ],
+            num_items: productState.qty,
+            value: productState.price * productState.qty,
+            currency: "BDT",
+          });
+        }
+
         setTimeout(() => {
           processAddToCart();
           window.location.href = "checkout";
@@ -2551,9 +2724,20 @@
       });
 
       if (searchInput) {
+        let searchTimeout;
         searchInput.addEventListener("input", (e) => {
           const query = e.target.value.toLowerCase().trim();
           searchGrid.innerHTML = "";
+
+          // ADVANCED PIXEL: SEARCH INTENT TRACKING
+          clearTimeout(searchTimeout);
+          if (query.length > 2) {
+            searchTimeout = setTimeout(() => {
+              if (typeof fbq !== "undefined") {
+                fbq("track", "Search", { search_string: query });
+              }
+            }, 800); // Debounce to capture the final search intent
+          }
 
           if (query.length === 0) {
             searchInfo.innerText = "Press enter or type to search";
@@ -2798,6 +2982,48 @@
         productState.price = p.finalPrice || p.price;
         productState.maxStock = Number(p.stock) || 0;
         productState.category = p.category || "Shop";
+
+        // --- DYNAMIC SEO & SCHEMA UPDATER ---
+        // Updates Google & Facebook Link Previews Instantly when product loads
+        document.getElementById("meta-description").content = p.desc
+          ? p.desc.replace(/(<([^>]+)>)/gi, "").substring(0, 160)
+          : `Buy ${p.title} exclusively at Shinozz.`;
+        document.getElementById("og-title").content = `${p.title} | Shinozz`;
+        document.getElementById("og-desc").content = p.desc
+          ? p.desc.replace(/(<([^>]+)>)/gi, "").substring(0, 160)
+          : `Shop the luxurious ${p.title} at Shinozz.`;
+        if (p.images && p.images.length > 0)
+          document.getElementById("og-image").content = p.images[0];
+        document.getElementById("og-price").content = productState.price;
+
+        const schemaEl = document.getElementById("product-schema");
+        if (schemaEl) {
+          let schemaData = JSON.parse(schemaEl.innerHTML);
+          schemaData.name = p.title;
+          schemaData.description = p.desc
+            ? p.desc.replace(/(<([^>]+)>)/gi, "")
+            : p.title;
+          if (p.images && p.images.length > 0) schemaData.image = p.images[0];
+          schemaData.offers.price = productState.price;
+          schemaData.offers.availability =
+            productState.maxStock > 0
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock";
+          schemaEl.innerHTML = JSON.stringify(schemaData);
+        }
+
+        // ADVANCED PIXEL: VIEW CONTENT (CRITICAL FOR DPA RETARGETING)
+        // This fires Facebook's exact required data format for Retargeting Ads
+        if (typeof fbq !== "undefined") {
+          fbq("track", "ViewContent", {
+            content_type: "product",
+            content_ids: [productState.id],
+            content_name: productState.title,
+            content_category: productState.category,
+            value: productState.price,
+            currency: "BDT",
+          });
+        }
 
         modalData.description.content = p.desc || "No description available.";
         modalData.details.content = p.care || "No details available.";

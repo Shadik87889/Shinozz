@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SHINOZZ | Advanced Enterprise OS</title>
 
+    <!-- ==========================================
+         ADMIN SECURITY & ANTI-SEO PROTOCOLS 
+         ========================================== -->
+    <!-- CRITICAL: Completely hide from Google and all search engines -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+    <!-- Prevent secure admin URLs from leaking to external sites -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- ==========================================
+         ADMIN UI & BRANDING (NATIVE APP FEEL) 
+         ========================================== -->
+    <link rel="icon" type="image/png" href="shinozz-official-fav.png" />
+    <link rel="apple-touch-icon" href="shinozz-official-fav.png" />
+    <meta name="theme-color" content="#f4f5f7" />
+    <!-- Allows saving Admin Panel as a native app on mobile devices -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Shinozz OS" />
+
     <!-- Luxury Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,6 +37,9 @@
 
     <!-- html2pdf Library for Invoice Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Chart.js for Business Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
       :root {
@@ -448,6 +473,103 @@
         to {
           opacity: 1;
           transform: translateY(0);
+        }
+      }
+
+      /* --- DASHBOARD ANALYTICS UI --- */
+      .dash-grid {
+        display: grid;
+        gap: 25px;
+        margin-bottom: 25px;
+      }
+      .dash-grid.top-metrics {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      }
+      .dash-grid.charts {
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      }
+      .dash-grid.secondary {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .metric-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+      }
+      .metric-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--accent);
+      }
+      .metric-card.success::before {
+        background: var(--success);
+      }
+      .metric-card.warning::before {
+        background: var(--warning);
+      }
+      .metric-card.danger::before {
+        background: var(--danger);
+      }
+      .metric-card.info::before {
+        background: var(--info);
+      }
+
+      .metric-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-light);
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .metric-value {
+        font-family: "Playfair Display", serif;
+        font-size: 2.6rem;
+        color: var(--accent);
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+      .metric-subtitle {
+        font-size: 0.8rem;
+        color: var(--text-light);
+      }
+      .chart-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        padding: 30px;
+        box-shadow: var(--shadow-sm);
+        height: 380px;
+        display: flex;
+        flex-direction: column;
+      }
+      .chart-card-title {
+        font-family: "Playfair Display", serif;
+        font-size: 1.4rem;
+        color: var(--accent);
+        margin-bottom: 20px;
+      }
+      .chart-wrapper {
+        flex: 1;
+        position: relative;
+        width: 100%;
+      }
+
+      @media (max-width: 768px) {
+        .dash-grid.charts {
+          grid-template-columns: 1fr;
         }
       }
 
@@ -1854,41 +1976,141 @@
       <div class="content-area">
         <!-- DASHBOARD -->
         <section id="view-dashboard" class="view-section active">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Real-time Intelligence</div>
-            </div>
-            <div
-              class="form-grid"
+          <div style="margin-bottom: 30px;">
+            <h2
               style="
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                font-family: 'Playfair Display', serif;
+                font-size: 2.2rem;
+                color: var(--accent);
+                margin-bottom: 5px;
               "
             >
-              <div class="stat-card">
-                <div class="stat-num" id="stat-products">0</div>
-                <div class="stat-label">Master Products</div>
+              Business Overview
+            </h2>
+            <p style="color: var(--text-light); font-size: 0.9rem;">
+              Simple, accurate, and comprehensive accounting for your store.
+            </p>
+          </div>
+
+          <!-- Primary Financial Metrics -->
+          <h3
+            style="
+              font-size: 0.85rem;
+              text-transform: uppercase;
+              letter-spacing: 2px;
+              color: var(--text-light);
+              margin-bottom: 15px;
+              font-weight: 600;
+            "
+          >
+            Accounting & Revenue
+          </h3>
+          <div
+            class="dash-grid"
+            style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));"
+          >
+            <div class="metric-card success">
+              <div class="metric-title">Total Earned</div>
+              <div class="metric-value" id="stat-earned">৳0</div>
+              <div class="metric-subtitle">
+                Net revenue from <strong>Delivered</strong> orders.
               </div>
-              <div class="stat-card">
-                <div class="stat-num" id="stat-orders">0</div>
-                <div class="stat-label">Total Orders</div>
+            </div>
+            <div class="metric-card warning">
+              <div class="metric-title">Pending Money</div>
+              <div class="metric-value" id="stat-pending">৳0</div>
+              <div class="metric-subtitle">
+                Money tied up in ongoing orders.
               </div>
-              <div class="stat-card">
-                <div
-                  class="stat-num"
-                  id="stat-revenue"
-                  style="font-size: 2.2rem;"
-                >
-                  ৳0
-                </div>
-                <div class="stat-label">Gross Revenue</div>
+            </div>
+            <div class="metric-card danger">
+              <div class="metric-title">Lost Money</div>
+              <div class="metric-value" id="stat-lost">৳0</div>
+              <div class="metric-subtitle">
+                Revenue lost to <strong>Cancelled</strong> orders.
               </div>
-              <div class="stat-card">
-                <div class="stat-num" id="stat-customers">0</div>
-                <div class="stat-label">Registered Clientele</div>
+            </div>
+            <div class="metric-card info">
+              <div class="metric-title">Discounts Given</div>
+              <div class="metric-value" id="stat-discounts">৳0</div>
+              <div class="metric-subtitle">
+                Total cost of promotions applied.
               </div>
-              <div class="stat-card">
-                <div class="stat-num" id="stat-stock">0</div>
-                <div class="stat-label">Inventory Units</div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="dash-grid charts">
+            <div class="chart-card">
+              <div class="chart-card-title">Order Status Breakdown</div>
+              <div class="chart-wrapper">
+                <canvas id="chart-fulfillment"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-title">Cash Flow & Losses</div>
+              <div class="chart-wrapper">
+                <canvas id="chart-revenue"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Secondary Metrics -->
+          <h3
+            style="
+              font-size: 0.85rem;
+              text-transform: uppercase;
+              letter-spacing: 2px;
+              color: var(--text-light);
+              margin-bottom: 15px;
+              margin-top: 10px;
+              font-weight: 600;
+            "
+          >
+            Store & Inventory Insights
+          </h3>
+          <div class="dash-grid secondary">
+            <div class="metric-card">
+              <div class="metric-title">Average Order Value</div>
+              <div class="metric-value" id="stat-aov" style="font-size: 2rem;">
+                ৳0
+              </div>
+              <div class="metric-subtitle">Based on delivered orders.</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Total Orders</div>
+              <div
+                class="metric-value"
+                id="stat-orders-total"
+                style="font-size: 2rem;"
+              >
+                0
+              </div>
+              <div class="metric-subtitle">All-time recorded transactions.</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Registered Clients</div>
+              <div
+                class="metric-value"
+                id="stat-customers"
+                style="font-size: 2rem;"
+              >
+                0
+              </div>
+              <div class="metric-subtitle">Total user accounts.</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Inventory Value</div>
+              <div
+                class="metric-value"
+                id="stat-inventory-val"
+                style="font-size: 2rem;"
+              >
+                ৳0
+              </div>
+              <div class="metric-subtitle">
+                Asset value of <strong id="stat-stock">0</strong> units in
+                stock.
               </div>
             </div>
           </div>
@@ -3200,6 +3422,9 @@
       const itemsPerPage = 8;
       let activeOrderId = null;
 
+      let chartFulfillmentInstance = null;
+      let chartRevenueInstance = null;
+
       const closeSVG = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
 
       function showLoader() {
@@ -3571,24 +3796,195 @@
       }
 
       function updateDashboardStats() {
-        const elProd = document.getElementById("stat-products");
-        if (elProd) elProd.innerText = productsDB.length;
-        const elCust = document.getElementById("stat-customers");
-        if (elCust) elCust.innerText = customersDB.length;
-        const elStock = document.getElementById("stat-stock");
-        if (elStock)
-          elStock.innerText = productsDB.reduce(
-            (acc, p) => acc + (Number(p.stock) || 0),
-            0,
-          );
-        const elOrders = document.getElementById("stat-orders");
-        if (elOrders) elOrders.innerText = ordersDB.length;
-        const elRev = document.getElementById("stat-revenue");
-        if (elRev) {
-          const totalRevenue = ordersDB
-            .filter((o) => o.status !== "Cancelled")
-            .reduce((acc, o) => acc + (o.financials?.total || 0), 0);
-          elRev.innerText = `৳${totalRevenue.toLocaleString()}`;
+        // 1. Exact Inventory & Asset Valuations
+        let inventoryValue = 0;
+        let totalStockUnits = 0;
+        productsDB.forEach((p) => {
+          const qty = Number(p.stock) || 0;
+          const price = Number(p.finalPrice || p.price) || 0;
+          inventoryValue += qty * price;
+          totalStockUnits += qty;
+        });
+
+        // 2. Exact Comprehensive Accounting
+        let earned = 0;
+        let pending = 0;
+        let lost = 0;
+        let discounts = 0;
+        let deliveredCount = 0;
+
+        let statusCounts = {
+          Pending: 0,
+          Processing: 0,
+          Shipped: 0,
+          Delivered: 0,
+          Cancelled: 0,
+        };
+
+        ordersDB.forEach((o) => {
+          const status = o.status || "Pending";
+          const total = o.financials?.total || 0;
+
+          // Calculate exact discount for this order
+          let orderDiscount = 0;
+          if (o.items) {
+            o.items.forEach((item) => {
+              const prod = productsDB.find((p) => p.id === item.id);
+              if (
+                prod &&
+                prod.price &&
+                prod.finalPrice &&
+                prod.price > prod.finalPrice
+              ) {
+                orderDiscount += (prod.price - prod.finalPrice) * item.qty;
+              }
+            });
+          }
+
+          if (statusCounts[status] !== undefined) statusCounts[status]++;
+
+          if (status === "Delivered") {
+            earned += total;
+            discounts += orderDiscount;
+            deliveredCount++;
+          } else if (status === "Cancelled") {
+            lost += total;
+          } else {
+            pending += total;
+          }
+        });
+
+        const aov = deliveredCount > 0 ? earned / deliveredCount : 0;
+
+        // 3. Update DOM Elements safely
+        const setVal = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.innerText = val;
+        };
+
+        setVal("stat-earned", `৳${earned.toLocaleString()}`);
+        setVal("stat-pending", `৳${pending.toLocaleString()}`);
+        setVal("stat-lost", `৳${lost.toLocaleString()}`);
+        setVal("stat-discounts", `৳${discounts.toLocaleString()}`);
+
+        setVal("stat-aov", `৳${Math.round(aov).toLocaleString()}`);
+        setVal("stat-customers", customersDB.length);
+        setVal("stat-orders-total", ordersDB.length);
+        setVal("stat-inventory-val", `৳${inventoryValue.toLocaleString()}`);
+        setVal("stat-stock", totalStockUnits.toLocaleString());
+
+        // 4. Render Chart.js Analytics
+        renderDashboardCharts(statusCounts, {
+          earned,
+          pending,
+          lost,
+          discounts,
+        });
+      }
+
+      function renderDashboardCharts(sCounts, revData) {
+        // Setup Fulfillment Doughnut Chart
+        const ctxFulfill = document.getElementById("chart-fulfillment");
+        if (ctxFulfill) {
+          if (chartFulfillmentInstance) chartFulfillmentInstance.destroy();
+          chartFulfillmentInstance = new Chart(ctxFulfill.getContext("2d"), {
+            type: "doughnut",
+            data: {
+              labels: [
+                "Pending",
+                "Processing",
+                "Shipped",
+                "Delivered",
+                "Cancelled",
+              ],
+              datasets: [
+                {
+                  data: [
+                    sCounts.Pending,
+                    sCounts.Processing,
+                    sCounts.Shipped,
+                    sCounts.Delivered,
+                    sCounts.Cancelled,
+                  ],
+                  backgroundColor: [
+                    "#f29900",
+                    "#2196f3",
+                    "#9c27b0",
+                    "#0d833a",
+                    "#d93025",
+                  ],
+                  borderWidth: 0,
+                  hoverOffset: 4,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: "right",
+                  labels: { font: { family: "'Jost', sans-serif" } },
+                },
+              },
+              cutout: "70%",
+            },
+          });
+        }
+
+        // Setup Revenue Bar Chart
+        const ctxRev = document.getElementById("chart-revenue");
+        if (ctxRev) {
+          if (chartRevenueInstance) chartRevenueInstance.destroy();
+          chartRevenueInstance = new Chart(ctxRev.getContext("2d"), {
+            type: "bar",
+            data: {
+              labels: [
+                "Earned (Delivered)",
+                "Pending Money",
+                "Lost (Cancelled)",
+                "Discounts Given",
+              ],
+              datasets: [
+                {
+                  label: "Amount (৳)",
+                  data: [
+                    revData.earned,
+                    revData.pending,
+                    revData.lost,
+                    revData.discounts,
+                  ],
+                  backgroundColor: ["#0d833a", "#f29900", "#d93025", "#2196f3"],
+                  borderRadius: 4,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      return "৳" + context.raw.toLocaleString();
+                    },
+                  },
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  grid: { color: "rgba(0,0,0,0.05)" },
+                  ticks: { font: { family: "'Jost'" } },
+                },
+                x: {
+                  grid: { display: false },
+                  ticks: { font: { family: "'Jost'" } },
+                },
+              },
+            },
+          });
         }
       }
 

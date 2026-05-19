@@ -5,6 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Secure Checkout | Shinooz</title>
 
+    <!-- SEO, Meta Tags & Privacy Protection -->
+    <meta
+      name="description"
+      content="Complete your secure checkout at Shinozz. Fast delivery and premium fashion in Bangladesh."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <!-- SEO Expert: Protects customer privacy and prevents cart indexing -->
+    <link rel="canonical" href="https://shinozz.com/checkout" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Secure Checkout | Shinozz" />
+    <meta
+      property="og:description"
+      content="Complete your secure checkout at Shinozz. Your premium fashion destination."
+    />
+    <meta property="og:url" content="https://shinozz.com/checkout" />
+    <meta property="og:site_name" content="Shinozz" />
+
+    <!-- Favicon Integration -->
+    <link rel="icon" type="image/png" href="shinozz-official-fav.png" />
+    <link rel="apple-touch-icon" href="shinozz-official-fav.png" />
+    <meta name="theme-color" content="#111111" />
+
+    <!-- Social Entity & Organization Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Shinozz",
+        "url": "https://shinozz.com",
+        "logo": "https://shinozz.com/shinozz-official-fav.png",
+        "sameAs": [
+          "https://www.facebook.com/profile.php?id=61589514398719",
+          "https://www.instagram.com/shinozz.official/"
+        ]
+      }
+    </script>
+
+    <!-- Meta Pixel Code (Advanced E-commerce Base) -->
+    <script>
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod
+            ? n.callMethod.apply(n, arguments)
+            : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = "2.0";
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(
+        window,
+        document,
+        "script",
+        "https://connect.facebook.net/en_US/fbevents.js",
+      );
+      fbq("init", "YOUR_FACEBOOK_PIXEL_ID");
+      fbq("track", "PageView");
+    </script>
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display: none;"
+        src="https://www.facebook.com/tr?id=YOUR_FACEBOOK_PIXEL_ID&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1310,6 +1386,24 @@
         // 3. Calculate Totals
         updateTotals();
 
+        // --- SENIOR META ADS HOOK: INITIATE CHECKOUT ---
+        // Tells Facebook the user started the checkout and how much the cart is worth.
+        if (typeof fbq === "function" && cartItems.length > 0) {
+          const pixelContents = cartItems.map((item) => ({
+            id: item.id || item.title,
+            quantity: item.qty,
+            item_price: item.price,
+          }));
+          fbq("track", "InitiateCheckout", {
+            content_type: "product",
+            contents: pixelContents,
+            num_items: cartItems.length,
+            value: total, // Using the Total Value including shipping
+            currency: "BDT",
+          });
+        }
+        // ------------------------------------------------
+
         loader.classList.remove("show");
       }
 
@@ -1327,6 +1421,19 @@
       let currentPaymentMethod = "cod";
       window.selectPayment = function (method) {
         currentPaymentMethod = method;
+
+        // --- SENIOR META ADS HOOK: ADD PAYMENT INFO ---
+        // Tracks high-intent users who interact with payment options
+        if (typeof fbq === "function") {
+          fbq("track", "AddPaymentInfo", {
+            payment_category:
+              method === "cod" ? "Cash on Delivery" : "Mobile Banking",
+            currency: "BDT",
+            value: total,
+          });
+        }
+        // ----------------------------------------------
+
         if (method === "cod") {
           document.getElementById("opt-cod").classList.add("active");
           document.getElementById("opt-mobile").classList.remove("active");
@@ -1480,6 +1587,27 @@
 
             // Save final ID globally for PDF naming
             window.finalOrderId = finalOrderId;
+
+            // --- THE HOLY GRAIL META ADS HOOK: PURCHASE EVENT ---
+            // This is the most critical code for your ROAS. It tells Facebook's AI
+            // exactly who bought, what they bought, and how much they spent.
+            if (typeof fbq === "function") {
+              const pixelContents = cartItems.map((item) => ({
+                id: item.id || item.title,
+                quantity: item.qty,
+                item_price: item.price,
+              }));
+
+              fbq("track", "Purchase", {
+                content_type: "product",
+                contents: pixelContents,
+                num_items: cartItems.length,
+                value: total, // CRITICAL: Feeds algorithm the exact revenue
+                currency: "BDT", // CRITICAL: Ensures correct currency tracking
+                order_id: finalOrderId, // CRITICAL: Prevents Facebook from double-counting
+              });
+            }
+            // ----------------------------------------------------
 
             // 3. Clear Cart
             localStorage.removeItem("SHINOZZ_cart");
