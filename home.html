@@ -250,7 +250,227 @@
       .nav-link:hover::after {
         transform: translateY(-100%);
       }
+      /* Premium Desktop Visual Mega-Menu */
+      .nav-item-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        padding: 20px 0;
+      }
+      .nav-dropdown {
+        position: absolute;
+        top: 80%;
+        left: -20px; /* ALIGNMENT FIX: Anchors safely to the left side */
+        transform: translateY(15px); /* REMOVED X-translation */
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--border-color);
+        padding: 30px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        z-index: 3000;
+        display: flex;
+        gap: 30px;
+        width: max-content;
+        max-width: 85vw;
+      }
+      .nav-item-wrapper:hover .nav-dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0); /* REMOVED X-translation */
+      }
+      .mega-menu-side {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-right: 1px solid var(--border-color);
+        padding-right: 30px;
+        min-width: 160px;
+        flex-shrink: 0; /* Prevents text from squishing */
+      }
+      .mega-menu-side h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.8rem;
+        color: var(--text-main);
+        margin-bottom: 10px;
+      }
+      .mega-menu-side a {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-light);
+        text-decoration: underline;
+        transition: color 0.3s;
+        font-family: "Jost", sans-serif;
+      }
+      .mega-menu-side a:hover {
+        color: var(--text-main);
+      }
 
+      /* Desktop Cinematic Reel */
+      .mega-menu-grid {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none; /* Hides scrollbar in Firefox */
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+        /* Fades the right edge so users know they can scroll */
+        mask-image: linear-gradient(to right, black 90%, transparent 100%);
+        -webkit-mask-image: linear-gradient(
+          to right,
+          black 90%,
+          transparent 100%
+        );
+      }
+      .mega-menu-grid::-webkit-scrollbar {
+        display: none; /* Hides scrollbar in Chrome/Safari */
+      }
+      .mega-menu-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        flex: 0 0 100px; /* Locks item size */
+        scroll-snap-align: start; /* Snaps satisfyingly into place */
+      }
+      .mega-menu-img-wrap {
+        width: 100px;
+        height: 130px;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #f4f4f4;
+      }
+      .mega-menu-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+      .mega-menu-card:hover .mega-menu-img-wrap img {
+        transform: scale(1.1);
+      }
+      .mega-menu-card span {
+        font-family: "Jost", sans-serif;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-main);
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+      }
+
+      /* Mobile Visual Accordion Groups */
+      .mobile-nav-group {
+        width: 100%;
+        text-align: center;
+        margin: 15px 0;
+      }
+      .mobile-nav-parent {
+        font-family: "Playfair Display", serif;
+        font-size: 2.5rem;
+        color: var(--text-main);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        transition: color 0.4s ease;
+      }
+      .mobile-nav-parent.active {
+        color: var(--text-light);
+      }
+      .mobile-nav-parent .toggle-icon {
+        font-family: "Jost", sans-serif;
+        font-size: 1.5rem;
+        font-weight: 300;
+        transition: transform 0.4s ease;
+      }
+      .mobile-nav-parent.active .toggle-icon {
+        transform: rotate(45deg);
+      }
+      .mobile-sub-menu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .mobile-sub-menu.active {
+        max-height: 600px;
+        margin-top: 20px;
+        margin-bottom: 30px;
+      }
+
+      /* Mobile App-Style Swipe Reel */
+      .mobile-sub-grid {
+        display: flex;
+        gap: 15px;
+        width: 100%;
+        padding: 0 5%;
+        margin-bottom: 25px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      .mobile-sub-grid::-webkit-scrollbar {
+        display: none;
+      }
+      .mobile-sub-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        gap: 10px;
+        /* Shows exactly 2.5 items on screen, hinting to the user to swipe! */
+        flex: 0 0 38%;
+        scroll-snap-align: center;
+      }
+      .mobile-sub-img {
+        width: 100%;
+        aspect-ratio: 3/4;
+        border-radius: 6px;
+        object-fit: cover;
+        background: #f4f4f4;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+      .mobile-sub-card span {
+        font-family: "Jost", sans-serif;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-main);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+      }
+      .mobile-sub-link.view-all {
+        font-family: "Jost", sans-serif;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--text-main);
+        font-weight: 500;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 8px;
+        display: inline-block;
+      }
       .logo {
         display: flex;
         justify-content: center;
@@ -827,7 +1047,120 @@
         opacity: 1;
         transform: translateY(0);
       }
+      /* --- GENDER SPLIT CATEGORY SECTION --- */
+      .category-split-section {
+        padding-top: 50px;
+        background: var(--bg-color);
+      }
+      .cat-split-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+      .cat-split-card {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 4/5;
+        display: block;
+        color: #fff;
+        border-radius: 4px;
+        transform: translateZ(0); /* Force hardware acceleration */
+      }
+      .cat-split-card:nth-child(2) {
+        margin-top: 80px; /* Asymmetrical staggering for editorial look */
+        height: calc(100% - 80px);
+      }
+      .cat-split-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform;
+      }
+      .cat-split-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.6) 0%,
+          rgba(0, 0, 0, 0.1) 40%,
+          rgba(0, 0, 0, 0) 100%
+        );
+        pointer-events: none;
+      }
+      .cat-split-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        z-index: 2;
+      }
+      .cat-split-eyebrow {
+        font-family: "Jost", sans-serif;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        margin-bottom: 15px;
+        opacity: 0.8;
+      }
+      .cat-split-title {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(2.5rem, 4vw, 4rem);
+        font-weight: 400;
+        margin-bottom: 25px;
+        line-height: 1;
+        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+      .cat-split-link {
+        font-family: "Jost", sans-serif;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        padding-bottom: 6px;
+        transition: border-color 0.4s ease;
+      }
+      .cat-split-link .arrow {
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
 
+      /* Hover Interactions */
+      .cat-split-card:hover .cat-split-img {
+        transform: scale(1.06);
+      }
+      .cat-split-card:hover .cat-split-link {
+        border-color: #fff;
+      }
+      .cat-split-card:hover .cat-split-link .arrow {
+        transform: translate(5px, -5px);
+      }
+
+      /* Mobile Override for Split Section */
+      @media (max-width: 950px) {
+        .category-split-section {
+          padding-top: 40px;
+        }
+        .cat-split-container {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+        .cat-split-card,
+        .cat-split-card:nth-child(2) {
+          aspect-ratio: 3/4;
+          margin-top: 0;
+          height: auto;
+        }
+        .cat-split-content {
+          padding: 35px 30px;
+        }
+      }
       /* --- SHOP BY CATEGORY --- */
       .category-grid {
         display: grid;
@@ -2352,7 +2685,50 @@
         </div>
       </div>
     </section>
+    <!-- CATEGORY GENDER SPLIT SECTION -->
+    <section class="category-split-section section-padding">
+      <div class="cat-split-container">
+        <!-- WOMENSWEAR CARD -->
+        <a href="shop?category=Women" class="cat-split-card reveal">
+          <img
+            src="https://images.unsplash.com/photo-1771098302171-d0ee8d7cfcfa?q=80&w=707&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Womenswear"
+            class="cat-split-img"
+            loading="lazy"
+          />
+          <div class="cat-split-overlay"></div>
+          <div class="cat-split-content">
+            <span class="cat-split-eyebrow">Discover</span>
+            <h2 class="cat-split-title">Womenswear</h2>
+            <div class="cat-split-link">
+              Explore Collection <span class="arrow">↗</span>
+            </div>
+          </div>
+        </a>
 
+        <!-- MENSWEAR CARD -->
+        <a
+          href="shop?category=Men"
+          class="cat-split-card reveal"
+          style="transition-delay: 0.2s;"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1590392139414-6997d09e2da7?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Menswear"
+            class="cat-split-img"
+            loading="lazy"
+          />
+          <div class="cat-split-overlay"></div>
+          <div class="cat-split-content">
+            <span class="cat-split-eyebrow">Discover</span>
+            <h2 class="cat-split-title">Menswear</h2>
+            <div class="cat-split-link">
+              Explore Collection <span class="arrow">↗</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
     <!-- LATEST ARRIVALS (DYNAMIC FROM FIREBASE) -->
     <section class="section-padding" style="padding-top: 80px;">
       <h2 class="section-title reveal">Latest <i>Arrivals</i></h2>
@@ -2690,10 +3066,9 @@
       }
       setupSlider("video-track", "video-prev", "video-next");
 
-      // --- DYNAMIC DATA & FIREBASE STOREFRONT POPULATION ---
       let productsDB = [];
       let layoutConfig = { latest: [], curated: [], categories: [] };
-      let globalCategories = [];
+      let globalCategories = {}; // Now an object to hold the hierarchy
 
       async function fetchStorefrontData() {
         try {
@@ -2713,12 +3088,29 @@
           if (attrSnap.exists()) {
             const attrData = attrSnap.data();
             if (attrData.categories) {
-              globalCategories = attrData.categories.map((c) =>
-                typeof c === "string" ? c : c.name,
-              );
+              globalCategories = {
+                Women: [],
+                Men: [],
+                Kids: [],
+                Accessories: [],
+                Other: [],
+              };
+              attrData.categories.forEach((c) => {
+                let parent = c.parent || "Women"; // Default fallback
+                let name = typeof c === "string" ? c : c.name;
+
+                // Securely grab the image or create a beautiful text placeholder if missing
+                let img = c.img
+                  ? c.img
+                  : "https://via.placeholder.com/300x400?text=" +
+                    encodeURIComponent(name);
+
+                if (!globalCategories[parent]) globalCategories[parent] = [];
+                // Store object with BOTH name and image!
+                globalCategories[parent].push({ name: name, img: img });
+              });
             }
           }
-
           renderNavMenus();
           // renderCategories(); // Keeping hidden per recent edits
           renderLatestArrivals();
@@ -2757,47 +3149,111 @@
         );
 
         if (desktopNav) {
-          let desktopHtml = `<a href="shop" class="nav-link" data-hover="New In"><span>New In</span></a>`;
-          globalCategories.forEach((cat) => {
-            desktopHtml += `<a href="shop?category=${encodeURIComponent(
-              cat,
-            )}" class="nav-link" data-hover="${cat}"><span>${cat}</span></a>`;
-          });
+          let desktopHtml = `<div class="nav-item-wrapper"><a href="shop" class="nav-link" data-hover="New In"><span>New In</span></a></div>`;
+
+          for (let parent in globalCategories) {
+            if (globalCategories[parent].length > 0) {
+              // Generate the image grid for the subcategories
+              let gridHtml = globalCategories[parent]
+                .map(
+                  (sub) => `
+                <a href="shop?parent=${encodeURIComponent(
+                  parent,
+                )}&category=${encodeURIComponent(
+                    sub.name,
+                  )}" class="mega-menu-card">
+                  <div class="mega-menu-img-wrap">
+                    <img src="${sub.img}" loading="lazy" alt="${sub.name}" />
+                  </div>
+                  <span>${sub.name}</span>
+                </a>
+              `,
+                )
+                .join("");
+
+              // Build the full mega menu layout for this parent category
+              desktopHtml += `
+                <div class="nav-item-wrapper">
+                  <a href="shop?parent=${encodeURIComponent(
+                    parent,
+                  )}" class="nav-link" data-hover="${parent}"><span>${parent}</span></a>
+                  <div class="nav-dropdown mega-menu">
+                    <div class="mega-menu-side">
+                      <h3>${parent}</h3>
+                      <a href="shop?parent=${encodeURIComponent(
+                        parent,
+                      )}">Shop All</a>
+                    </div>
+                    <div class="mega-menu-grid">
+                      ${gridHtml}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+          }
           desktopNav.innerHTML = desktopHtml;
         }
 
         if (mobileNavContainer) {
           let mobileHtml = `
-            <a href="home" class="mobile-nav-link">Home</a>
-            <a href="shop" class="mobile-nav-link">New In</a>
+            <a href="home" class="mobile-nav-link" style="font-size: 2.2rem; margin: 10px 0;">Home</a>
+            <a href="shop" class="mobile-nav-link" style="font-size: 2.2rem; margin: 10px 0;">New In</a>
           `;
-          globalCategories.forEach((cat) => {
-            mobileHtml += `<a href="shop?category=${encodeURIComponent(
-              cat,
-            )}" class="mobile-nav-link">${cat}</a>`;
-          });
+
+          for (let parent in globalCategories) {
+            if (globalCategories[parent].length > 0) {
+              // Generate the mobile image grid for the subcategories
+              let gridHtml = globalCategories[parent]
+                .map(
+                  (sub) => `
+                <a href="shop?parent=${encodeURIComponent(
+                  parent,
+                )}&category=${encodeURIComponent(
+                    sub.name,
+                  )}" class="mobile-sub-card">
+                  <img src="${
+                    sub.img
+                  }" class="mobile-sub-img" loading="lazy" alt="${sub.name}" />
+                  <span>${sub.name}</span>
+                </a>
+              `,
+                )
+                .join("");
+
+              mobileHtml += `
+                <div class="mobile-nav-group">
+                  <div class="mobile-nav-parent" onclick="this.classList.toggle('active'); this.nextElementSibling.classList.toggle('active')">
+                    ${parent} <span class="toggle-icon">+</span>
+                  </div>
+                  <div class="mobile-sub-menu">
+                    <div class="mobile-sub-grid">
+                      ${gridHtml}
+                    </div>
+                    <a href="shop?parent=${encodeURIComponent(
+                      parent,
+                    )}" class="mobile-sub-link view-all">Shop All ${parent}</a>
+                  </div>
+                </div>
+              `;
+            }
+          }
           mobileNavContainer.innerHTML = mobileHtml;
         }
       }
-
-      function renderLatestArrivals() {
+   function renderLatestArrivals() {
         const container = document.getElementById("latest-arrivals-grid");
         container.innerHTML = "";
+        
+        // Follow Admin Selections instead of automatic sorting
+        const latestIds = layoutConfig.latest || [];
 
-        // Automatically display the latest uploaded products
-        const latestProducts = [...productsDB]
-          .sort((a, b) => {
-            const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-            const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-            return dateB - dateA;
-          })
-          .slice(0, 4);
+        latestIds.forEach((id, idx) => {
+          if (!id) return;
+          const p = productsDB.find((x) => x.id === id);
+          if (!p) return;
 
-        latestProducts.forEach((p, idx) => {
-          let imgMain =
-            p.images && p.images[0]
-              ? p.images[0]
-              : "https://via.placeholder.com/500x750?text=No+Image";
+          let imgMain = p.images && p.images[0] ? p.images[0] : "https://via.placeholder.com/500x750?text=No+Image";
           let imgHover = p.images && p.images[1] ? p.images[1] : imgMain;
           let delay = idx * 0.1;
 
@@ -2805,28 +3261,16 @@
             <div class="product-card reveal" style="transition-delay: ${delay}s;">
               <div class="product-image-wrapper">
                 ${getBadges(p)}
-                <a href="details?id=${
-                  p.id
-                }" style="display: block; width: 100%; height: 100%;">
-                  <img src="${imgMain}" class="img-main" loading="lazy" alt="${
-            p.title
-          }" />
-                  <img src="${imgHover}" class="img-hover" loading="lazy" alt="${
-            p.title
-          }" />
+                <a href="details?id=${p.id}" style="display: block; width: 100%; height: 100%;">
+                  <img src="${imgMain}" class="img-main" loading="lazy" alt="${p.title}" />
+                  <img src="${imgHover}" class="img-hover" loading="lazy" alt="${p.title}" />
                 </a>
-                <button class="quick-shop-btn" onclick="event.preventDefault(); window.openQuickAdd('${
-                  p.id
-                }')">Quick Shop</button>
-                <button class="mobile-action-btn" aria-label="Quick Add" onclick="event.preventDefault(); window.openQuickAdd('${
-                  p.id
-                }')">
+                <button class="quick-shop-btn" onclick="event.preventDefault(); window.openQuickAdd('${p.id}')">Quick Shop</button>
+                <button class="mobile-action-btn" aria-label="Quick Add" onclick="event.preventDefault(); window.openQuickAdd('${p.id}')">
                   <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
               </div>
-              <a href="details?id=${
-                p.id
-              }" style="text-decoration: none; display: block;">
+              <a href="details?id=${p.id}" style="text-decoration: none; display: block;">
                 <h3 class="product-title">${p.title}</h3>
                 <p class="product-price">${getPriceHtml(p)}</p>
               </a>

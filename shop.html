@@ -86,13 +86,8 @@
       );
 
       // SENIOR PIXEL ARCHITECTURE: Advanced Matching Preparation
-      // (When user logs in, pass their email/phone here to lower Cost Per Acquisition)
-      fbq("init", "1974098680208853", {
-        // em: 'customer@email.com',
-        // ph: '1234567890'
-      });
+      fbq("init", "1974098680208853", {});
       fbq("track", "PageView");
-      // Category Specific Event for Shop Page
       fbq("trackCustom", "ViewCategory", {
         content_name: "The Full Collection",
       });
@@ -159,7 +154,7 @@
         -webkit-font-smoothing: antialiased;
         width: 100%;
         max-width: 100%;
-        overflow-x: clip; /* CHANGED FROM HIDDEN TO CLIP - FIXES STICKY SIDEBAR BUG */
+        overflow-x: clip;
       }
 
       /* Lenis Smooth Scroll */
@@ -235,6 +230,226 @@
       .nav-link:hover span,
       .nav-link:hover::after {
         transform: translateY(-100%);
+      }
+
+      /* Premium Desktop Visual Mega-Menu */
+      .nav-item-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        padding: 20px 0;
+      }
+      .nav-dropdown {
+        position: absolute;
+        top: 80%;
+        left: -20px;
+        transform: translateY(15px);
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--border-color);
+        padding: 30px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        z-index: 3000;
+        display: flex;
+        gap: 30px;
+        width: max-content;
+        max-width: 85vw;
+      }
+      .nav-item-wrapper:hover .nav-dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      .mega-menu-side {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-right: 1px solid var(--border-color);
+        padding-right: 30px;
+        min-width: 160px;
+        flex-shrink: 0;
+      }
+      .mega-menu-side h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.8rem;
+        color: var(--text-main);
+        margin-bottom: 10px;
+      }
+      .mega-menu-side a {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-light);
+        text-decoration: underline;
+        transition: color 0.3s;
+        font-family: "Jost", sans-serif;
+      }
+      .mega-menu-side a:hover {
+        color: var(--text-main);
+      }
+
+      /* Desktop Cinematic Reel */
+      .mega-menu-grid {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+        mask-image: linear-gradient(to right, black 90%, transparent 100%);
+        -webkit-mask-image: linear-gradient(
+          to right,
+          black 90%,
+          transparent 100%
+        );
+      }
+      .mega-menu-grid::-webkit-scrollbar {
+        display: none;
+      }
+      .mega-menu-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        flex: 0 0 100px;
+        scroll-snap-align: start;
+      }
+      .mega-menu-img-wrap {
+        width: 100px;
+        height: 130px;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #f4f4f4;
+      }
+      .mega-menu-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+      .mega-menu-card:hover .mega-menu-img-wrap img {
+        transform: scale(1.1);
+      }
+      .mega-menu-card span {
+        font-family: "Jost", sans-serif;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-main);
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+      }
+
+      /* Mobile Visual Accordion Groups */
+      .mobile-nav-group {
+        width: 100%;
+        text-align: center;
+        margin: 15px 0;
+      }
+      .mobile-nav-parent {
+        font-family: "Playfair Display", serif;
+        font-size: 2.5rem;
+        color: var(--text-main);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        transition: color 0.4s ease;
+      }
+      .mobile-nav-parent.active {
+        color: var(--text-light);
+      }
+      .mobile-nav-parent .toggle-icon {
+        font-family: "Jost", sans-serif;
+        font-size: 1.5rem;
+        font-weight: 300;
+        transition: transform 0.4s ease;
+      }
+      .mobile-nav-parent.active .toggle-icon {
+        transform: rotate(45deg);
+      }
+      .mobile-sub-menu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .mobile-sub-menu.active {
+        max-height: 600px;
+        margin-top: 20px;
+        margin-bottom: 30px;
+      }
+
+      /* Mobile App-Style Swipe Reel */
+      .mobile-sub-grid {
+        display: flex;
+        gap: 15px;
+        width: 100%;
+        padding: 0 5%;
+        margin-bottom: 25px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      .mobile-sub-grid::-webkit-scrollbar {
+        display: none;
+      }
+      .mobile-sub-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        gap: 10px;
+        flex: 0 0 38%;
+        scroll-snap-align: center;
+      }
+      .mobile-sub-img {
+        width: 100%;
+        aspect-ratio: 3/4;
+        border-radius: 6px;
+        object-fit: cover;
+        background: #f4f4f4;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+      .mobile-sub-card span {
+        font-family: "Jost", sans-serif;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-main);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+      }
+      .mobile-sub-link.view-all {
+        font-family: "Jost", sans-serif;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--text-main);
+        font-weight: 500;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 8px;
+        display: inline-block;
       }
 
       .logo {
@@ -495,7 +710,7 @@
         justify-content: center;
         align-items: center;
         transition: all 0.2s;
-        border-radius: 0px; /* Sharp luxury edges */
+        border-radius: 0px;
       }
       .checkbox-label input:checked + .checkbox-custom {
         background: var(--text-main);
@@ -631,7 +846,6 @@
         gap: 50px 20px;
       }
 
-      /* Product Card styling matching Details */
       .product-card {
         text-align: left;
         position: relative;
@@ -960,8 +1174,6 @@
       /* =========================================
          PREMIUM CART & QUICK ADD MODALS
          ========================================= */
-
-      /* Reusable Quantity Selectors */
       .qty-wrapper {
         display: inline-flex;
         align-items: center;
@@ -991,7 +1203,6 @@
         font-family: "Jost", sans-serif;
       }
 
-      /* Cart Drawer */
       .cart-overlay {
         position: fixed;
         inset: 0;
@@ -1122,7 +1333,6 @@
         font-weight: 500;
       }
 
-      /* Premium Specific Checkout Button */
       .checkout-btn {
         display: block;
         width: 100%;
@@ -1143,25 +1353,6 @@
         background-color: #333;
       }
 
-      .hero-btn {
-        display: inline-block;
-        background-color: #0f0f0f;
-        color: #ffffff;
-        padding: 18px 48px;
-        font-family: "Jost", sans-serif;
-        font-size: 0.85rem;
-        font-weight: 500;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.4s ease, color 0.4s ease;
-      }
-      .hero-btn:hover {
-        background-color: #333;
-      }
-
-      /* Advanced Quick Add Modal */
       .qa-overlay {
         position: fixed;
         inset: 0;
@@ -1397,44 +1588,6 @@
         background: var(--text-main);
         color: #fff;
         border-color: var(--text-main);
-      }
-
-      .pdp-btn {
-        display: inline-block;
-        background-color: #0f0f0f;
-        color: #ffffff;
-        padding: 18px 48px;
-        font-family: "Jost", sans-serif;
-        font-size: 0.85rem;
-        font-weight: 500;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        border: none;
-        cursor: pointer;
-        transition: all 0.4s ease;
-        width: 100%;
-        text-align: center;
-        border-radius: 0;
-      }
-      .pdp-btn:hover {
-        background-color: #333;
-      }
-
-      .btn-outline {
-        display: inline-block;
-        padding: 14px 40px;
-        border: 1px solid var(--text-main);
-        background: transparent;
-        color: var(--text-main);
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        transition: all 0.4s ease;
-        cursor: pointer;
-      }
-      .btn-outline:hover {
-        background: var(--text-main);
-        color: #fff;
       }
 
       /* Footer */
@@ -2018,17 +2171,11 @@
           </button>
         </div>
 
-        <div class="filter-group">
-          <div class="filter-title" onclick="toggleFilter(this)">
-            Categories
-            <svg viewBox="0 0 24 24">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-          <div class="filter-content" id="filter-categories">
-            <!-- Dynamic Categories -->
-            <span style="font-size: 0.8rem; color: #aaa;">Loading...</span>
-          </div>
+        <div id="dynamic-category-filters">
+          <!-- Injected via JS -->
+          <span style="font-size: 0.8rem; color: #aaa;"
+            >Loading Departments...</span
+          >
         </div>
 
         <div class="filter-group">
@@ -2262,21 +2409,25 @@
         const content = el.nextElementSibling;
         const svg = el.querySelector("svg");
         content.classList.toggle("collapsed");
-        svg.style.transform = content.classList.contains("collapsed")
-          ? "rotate(-90deg)"
-          : "rotate(0deg)";
+        if (svg) {
+          svg.style.transform = content.classList.contains("collapsed")
+            ? "rotate(-90deg)"
+            : "rotate(0deg)";
+        }
       };
 
       // STATE & DATA
       let allProducts = [];
       let filteredProducts = [];
       let globalAttributes = {};
+      let globalCategories = {}; // Hierarchical Category Storage
 
       // Pagination State
       let itemsPerPage = 12;
       let currentPage = 1;
-
+      let shopSequence = [];
       let filterState = {
+        parents: [], // New! Tracks Men, Women, etc.
         categories: [],
         colors: [],
         sizes: [],
@@ -2291,8 +2442,39 @@
           );
           if (attrSnap.exists()) {
             globalAttributes = attrSnap.data();
+
+            if (globalAttributes.categories) {
+              globalCategories = {
+                Women: [],
+                Men: [],
+                Kids: [],
+                Accessories: [],
+                Other: [],
+              };
+              globalAttributes.categories.forEach((c) => {
+                let parent = c.parent || "Women"; // Default fallback
+                let name = typeof c === "string" ? c : c.name;
+                let img = c.img
+                  ? c.img
+                  : "https://via.placeholder.com/300x400?text=" +
+                    encodeURIComponent(name);
+                if (!globalCategories[parent]) globalCategories[parent] = [];
+                globalCategories[parent].push({ name: name, img: img });
+              });
+            }
             renderFilterUI();
             renderNavMenus();
+            // Fetch Manual Rank Sequence
+            try {
+              const seqSnap = await getDoc(
+                doc(db, "settings", "shop_sequence"),
+              );
+              if (seqSnap.exists()) {
+                shopSequence = seqSnap.data().order || [];
+              }
+            } catch (e) {
+              console.warn("Sequence fetch failed");
+            }
           }
 
           // Fetch Active Products
@@ -2304,21 +2486,65 @@
             }
           });
 
-          // Pre-select filter based on URL (e.g. ?category=Sarees)
+          // Handle Advanced URLs (e.g. ?parent=Women&category=Sarees)
           const urlParams = new URLSearchParams(window.location.search);
+          const urlParent = urlParams.get("parent");
           const urlCategory = urlParams.get("category");
-          if (urlCategory) {
-            filterState.categories.push(urlCategory);
-            document.getElementById("shop-main-title").innerText = urlCategory;
 
-            // visually check the box
-            setTimeout(() => {
+          // FIX: Only apply the 'All Parent' filter if NO specific category is clicked
+          if (urlParent && !urlCategory) filterState.parents.push(urlParent);
+          if (urlCategory) filterState.categories.push(urlCategory);
+
+          // Update Hero Title
+          if (urlCategory) {
+            document.getElementById("shop-main-title").innerText = urlCategory;
+          } else if (urlParent) {
+            document.getElementById("shop-main-title").innerText =
+              urlParent + " Collection";
+          } else {
+            document.getElementById("shop-main-title").innerText =
+              "The Collection";
+          }
+
+          // Pre-check the UI elements
+          setTimeout(() => {
+            if (urlParent) {
+              const pb = document.querySelector(
+                `input[value="${urlParent}"][data-type="parent"]`,
+              );
+              if (pb) {
+                // FIX: Only visually check the "All Parent" box if NO specific category is present
+                if (!urlCategory) pb.checked = true;
+
+                // Always ensure parent drawer is open
+                const content = pb.closest(".filter-content");
+                if (content) {
+                  content.classList.remove("collapsed");
+                  const svg = content.previousElementSibling.querySelector(
+                    "svg",
+                  );
+                  if (svg) svg.style.transform = "rotate(0deg)";
+                }
+              }
+            }
+            if (urlCategory) {
               const cb = document.querySelector(
                 `input[value="${urlCategory}"][data-type="category"]`,
               );
-              if (cb) cb.checked = true;
-            }, 100);
-          }
+              if (cb) {
+                cb.checked = true;
+                // Ensure this drawer is open
+                const content = cb.closest(".filter-content");
+                if (content) {
+                  content.classList.remove("collapsed");
+                  const svg = content.previousElementSibling.querySelector(
+                    "svg",
+                  );
+                  if (svg) svg.style.transform = "rotate(0deg)";
+                }
+              }
+            }
+          }, 100);
 
           applyFilters();
         } catch (error) {
@@ -2332,57 +2558,135 @@
           "dynamic-mobile-nav",
         );
 
-        const cats = globalAttributes.categories
-          ? globalAttributes.categories.map((c) =>
-              typeof c === "string" ? c : c.name,
-            )
-          : [];
-
         if (desktopNav) {
-          let desktopHtml = `<a href="shop" class="nav-link" data-hover="New In"><span>New In</span></a>`;
-          cats.forEach((cat) => {
-            desktopHtml += `<a href="shop?category=${encodeURIComponent(
-              cat,
-            )}" class="nav-link" data-hover="${cat}"><span>${cat}</span></a>`;
-          });
+          let desktopHtml = `<div class="nav-item-wrapper"><a href="shop" class="nav-link" data-hover="New In"><span>New In</span></a></div>`;
+
+          for (let parent in globalCategories) {
+            if (globalCategories[parent].length > 0) {
+              let gridHtml = globalCategories[parent]
+                .map(
+                  (sub) => `
+                <a href="shop?parent=${encodeURIComponent(
+                  parent,
+                )}&category=${encodeURIComponent(
+                    sub.name,
+                  )}" class="mega-menu-card">
+                  <div class="mega-menu-img-wrap">
+                    <img src="${sub.img}" loading="lazy" alt="${sub.name}" />
+                  </div>
+                  <span>${sub.name}</span>
+                </a>
+              `,
+                )
+                .join("");
+
+              desktopHtml += `
+                <div class="nav-item-wrapper">
+                  <a href="shop?parent=${encodeURIComponent(
+                    parent,
+                  )}" class="nav-link" data-hover="${parent}"><span>${parent}</span></a>
+                  <div class="nav-dropdown mega-menu">
+                    <div class="mega-menu-side">
+                      <h3>${parent}</h3>
+                      <a href="shop?parent=${encodeURIComponent(
+                        parent,
+                      )}">Shop All</a>
+                    </div>
+                    <div class="mega-menu-grid">
+                      ${gridHtml}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+          }
           desktopNav.innerHTML = desktopHtml;
         }
 
         if (mobileNavContainer) {
           let mobileHtml = `
-            <a href="home" class="mobile-nav-link">Home</a>
-            <a href="shop" class="mobile-nav-link">New In</a>
+            <a href="home" class="mobile-nav-link" style="font-size: 2.2rem; margin: 10px 0;">Home</a>
+            <a href="shop" class="mobile-nav-link" style="font-size: 2.2rem; margin: 10px 0;">New In</a>
           `;
-          cats.forEach((cat) => {
-            mobileHtml += `<a href="shop?category=${encodeURIComponent(
-              cat,
-            )}" class="mobile-nav-link">${cat}</a>`;
-          });
+
+          for (let parent in globalCategories) {
+            if (globalCategories[parent].length > 0) {
+              let gridHtml = globalCategories[parent]
+                .map(
+                  (sub) => `
+                <a href="shop?parent=${encodeURIComponent(
+                  parent,
+                )}&category=${encodeURIComponent(
+                    sub.name,
+                  )}" class="mobile-sub-card">
+                  <img src="${
+                    sub.img
+                  }" class="mobile-sub-img" loading="lazy" alt="${sub.name}" />
+                  <span>${sub.name}</span>
+                </a>
+              `,
+                )
+                .join("");
+
+              mobileHtml += `
+                <div class="mobile-nav-group">
+                  <div class="mobile-nav-parent" onclick="this.classList.toggle('active'); this.nextElementSibling.classList.toggle('active')">
+                    ${parent} <span class="toggle-icon">+</span>
+                  </div>
+                  <div class="mobile-sub-menu">
+                    <div class="mobile-sub-grid">
+                      ${gridHtml}
+                    </div>
+                    <a href="shop?parent=${encodeURIComponent(
+                      parent,
+                    )}" class="mobile-sub-link view-all">Shop All ${parent}</a>
+                  </div>
+                </div>
+              `;
+            }
+          }
           mobileNavContainer.innerHTML = mobileHtml;
         }
       }
 
       function renderFilterUI() {
-        // Categories
-        const catContainer = document.getElementById("filter-categories");
-        if (
-          globalAttributes.categories &&
-          globalAttributes.categories.length > 0
-        ) {
-          catContainer.innerHTML = globalAttributes.categories
-            .map(
-              (c) => `
-                  <label class="checkbox-label">
-                      <input type="checkbox" value="${
-                        typeof c === "string" ? c : c.name
-                      }" data-type="category" onchange="handleFilterChange(this)">
-                      <div class="checkbox-custom"></div>
-                      ${typeof c === "string" ? c : c.name}
-                  </label>
-              `,
-            )
-            .join("");
+        // Hierarchical Categories Filter
+        const dynamicCatFilters = document.getElementById(
+          "dynamic-category-filters",
+        );
+        let catHtml = "";
+        for (let parent in globalCategories) {
+          if (globalCategories[parent].length > 0) {
+            // By default, collapse all drawers unless pre-opened by initShop
+            catHtml += `
+                <div class="filter-group">
+                  <div class="filter-title" onclick="toggleFilter(this)">
+                    ${parent}
+                    <svg viewBox="0 0 24 24" style="transform: rotate(-90deg);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </div>
+                  <div class="filter-content collapsed">
+                    <label class="checkbox-label" style="font-weight:600; margin-bottom: 5px; color: var(--text-main);">
+                        <input type="checkbox" value="${parent}" data-type="parent" onchange="handleFilterChange(this)">
+                        <div class="checkbox-custom" style="border-radius: 4px;"></div>
+                        All ${parent}
+                    </label>
+                    ${globalCategories[parent]
+                      .map(
+                        (sub) => `
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="${sub.name}" data-type="category" onchange="handleFilterChange(this)">
+                            <div class="checkbox-custom"></div>
+                            ${sub.name}
+                        </label>
+                    `,
+                      )
+                      .join("")}
+                  </div>
+                </div>
+                `;
+          }
         }
+        dynamicCatFilters.innerHTML = catHtml;
 
         // Colors
         const colorContainer = document.getElementById("filter-colors");
@@ -2420,10 +2724,13 @@
         const val = cb.value;
 
         if (cb.checked) {
+          if (type === "parent") filterState.parents.push(val);
           if (type === "category") filterState.categories.push(val);
           if (type === "color") filterState.colors.push(val);
           if (type === "size") filterState.sizes.push(val);
         } else {
+          if (type === "parent")
+            filterState.parents = filterState.parents.filter((v) => v !== val);
           if (type === "category")
             filterState.categories = filterState.categories.filter(
               (v) => v !== val,
@@ -2434,10 +2741,19 @@
             filterState.sizes = filterState.sizes.filter((v) => v !== val);
         }
 
-        // Update title if only one category selected
-        if (filterState.categories.length === 1) {
+        // Update Title Logically
+        if (
+          filterState.categories.length === 1 &&
+          filterState.parents.length === 0
+        ) {
           document.getElementById("shop-main-title").innerText =
             filterState.categories[0];
+        } else if (
+          filterState.parents.length === 1 &&
+          filterState.categories.length === 0
+        ) {
+          document.getElementById("shop-main-title").innerText =
+            filterState.parents[0] + " Collection";
         } else {
           document.getElementById("shop-main-title").innerText =
             "The Collection";
@@ -2447,12 +2763,11 @@
       };
 
       window.clearAllFilters = function () {
-        filterState = { categories: [], colors: [], sizes: [] };
+        filterState = { parents: [], categories: [], colors: [], sizes: [] };
         document
           .querySelectorAll('input[type="checkbox"]')
           .forEach((cb) => (cb.checked = false));
         document.getElementById("shop-main-title").innerText = "The Collection";
-        // Clear URL parameter without refreshing
         window.history.replaceState(
           {},
           document.title,
@@ -2465,14 +2780,28 @@
         const sortVal = document.getElementById("sort-select").value;
 
         filteredProducts = allProducts.filter((p) => {
-          // Category Match
-          if (
-            filterState.categories.length > 0 &&
-            !filterState.categories.includes(p.category)
-          )
-            return false;
+          // Resolve exact parent for the product (Legacy fallback safety included)
+          let pParent = p.categoryParent;
+          if (!pParent && globalAttributes.categories) {
+            const catAttr = globalAttributes.categories.find(
+              (c) => (typeof c === "string" ? c : c.name) === p.category,
+            );
+            pParent = catAttr?.parent || "Women";
+          }
 
-          // Color Match (Product must have at least one of the selected colors)
+          // Parent & Category Match Logic
+          let passCategory = true;
+          if (
+            filterState.parents.length > 0 ||
+            filterState.categories.length > 0
+          ) {
+            const matchParent = filterState.parents.includes(pParent);
+            const matchSub = filterState.categories.includes(p.category);
+            passCategory = matchParent || matchSub;
+          }
+          if (!passCategory) return false;
+
+          // Color Match
           if (filterState.colors.length > 0) {
             if (!p.colors) return false;
             const pColors = p.colors.map((c) => c.name);
@@ -2493,23 +2822,35 @@
           return true;
         });
 
-        // Sort Logic
-        if (sortVal === "price_low") {
-          filteredProducts.sort(
-            (a, b) => (a.finalPrice || a.price) - (b.finalPrice || b.price),
-          );
-        } else if (sortVal === "price_high") {
-          filteredProducts.sort(
-            (a, b) => (b.finalPrice || b.price) - (a.finalPrice || a.price),
-          );
-        } else {
-          // 'newest' - Assuming reverse array or timestamp if exists
-          filteredProducts.sort((a, b) => {
-            if (a.updatedAt && b.updatedAt)
-              return new Date(b.updatedAt) - new Date(a.updatedAt);
-            return -1; // Default
-          });
-        }
+        // ADVANCED SORTING: Priority Sequence First, then selected sort
+        filteredProducts.sort((a, b) => {
+          const idxA = shopSequence.indexOf(a.id);
+          const idxB = shopSequence.indexOf(b.id);
+
+          const isRankedA = idxA !== -1;
+          const isRankedB = idxB !== -1;
+
+          // 1. If both are ranked, sort by their rank position
+          if (isRankedA && isRankedB) return idxA - idxB;
+
+          // 2. If only A is ranked, move it to the top
+          if (isRankedA) return -1;
+
+          // 3. If only B is ranked, move it down
+          if (isRankedB) return 1;
+
+          // 4. If neither is ranked, use the user's selected sorting method
+          if (sortVal === "price_low") {
+            return (a.finalPrice || a.price) - (b.finalPrice || b.price);
+          } else if (sortVal === "price_high") {
+            return (b.finalPrice || b.price) - (a.finalPrice || a.price);
+          } else {
+            // newest
+            const timeA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+            const timeB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+            return timeB - timeA;
+          }
+        });
 
         document.getElementById(
           "product-count-display",
@@ -2524,7 +2865,7 @@
           document.getElementById("no-products-msg").style.display = "none";
           document.getElementById("pagination-container").style.display =
             "flex";
-          renderPage(1); // Reset to page 1 on filter
+          renderPage(1);
         }
       };
 
@@ -2721,7 +3062,7 @@
       });
 
       // Live Search Filtering
-      let searchPixelTimeout; // Variable to hold our debounce timer
+      let searchPixelTimeout;
       searchInput.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase().trim();
         searchGrid.innerHTML = "";
@@ -2774,7 +3115,7 @@
               content_category: "Shop Search",
             });
           }
-        }, 1200); // Waits 1.2s after they stop typing to fire pixel
+        }, 1200);
       });
 
       // --- QUICK ADD & CART SYSTEM ---
@@ -2828,7 +3169,6 @@
         const p = allProducts.find((x) => x.id === productId);
         if (!p) return;
 
-        // Initialize activeQAProduct with basic product details to fix null reference error
         activeQAProduct = {
           id: p.id,
           title: p.title,
@@ -2845,11 +3185,9 @@
         activeQAMaxStock = Number(p.stock) || 0;
         const outOfStock = activeQAMaxStock <= 0;
 
-        // Populate dynamic modal UI details to make the workspace functional
         document.getElementById("qa-title-target").innerText = p.title;
         document.getElementById("qa-price-target").innerHTML = getPriceHtml(p);
 
-        // Populate images and interactive thumbnail galleries
         qaImages = p.images || [];
         currentQAImgIdx = 0;
         const thumbContainer = document.getElementById(
@@ -2868,7 +3206,6 @@
             .join("");
         }
 
-        // Populate matching colors
         const colorsContainer = document.getElementById("qa-colors");
         colorsContainer.innerHTML = "";
         if (p.colors && p.colors.length > 0) {
@@ -2958,7 +3295,6 @@
         if (e.target === qaModal) closeQuickAdd();
       });
 
-      // QA Image Zoom Logic
       const zoomArea = document.getElementById("qa-main-zoom-area");
       zoomArea.addEventListener("mousemove", (e) => {
         if (window.innerWidth <= 950) return;
@@ -3021,13 +3357,12 @@
       function processAddToCart() {
         let uniqueId = `${activeQAProduct.id}-${activeQAProduct.size}-${activeQAProduct.color}`;
 
-        // SENIOR UPGRADE: DPA (Dynamic Product Ads) Compliant AddToCart
         if (typeof fbq !== "undefined") {
           fbq("track", "AddToCart", {
             content_ids: [activeQAProduct.id],
             contents: [
               { id: activeQAProduct.id, quantity: activeQAProduct.qty },
-            ], // Critical for accurate DPA
+            ],
             content_type: "product",
             content_name: activeQAProduct.title,
             value: activeQAProduct.price * activeQAProduct.qty,
@@ -3081,7 +3416,6 @@
           0,
         );
 
-        // SENIOR UPGRADE: DPA Compliant InitiateCheckout array mapping
         let fbContents = cartState.items.map((item) => ({
           id: item.id,
           quantity: item.qty,

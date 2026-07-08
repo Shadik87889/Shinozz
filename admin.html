@@ -1907,6 +1907,16 @@
             <line x1="9" y1="21" x2="9" y2="9"></line></svg
           >Storefront Builder
         </li>
+        <li class="nav-item" data-target="view-sequence">
+          <svg viewBox="0 0 24 24">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line></svg
+          >Shop Sequence
+        </li>
         <li class="nav-item" data-target="view-settings">
           <svg viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="3"></circle>
@@ -2367,10 +2377,25 @@
                   flex-wrap: wrap;
                 "
               >
+                <select
+                  id="attr-categories-parent"
+                  class="filter-select"
+                  style="padding: 10px; font-weight: 600; color: var(--accent);"
+                  required
+                >
+                  <option value="" disabled selected
+                    >Select Main Dept...</option
+                  >
+                  <option value="Women">Women</option>
+                  <option value="Men">Men</option>
+                  <option value="Kids">Kids</option>
+                  <option value="Accessories">Accessories</option>
+                  <option value="Other">Other</option>
+                </select>
                 <input
                   type="text"
                   id="attr-categories-input"
-                  placeholder="e.g. Sarees"
+                  placeholder="Subcategory (e.g. Sarees, Shirts)"
                   required
                   style="padding: 10px; flex: 1; min-width: 150px;"
                 />
@@ -2638,17 +2663,28 @@
                       />
                     </div>
                     <div class="form-group">
-                      <label>Category *</label>
+                      <label>Category Hierarchy *</label>
                       <div style="display: flex; gap: 10px;">
                         <select
                           id="prod-category"
                           onchange="handleCategorySelect(this)"
                           required
                         ></select>
+                        <select
+                          id="prod-category-parent-new"
+                          class="filter-select"
+                          style="display: none; width: 140px; font-weight: 600;"
+                        >
+                          <option value="Women">Women</option>
+                          <option value="Men">Men</option>
+                          <option value="Kids">Kids</option>
+                          <option value="Accessories">Accessories</option>
+                          <option value="Other">Other</option>
+                        </select>
                         <input
                           type="text"
                           id="prod-category-new"
-                          placeholder="Type new category..."
+                          placeholder="Type new subcategory..."
                           style="display: none; flex: 1;"
                         />
                       </div>
@@ -2984,6 +3020,14 @@
               Latest Arrivals (Hero Grid)
             </h3>
             <div id="builder-latest" class="builder-grid"></div>
+            <button
+              type="button"
+              class="btn btn-outline btn-small"
+              onclick="addBuilderSlot('latest')"
+              style="margin-top: 15px;"
+            >
+              + Add Hero Slot
+            </button>
             <hr />
             <h3
               style="
@@ -3024,6 +3068,14 @@
               Curated Edit (Horizontal Reel)
             </h3>
             <div id="builder-curated" class="builder-grid"></div>
+            <button
+              type="button"
+              class="btn btn-outline btn-small"
+              onclick="addBuilderSlot('curated')"
+              style="margin-top: 15px;"
+            >
+              + Add Reel Slot
+            </button>
             <div
               style="
                 margin-top: 50px;
@@ -3039,6 +3091,52 @@
               >
                 Publish Storefront Live
               </button>
+            </div>
+          </div>
+        </section>
+        <!-- SHOP SEQUENCE CONTROL -->
+        <section id="view-sequence" class="view-section">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Shop Priority Sequencer</div>
+              <button
+                class="btn btn-dark"
+                onclick="saveShopSequence()"
+                id="btn-save-sequence"
+              >
+                Save Global Sequence
+              </button>
+            </div>
+            <p
+              style="
+                color: var(--text-light);
+                margin-bottom: 25px;
+                font-size: 0.85rem;
+              "
+            >
+              Select products to appear <strong>FIRST</strong> on the shop page.
+              Unlisted products will follow normally by date.
+            </p>
+            <div class="filter-bar-container">
+              <select id="seq-add-select" class="filter-select" style="flex: 1;"
+                ><option value="">-- Select Product to Rank --</option></select
+              >
+              <button class="btn btn-dark" onclick="addToSequence()">
+                Add to Rank
+              </button>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 80px;">Rank</th>
+                    <th>Visual</th>
+                    <th>Product</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="sequence-table-body"></tbody>
+              </table>
             </div>
           </div>
         </section>
@@ -3348,7 +3446,6 @@
 
     <div class="toast" id="toast"><span id="toast-msg">Success</span></div>
 
-    <!-- FIREBASE & LOGIC -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
       import {
@@ -3382,13 +3479,13 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
 
-      // Databases
       let productsDB = [];
       let filteredDB = [];
       let customersDB = [];
       let ordersDB = [];
       let filteredOrdersDB = [];
       let storeConfig = { shippingInside: 80, shippingOutside: 150 };
+      let shopSequence = [];
 
       let layoutDB = {
         latest: ["", "", "", ""],
@@ -3402,8 +3499,8 @@
 
       let attributesDB = {
         categories: [
-          { name: "Sarees", img: "" },
-          { name: "Pret-A-Porter", img: "" },
+          { name: "Sarees", parent: "Women", img: "" },
+          { name: "Pret-A-Porter", parent: "Women", img: "" },
         ],
         sizes: ["XS", "S", "M", "L", "XL"],
         materials: ["Pure Silk", "Cotton"],
@@ -3452,10 +3549,7 @@
         if (el) el.classList.add("active");
         const pane = document.getElementById(tabId);
         if (pane) pane.classList.add("active");
-
-        if (tabId === "tab-inspector") {
-          window.refreshInspectorImage();
-        }
+        if (tabId === "tab-inspector") window.refreshInspectorImage();
       };
 
       window.customConfirm = (
@@ -3494,25 +3588,20 @@
 
       window.closeModal = (modalId) => {
         const modal = document.getElementById(modalId);
-        if (modal) {
-          modal.classList.remove("show");
-        }
+        if (modal) modal.classList.remove("show");
       };
 
       window.openQuickView = (id) => {
         const p = productsDB.find((x) => x.id === id);
         if (!p) return;
-
         document.getElementById("qv-category").innerText = p.category || "N/A";
         document.getElementById("qv-sku").innerText = `SKU: ${p.sku || "N/A"}`;
         document.getElementById("qv-title").innerText = p.title || "Untitled";
-
         let priceHtml = `৳${(p.price || 0).toLocaleString()}`;
         if (p.finalPrice && p.finalPrice < p.price) {
           priceHtml = `<del style="color:#aaa; font-size:0.75rem; margin-right:8px;">৳${p.price.toLocaleString()}</del> ৳${p.finalPrice.toLocaleString()}`;
         }
         document.getElementById("qv-price").innerHTML = priceHtml;
-
         let sQty = Number(p.stock) || 0;
         let sAlert = Number(p.stockAlert) || 0;
         let stockBadge = document.getElementById("qv-stock-status");
@@ -3526,10 +3615,8 @@
           stockBadge.className = "status-badge";
           stockBadge.innerText = `In Stock (${sQty})`;
         }
-
         document.getElementById("qv-desc").innerHTML =
           p.desc || "No description provided.";
-
         const colorsContainer = document.getElementById("qv-colors");
         if (p.colors && p.colors.length > 0) {
           colorsContainer.innerHTML = p.colors
@@ -3541,7 +3628,6 @@
         } else {
           colorsContainer.innerHTML = `<span style="font-size:0.8rem; color:var(--text-light);">None</span>`;
         }
-
         const sizesContainer = document.getElementById("qv-sizes");
         if (p.sizes) {
           sizesContainer.innerHTML = p.sizes
@@ -3553,7 +3639,6 @@
         } else {
           sizesContainer.innerHTML = `<span style="font-size:0.8rem; color:var(--text-light);">None</span>`;
         }
-
         const materialsContainer = document.getElementById("qv-materials");
         if (p.materials) {
           materialsContainer.innerHTML = p.materials
@@ -3565,13 +3650,11 @@
         } else {
           materialsContainer.innerHTML = `<span style="font-size:0.8rem; color:var(--text-light);">None</span>`;
         }
-
         const thumbContainer = document.getElementById(
           "qv-thumbnails-container",
         );
         const mainImg = document.getElementById("qv-main-img");
         thumbContainer.innerHTML = "";
-
         if (p.images && p.images.length > 0) {
           mainImg.src = p.images[0];
           p.images.forEach((img, idx) => {
@@ -3590,7 +3673,6 @@
         } else {
           mainImg.src = "https://via.placeholder.com/500x750?text=No+Image";
         }
-
         document.getElementById("quick-view-modal").classList.add("show");
       };
 
@@ -3625,7 +3707,6 @@
           .classList.remove("show");
       };
 
-      // Auth
       onAuthStateChanged(auth, async (user) => {
         if (user) {
           document.getElementById("auth-overlay").style.opacity = "0";
@@ -3668,13 +3749,13 @@
             e.target.querySelector("button").innerText = "Access System";
           }
         });
+
       window.logoutAdmin = async () => {
         localStorage.removeItem("shinozz_active_view");
         await signOut(auth);
         window.location.reload();
       };
 
-      // View Switcher
       window.switchView = (viewId) => {
         closeSidebar();
         document
@@ -3692,7 +3773,7 @@
           "view-products": "Master Catalog",
           "view-customers": "Clientele Database",
           "view-attributes": "System Attributes",
-          "view-builder": "Storefront Builder",
+          "view-sequence": "Shop Priority Sequencer",
           "view-editor": "Product Intelligence Engine",
           "view-settings": "System Config",
         };
@@ -3703,9 +3784,10 @@
         if (viewId === "view-products") filterCatalog();
         if (viewId === "view-orders") filterOrders();
         if (viewId === "view-dashboard") updateDashboardStats();
-        if (viewId === "view-builder") renderBuilder();
+        if (viewId === "view-sequence") renderSequencer();
         window.scrollTo({ top: 0, behavior: "smooth" });
       };
+
       document
         .querySelectorAll(".nav-item")
         .forEach((item) =>
@@ -3771,7 +3853,9 @@
             attributesDB = { ...attributesDB, ...attrSnap.data() };
             if (Array.isArray(attributesDB.categories)) {
               attributesDB.categories = attributesDB.categories.map((c) =>
-                typeof c === "string" ? { name: c, img: "" } : c,
+                typeof c === "string"
+                  ? { name: c, parent: "Women", img: "" }
+                  : c,
               );
             }
           }
@@ -3789,6 +3873,13 @@
           filterCatalog();
           renderCustomersTable();
           renderBuilder();
+          try {
+            const seqSnap = await getDoc(doc(db, "settings", "shop_sequence"));
+            if (seqSnap.exists()) {
+              shopSequence = seqSnap.data().order || [];
+            }
+          } catch (e) {}
+          renderSequencer();
         } catch (e) {
           showToast("Database Sync Failed", true);
         }
@@ -3796,9 +3887,8 @@
       }
 
       function updateDashboardStats() {
-        // 1. Exact Inventory & Asset Valuations
-        let inventoryValue = 0;
-        let totalStockUnits = 0;
+        let inventoryValue = 0,
+          totalStockUnits = 0;
         productsDB.forEach((p) => {
           const qty = Number(p.stock) || 0;
           const price = Number(p.finalPrice || p.price) || 0;
@@ -3806,13 +3896,11 @@
           totalStockUnits += qty;
         });
 
-        // 2. Exact Comprehensive Accounting
-        let earned = 0;
-        let pending = 0;
-        let lost = 0;
-        let discounts = 0;
-        let deliveredCount = 0;
-
+        let earned = 0,
+          pending = 0,
+          lost = 0,
+          discounts = 0,
+          deliveredCount = 0;
         let statusCounts = {
           Pending: 0,
           Processing: 0,
@@ -3824,8 +3912,6 @@
         ordersDB.forEach((o) => {
           const status = o.status || "Pending";
           const total = o.financials?.total || 0;
-
-          // Calculate exact discount for this order
           let orderDiscount = 0;
           if (o.items) {
             o.items.forEach((item) => {
@@ -3840,9 +3926,7 @@
               }
             });
           }
-
           if (statusCounts[status] !== undefined) statusCounts[status]++;
-
           if (status === "Delivered") {
             earned += total;
             discounts += orderDiscount;
@@ -3855,25 +3939,20 @@
         });
 
         const aov = deliveredCount > 0 ? earned / deliveredCount : 0;
-
-        // 3. Update DOM Elements safely
         const setVal = (id, val) => {
           const el = document.getElementById(id);
           if (el) el.innerText = val;
         };
-
         setVal("stat-earned", `৳${earned.toLocaleString()}`);
         setVal("stat-pending", `৳${pending.toLocaleString()}`);
         setVal("stat-lost", `৳${lost.toLocaleString()}`);
         setVal("stat-discounts", `৳${discounts.toLocaleString()}`);
-
         setVal("stat-aov", `৳${Math.round(aov).toLocaleString()}`);
         setVal("stat-customers", customersDB.length);
         setVal("stat-orders-total", ordersDB.length);
         setVal("stat-inventory-val", `৳${inventoryValue.toLocaleString()}`);
         setVal("stat-stock", totalStockUnits.toLocaleString());
 
-        // 4. Render Chart.js Analytics
         renderDashboardCharts(statusCounts, {
           earned,
           pending,
@@ -3883,7 +3962,6 @@
       }
 
       function renderDashboardCharts(sCounts, revData) {
-        // Setup Fulfillment Doughnut Chart
         const ctxFulfill = document.getElementById("chart-fulfillment");
         if (ctxFulfill) {
           if (chartFulfillmentInstance) chartFulfillmentInstance.destroy();
@@ -3931,8 +4009,6 @@
             },
           });
         }
-
-        // Setup Revenue Bar Chart
         const ctxRev = document.getElementById("chart-revenue");
         if (ctxRev) {
           if (chartRevenueInstance) chartRevenueInstance.destroy();
@@ -3996,17 +4072,14 @@
             ordersDB.push({ id: doc.id, ...doc.data() });
           });
           ordersDB.sort((a, b) => {
-            const timeA = a.createdAt?.seconds || 0;
-            const timeB = b.createdAt?.seconds || 0;
-            return timeB - timeA;
+            return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
           });
           updateNotificationUI();
           updateDashboardStats();
           if (
             document.getElementById("view-orders").classList.contains("active")
-          ) {
+          )
             filterOrders();
-          }
         });
       }
 
@@ -4020,9 +4093,8 @@
           bell &&
           !bell.contains(event.target) &&
           !drop.contains(event.target)
-        ) {
+        )
           drop.classList.remove("show");
-        }
       });
 
       function updateNotificationUI() {
@@ -4195,7 +4267,6 @@
           "oi-fin-total",
         ).innerText = `৳${grandTotal.toLocaleString()}`;
 
-        // PDF Generation Injectors
         document.getElementById("pdf-id").innerText = `#${shortId}`;
         document.getElementById("pdf-date").innerText = formatDate(o.createdAt);
         document.getElementById(
@@ -4223,8 +4294,9 @@
                   item.title
                 }</div>
                 <div style="font-size:0.75rem; color:#777; margin-top: 4px;">
-                  Color: ${item.color} | Size: ${item.size}<br>
-                  SKU: ${sku} | ID: ${item.id}
+                  Color: ${item.color} | Size: ${
+              item.size
+            }<br>SKU: ${sku} | ID: ${item.id}
                 </div>
               </td>
               <td style="text-align:center; vertical-align:middle; padding: 15px 12px; border-bottom: 1px solid #ddd;">${
@@ -4236,7 +4308,6 @@
             </tr>`;
           });
         }
-
         document.getElementById(
           "pdf-sub",
         ).innerText = `৳${o.financials.subtotal.toLocaleString()}`;
@@ -4252,7 +4323,6 @@
         document.getElementById(
           "pdf-due",
         ).innerText = `৳${due.toLocaleString()}`;
-
         document.getElementById("order-inspector-modal").classList.add("show");
       };
 
@@ -4273,30 +4343,21 @@
 
       window.generateOrderInvoice = () => {
         if (!activeOrderId) return;
-
-        // Show loader to indicate processing
         showLoader();
-
         const o = ordersDB.find((x) => x.id === activeOrderId);
         const shortId = "NR-" + o.id.toUpperCase().substring(0, 8);
         const originalElement = document.getElementById(
           "admin-invoice-capture-area",
         );
-
-        // Create a hidden wrapper off-screen to prevent UI flashing or breaking layout
         const wrapper = document.createElement("div");
         wrapper.style.position = "fixed";
         wrapper.style.left = "-9999px";
         wrapper.style.top = "-9999px";
-
-        // Clone the invoice template and make it visible inside the wrapper
         const clone = originalElement.cloneNode(true);
         clone.id = "temp-invoice-clone";
         clone.style.display = "block";
-
         wrapper.appendChild(clone);
         document.body.appendChild(wrapper);
-
         const opt = {
           margin: 0.5,
           filename: `SHINOZZ_Invoice_${shortId}.pdf`,
@@ -4304,8 +4365,6 @@
           html2canvas: { scale: 2, useCORS: true, allowTaint: true },
           jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
         };
-
-        // Allow 1 second for any dynamic images inside the clone to fully load
         setTimeout(() => {
           try {
             html2pdf()
@@ -4318,13 +4377,11 @@
                 showToast("Invoice Generated Successfully!");
               })
               .catch((e) => {
-                console.error("html2pdf generation error:", e);
                 document.body.removeChild(wrapper);
                 hideLoader();
                 showToast("Failed to generate PDF. Check console.", true);
               });
           } catch (e) {
-            console.error("html2pdf initialization error:", e);
             document.body.removeChild(wrapper);
             hideLoader();
             showToast("Library error. Please try again.", true);
@@ -4367,6 +4424,7 @@
           showToast("Failed to save attribute", true);
         }
       }
+
       function refreshGlobalAttributesUI() {
         const renderTextList = (type) =>
           attributesDB[type]
@@ -4375,20 +4433,24 @@
                 `<tr><td><strong>${val}</strong></td><td style="text-align: right;"><button class="btn-action-sm danger" style="margin-left:auto;" onclick="deleteAttribute('${type}', ${i})">${closeSVG}</button></td></tr>`,
             )
             .join("");
+
         document.getElementById(
           "attr-list-categories",
         ).innerHTML = attributesDB.categories
-          .map(
-            (c, i) =>
-              `<tr><td style="display:flex; align-items:center; gap:15px;"><div style="width:40px; height:40px; border-radius:4px; background:var(--bg-main); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">${
-                c.img
-                  ? `<img src="${c.img}" style="width:100%; height:100%; object-fit:cover;">`
-                  : `<span style="font-size:10px; color:#aaa;">No Img</span>`
-              }</div><strong>${
-                c.name
-              }</strong></td><td style="text-align: right;"><button class="btn-action-sm danger" style="margin-left:auto;" onclick="deleteCategoryAttribute(${i})">${closeSVG}</button></td></tr>`,
-          )
+          .map((c, i) => {
+            let parentBadge = c.parent
+              ? `<span class="state-badge" style="margin-right:10px;">${c.parent}</span>`
+              : `<span class="state-badge" style="margin-right:10px;">Women</span>`;
+            return `<tr><td style="display:flex; align-items:center; gap:15px;"><div style="width:40px; height:40px; border-radius:4px; background:var(--bg-main); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">${
+              c.img
+                ? `<img src="${c.img}" style="width:100%; height:100%; object-fit:cover;">`
+                : `<span style="font-size:10px; color:#aaa;">No Img</span>`
+            }</div><div>${parentBadge}<strong>${
+              c.name
+            }</strong></div></td><td style="text-align: right;"><button class="btn-action-sm danger" style="margin-left:auto;" onclick="deleteCategoryAttribute(${i})">${closeSVG}</button></td></tr>`;
+          })
           .join("");
+
         document.getElementById("attr-list-sizes").innerHTML = renderTextList(
           "sizes",
         );
@@ -4403,17 +4465,41 @@
               `<tr><td style="display:flex; align-items:center; gap:10px;"><div style="width:20px; height:20px; border-radius:50%; background:${c.hex}; border:1px solid #ccc; flex-shrink:0;"></div> <strong>${c.name}</strong></td><td style="text-align: right;"><button class="btn-action-sm danger" style="margin-left:auto;" onclick="deleteAttribute('colors', ${i})">${closeSVG}</button></td></tr>`,
           )
           .join("");
-        let catFilter = '<option value="all">All Categories</option>',
-          catEdit = '<option value="">Select Category...</option>';
+
+        // HIERARCHICAL GROUPING
+        let groupedCats = {
+          Men: [],
+          Women: [],
+          Kids: [],
+          Accessories: [],
+          Other: [],
+        };
         attributesDB.categories.forEach((c) => {
-          catFilter += `<option value="${c.name}">${c.name}</option>`;
-          catEdit += `<option value="${c.name}">${c.name}</option>`;
+          let p = c.parent || "Women";
+          if (!groupedCats[p]) groupedCats[p] = [];
+          groupedCats[p].push(c);
         });
-        catEdit += `<option value="_new" style="font-weight:bold; color:var(--accent);">➕ Create New Category</option>`;
+
+        let catFilter = '<option value="all">All Categories</option>';
+        let catEdit = '<option value="">Select Subcategory...</option>';
+
+        for (let parent in groupedCats) {
+          if (groupedCats[parent].length > 0) {
+            catFilter += `<optgroup label="${parent}">`;
+            catEdit += `<optgroup label="${parent}">`;
+            groupedCats[parent].forEach((c) => {
+              catFilter += `<option value="${c.name}">${c.name}</option>`;
+              catEdit += `<option value="${c.name}">${c.name}</option>`;
+            });
+            catFilter += `</optgroup>`;
+            catEdit += `</optgroup>`;
+          }
+        }
+        catEdit += `<option value="_new" style="font-weight:bold; color:var(--accent);">➕ Create New Subcategory</option>`;
+
         document.getElementById("filter-category").innerHTML = catFilter;
         document.getElementById("prod-category").innerHTML = catEdit;
 
-        // Render Quick Chips for the Editor
         document.getElementById(
           "quick-sizes",
         ).innerHTML = attributesDB.sizes
@@ -4436,24 +4522,27 @@
             .map((c, i) => `<option value="${i}">${c.name}</option>`)
             .join("");
       }
+
       window.saveCategoryAttribute = (e) => {
         e.preventDefault();
+        const parent = document.getElementById("attr-categories-parent").value;
         const nameInput = document.getElementById("attr-categories-input");
         const imgInput = document.getElementById("attr-categories-img-input");
         const name = nameInput.value.trim();
         const img = imgInput.value.trim();
         if (!name || attributesDB.categories.find((c) => c.name === name))
           return showToast("Invalid or duplicate", true);
-        attributesDB.categories.push({ name, img });
+        attributesDB.categories.push({ name, img, parent });
         nameInput.value = "";
         imgInput.value = "";
         syncAttributesDB();
-        showToast("Category Added");
+        showToast("Category Hierarchy Updated");
       };
+
       window.deleteCategoryAttribute = async (index) => {
         if (
           !(await customConfirm(
-            "Delete this category attribute?",
+            "Delete this subcategory?",
             "System Alert",
             "Delete",
             true,
@@ -4464,6 +4553,7 @@
         syncAttributesDB();
         showToast("Deleted");
       };
+
       window.saveAttribute = (type, e) => {
         e.preventDefault();
         const input = document.getElementById(`attr-${type}-input`);
@@ -4475,6 +4565,7 @@
         syncAttributesDB();
         showToast("Added Successfully");
       };
+
       window.saveColorAttribute = (e) => {
         e.preventDefault();
         const name = document.getElementById("attr-color-name").value.trim();
@@ -4485,6 +4576,7 @@
         syncAttributesDB();
         showToast("Color Added");
       };
+
       window.deleteAttribute = async (type, index) => {
         if (
           !(await customConfirm(
@@ -4499,10 +4591,13 @@
         syncAttributesDB();
         showToast("Deleted");
       };
+
       window.handleCategorySelect = (select) => {
         const input = document.getElementById("prod-category-new");
+        const parentSel = document.getElementById("prod-category-parent-new");
         if (select.value === "_new") {
           select.style.display = "none";
+          parentSel.style.display = "block";
           input.style.display = "block";
           input.focus();
         }
@@ -4528,6 +4623,7 @@
           currentPage === totalPages ? "disabled" : ""
         } onclick="${callbackName}(${currentPage + 1})">Next</button>`;
       }
+
       window.changeCustPage = (p) => {
         custCurrentPage = p;
         renderCustomersTable();
@@ -4578,10 +4674,12 @@
         prodCurrentPage = 1;
         renderProductsTable();
       };
+
       window.changeProdPage = (p) => {
         prodCurrentPage = p;
         renderProductsTable();
       };
+
       function renderProductsTable() {
         const start = (prodCurrentPage - 1) * itemsPerPage;
         const paginated = filteredDB.slice(start, start + itemsPerPage);
@@ -4633,6 +4731,7 @@
           "changeProdPage",
         );
       }
+
       window.exportCatalogCSV = () => {
         if (filteredDB.length === 0)
           return showToast("No products to export", true);
@@ -4688,10 +4787,14 @@
           const id = document.getElementById("prod-id").value;
           let finalCategory = document.getElementById("prod-category").value;
           let categoryIsNew = finalCategory === "_new";
-          if (categoryIsNew)
+          let categoryParent = "";
+          if (categoryIsNew) {
             finalCategory = document
               .getElementById("prod-category-new")
               .value.trim();
+            categoryParent = document.getElementById("prod-category-parent-new")
+              .value;
+          }
           let primaryUrl = "";
           let secondaryUrls = [];
           document
@@ -4730,6 +4833,7 @@
             barcode: document.getElementById("prod-barcode").value,
             category: finalCategory,
             categoryIsNew: categoryIsNew,
+            categoryParent: categoryParent,
             price: document.getElementById("prod-price").value,
             discountType: document.getElementById("prod-discount-type").value,
             discountValue: document.getElementById("prod-discount-val").value,
@@ -4776,9 +4880,8 @@
             const url = item.querySelector(".dyn-val").value.trim();
             if (url) {
               urls.push(url);
-              if (item.querySelector(".img-primary-radio").checked) {
+              if (item.querySelector(".img-primary-radio").checked)
                 primaryUrl = url;
-              }
             }
           });
         const thumbSelector = document.getElementById(
@@ -4813,10 +4916,12 @@
         placeholder.style.display = "none";
         window.renderHotspots();
       };
+
       window.selectInspectorImage = (url) => {
         activeInspectorImgUrl = url;
         window.refreshInspectorImage();
       };
+
       document
         .getElementById("inspector-img-wrap")
         .addEventListener("click", function (e) {
@@ -4837,6 +4942,7 @@
           window.renderHotspots();
           window.triggerDraftSave();
         });
+
       window.updateHotspot = (idx, field, val) => {
         if (currentHotspots[idx]) {
           currentHotspots[idx][field] = val;
@@ -4848,6 +4954,7 @@
         window.renderHotspots();
         window.triggerDraftSave();
       };
+
       window.renderHotspots = () => {
         const markersContainer = document.getElementById(
           "inspector-markers-container",
@@ -4859,9 +4966,8 @@
         formsContainer.innerHTML = "";
         let displayIdx = 1;
         currentHotspots.forEach((hs, originalIdx) => {
-          if (!hs.targetImg && activeInspectorImgUrl) {
+          if (!hs.targetImg && activeInspectorImgUrl)
             hs.targetImg = activeInspectorImgUrl;
-          }
           if (hs.targetImg !== activeInspectorImgUrl) return;
           const marker = document.createElement("div");
           marker.className = "hotspot-marker";
@@ -4877,17 +4983,11 @@
         });
       };
 
-      // DYNAMIC ITEM GENERATION (WITH FLEXBOX CSS FIXES APPLIED)
       window.addColorItem = (name = "", hex = "#000000") => {
         if (!isValidHex(hex)) hex = "#000000";
         const div = document.createElement("div");
         div.className = "dynamic-item";
-        div.innerHTML = `
-          <div style="width:36px; height:36px; border-radius:50%; background-color:${hex}; border:1px solid #ccc; flex-shrink:0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);" class="color-preview"></div>
-          <input type="text" placeholder="e.g. Red, Navy, #FF0000" value="${name}" class="color-name" style="flex:1;">
-          <input type="color" value="${hex}" class="color-hex">
-          <button type="button" class="btn-action-sm danger" onclick="this.parentElement.remove(); window.triggerDraftSave();">${closeSVG}</button>
-        `;
+        div.innerHTML = `<div style="width:36px; height:36px; border-radius:50%; background-color:${hex}; border:1px solid #ccc; flex-shrink:0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);" class="color-preview"></div><input type="text" placeholder="e.g. Red, Navy, #FF0000" value="${name}" class="color-name" style="flex:1;"><input type="color" value="${hex}" class="color-hex"><button type="button" class="btn-action-sm danger" onclick="this.parentElement.remove(); window.triggerDraftSave();">${closeSVG}</button>`;
         div.querySelector(".color-hex").addEventListener("input", (e) => {
           div.querySelector(".color-preview").style.backgroundColor =
             e.target.value;
@@ -4953,9 +5053,8 @@
             document
               .getElementById("tab-inspector")
               .classList.contains("active")
-          ) {
+          )
             window.refreshInspectorImage();
-          }
         };
         const radioLabel = document.createElement("label");
         radioLabel.className = "primary-radio-label";
@@ -4969,9 +5068,8 @@
             document
               .getElementById("tab-inspector")
               .classList.contains("active")
-          ) {
+          )
             window.refreshInspectorImage();
-          }
           window.triggerDraftSave();
         };
         radioLabel.appendChild(radio);
@@ -4986,9 +5084,8 @@
             document
               .getElementById("tab-inspector")
               .classList.contains("active")
-          ) {
+          )
             window.refreshInspectorImage();
-          }
           window.triggerDraftSave();
         };
         div.appendChild(moveBox);
@@ -5003,9 +5100,8 @@
             document
               .getElementById("tab-inspector")
               .classList.contains("active")
-          ) {
+          )
             window.refreshInspectorImage();
-          }
         }
         window.triggerDraftSave();
       };
@@ -5076,11 +5172,16 @@
         document.getElementById("prod-title").value = p.title || "";
         document.getElementById("prod-sku").value = p.sku || "";
         document.getElementById("prod-barcode").value = p.barcode || "";
+
         const catSelect = document.getElementById("prod-category");
         const catInput = document.getElementById("prod-category-new");
+        const catParent = document.getElementById("prod-category-parent-new");
+
         if (isDraft && p.categoryIsNew) {
           catSelect.value = "_new";
           catSelect.style.display = "none";
+          catParent.style.display = "block";
+          catParent.value = p.categoryParent || "Women";
           catInput.style.display = "block";
           catInput.value = p.category || "";
         } else if (
@@ -5089,17 +5190,21 @@
         ) {
           catSelect.value = p.category;
           catSelect.style.display = "block";
+          catParent.style.display = "none";
           catInput.style.display = "none";
         } else if (p.category) {
           catSelect.value = "_new";
           catSelect.style.display = "none";
+          catParent.style.display = "block";
           catInput.style.display = "block";
           catInput.value = p.category;
         } else {
           catSelect.value = "";
           catSelect.style.display = "block";
+          catParent.style.display = "none";
           catInput.style.display = "none";
         }
+
         document.getElementById("prod-price").value = p.price || "";
         document.getElementById("prod-discount-type").value =
           p.discountType || "none";
@@ -5111,6 +5216,7 @@
         document.getElementById("prod-care").value = p.care || "";
         document.getElementById("prod-shipping").value = p.shipping || "";
         window.calculateDiscount();
+
         currentSizeTags.length = 0;
         if (p.sizes)
           currentSizeTags.push(
@@ -5120,6 +5226,7 @@
               .filter((s) => s),
           );
         renderSizeTags();
+
         currentMaterialTags.length = 0;
         if (p.materials)
           currentMaterialTags.push(
@@ -5129,15 +5236,18 @@
               .filter((s) => s),
           );
         renderMaterialTags();
+
         document.getElementById("img-list").innerHTML = "";
         if (p.images && p.images.length > 0)
           p.images.forEach((img, i) =>
             window.addDynamicImageItem(img, i === 0),
           );
         else window.addDynamicImageItem("", true);
+
         document.getElementById("color-list").innerHTML = "";
         if (p.colors && p.colors.length > 0)
           p.colors.forEach((c) => window.addColorItem(c.name, c.hex));
+
         currentHotspots = p.hotspots
           ? JSON.parse(JSON.stringify(p.hotspots))
           : [];
@@ -5147,9 +5257,8 @@
         });
         if (
           document.getElementById("tab-inspector").classList.contains("active")
-        ) {
+        )
           window.refreshInspectorImage();
-        }
         window.renderHotspots();
       };
 
@@ -5172,6 +5281,8 @@
         } else {
           document.getElementById("product-form").reset();
           document.getElementById("prod-category-new").style.display = "none";
+          document.getElementById("prod-category-parent-new").style.display =
+            "none";
           document.getElementById("prod-category").style.display = "block";
           document.getElementById("img-list").innerHTML = "";
           document.getElementById("color-list").innerHTML = "";
@@ -5209,6 +5320,8 @@
         }
         if (!draftStr) {
           document.getElementById("prod-category-new").style.display = "none";
+          document.getElementById("prod-category-parent-new").style.display =
+            "none";
           document.getElementById("prod-category").style.display = "block";
           document.getElementById("img-list").innerHTML = "";
           document.getElementById("color-list").innerHTML = "";
@@ -5300,11 +5413,14 @@
         const btn = document.getElementById("btn-save-prod");
         btn.innerText = "Synchronizing...";
         btn.disabled = true;
+
         let finalCategory = document.getElementById("prod-category").value;
         if (finalCategory === "_new") {
           finalCategory = document
             .getElementById("prod-category-new")
             .value.trim();
+          let finalParent = document.getElementById("prod-category-parent-new")
+            .value;
           if (!finalCategory) {
             const tabBtn = document.querySelector(
               `.editor-tab[onclick*="tab-general"]`,
@@ -5317,10 +5433,15 @@
             return;
           }
           if (!attributesDB.categories.find((c) => c.name === finalCategory)) {
-            attributesDB.categories.push({ name: finalCategory, img: "" });
+            attributesDB.categories.push({
+              name: finalCategory,
+              parent: finalParent,
+              img: "",
+            });
             await syncAttributesDB();
           }
         }
+
         let primaryUrl = "";
         let secondaryUrls = [];
         document
@@ -5352,6 +5473,7 @@
             };
           })
           .filter((c) => c.name);
+
         const price = Number(document.getElementById("prod-price").value);
         const dType = document.getElementById("prod-discount-type").value;
         const dVal =
@@ -5361,6 +5483,7 @@
           finalPrice = price - price * (dVal / 100);
         else if (dType === "fixed" && dVal > 0 && dVal < price)
           finalPrice = price - dVal;
+
         const idField = document.getElementById("prod-id").value;
         const newId = idField || "prod_" + Date.now().toString();
         const prodData = {
@@ -5439,36 +5562,58 @@
         else
           previewDiv.innerHTML = `<svg viewBox="0 0 24 24" width="32" height="32" stroke="#ccc" stroke-width="1" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`;
       };
+
       function renderBuilder() {
         const activeProds = productsDB.filter(
           (p) => p.status === "active" || !p.status,
         );
-        const buildSelect = (className, selectedId) => {
+        const buildSelect = (className, selectedId, type, index) => {
           let opts = `<option value="">-- Unassigned --</option>`;
           activeProds.forEach((p) => {
             const isSelected = p.id === selectedId ? "selected" : "";
-            opts += `<option value="${p.id}" ${isSelected}>${p.title} (SKU: ${
+            opts += `<option value="${p.id}" ${isSelected}>${p.title} (${
               p.sku || "N/A"
             })</option>`;
           });
-          return `<select class="${className} filter-select" style="width:100%; border:1px solid var(--border-color);">${opts}</select>`;
+          return `
+            <div class="builder-slot">
+                <div style="display:flex; justify-content:between; align-items:center; margin-bottom:10px;">
+                    <span class="slot-label" style="border:none; padding:0;">Slot ${
+                      index + 1
+                    }</span>
+                    <button type="button" class="btn-action-sm danger" onclick="removeBuilderSlot('${type}', ${index})" style="margin-left:auto;">${closeSVG}</button>
+                </div>
+                <select class="${className} filter-select" style="width:100%; border:1px solid var(--border-color);">${opts}</select>
+            </div>`;
         };
-        let latestHtml = "",
-          curatedHtml = "";
-        for (let i = 0; i < 4; i++) {
-          latestHtml += `<div class="builder-slot"><span class="slot-label">Hero Slot 0${
-            i + 1
-          }</span>${buildSelect("latest-sel", layoutDB.latest[i] || "")}</div>`;
-          curatedHtml += `<div class="builder-slot"><span class="slot-label">Reel Slot 0${
-            i + 1
-          }</span>${buildSelect(
-            "curated-sel",
-            layoutDB.curated[i] || "",
-          )}</div>`;
-        }
+
+        let latestHtml = "";
+        layoutDB.latest.forEach((id, idx) => {
+          latestHtml += buildSelect("latest-sel", id, "latest", idx);
+        });
+
+        let curatedHtml = "";
+        layoutDB.curated.forEach((id, idx) => {
+          curatedHtml += buildSelect("curated-sel", id, "curated", idx);
+        });
+
         document.getElementById("builder-latest").innerHTML = latestHtml;
         document.getElementById("builder-curated").innerHTML = curatedHtml;
+
         let catHtml = "";
+        let groupedCats = {
+          Men: [],
+          Women: [],
+          Kids: [],
+          Accessories: [],
+          Other: [],
+        };
+        attributesDB.categories.forEach((c) => {
+          let p = c.parent || "Women";
+          if (!groupedCats[p]) groupedCats[p] = [];
+          groupedCats[p].push(c);
+        });
+
         for (let i = 0; i < 3; i++) {
           let catData =
             layoutDB.categories && layoutDB.categories[i]
@@ -5478,12 +5623,18 @@
             (c) => c.name === catData.name,
           );
           let previewImg = catAttr && catAttr.img ? catAttr.img : catData.img;
-          let opts = `<option value="">-- Select Category --</option>`;
-          attributesDB.categories.forEach((c) => {
-            opts += `<option value="${c.name}" ${
-              c.name === catData.name ? "selected" : ""
-            }>${c.name}</option>`;
-          });
+          let opts = `<option value="">-- Select Subcategory --</option>`;
+          for (let parent in groupedCats) {
+            if (groupedCats[parent].length > 0) {
+              opts += `<optgroup label="${parent}">`;
+              groupedCats[parent].forEach((c) => {
+                opts += `<option value="${c.name}" ${
+                  c.name === catData.name ? "selected" : ""
+                }>${c.name}</option>`;
+              });
+              opts += `</optgroup>`;
+            }
+          }
           catHtml += `<div class="builder-slot"><span class="slot-label">Category Slot 0${
             i + 1
           }</span><select class="cat-name-sel filter-select" onchange="updateBuilderCatPreview(this)" style="width:100%; border:1px solid var(--border-color); margin-bottom: 10px;">${opts}</select><div class="builder-cat-preview" style="width:100%; height:180px; background:var(--bg-main); border-radius:4px; overflow:hidden; border:1px dashed #ccc; display:flex; align-items:center; justify-content:center;">${
@@ -5494,6 +5645,95 @@
         }
         document.getElementById("builder-categories").innerHTML = catHtml;
       }
+
+      window.renderSequencer = () => {
+        const tbody = document.getElementById("sequence-table-body");
+        const select = document.getElementById("seq-add-select");
+        if (!tbody || !select) return;
+        tbody.innerHTML = "";
+        const activeProds = productsDB.filter(
+          (p) => p.status === "active" || !p.status,
+        );
+        select.innerHTML =
+          '<option value="">-- Select Product to Rank --</option>';
+        activeProds.forEach((p) => {
+          if (!shopSequence.includes(p.id)) {
+            select.innerHTML += `<option value="${p.id}">${p.title} (SKU: ${
+              p.sku || "N/A"
+            })</option>`;
+          }
+        });
+        if (shopSequence.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--text-light);">No priority sequence defined.</td></tr>';
+          return;
+        }
+        shopSequence.forEach((id, idx) => {
+          const p = productsDB.find((x) => x.id === id);
+          if (!p) return;
+          const img =
+            p.images && p.images[0]
+              ? p.images[0]
+              : "https://via.placeholder.com/60x80?text=NA";
+          tbody.innerHTML += `<tr>
+              <td><strong style="font-size: 1.2rem; color: var(--accent);">#${
+                idx + 1
+              }</strong></td>
+              <td><img src="${img}" class="prod-img-mini"></td>
+              <td><strong style="font-size:1rem; font-family:'Playfair Display';">${
+                p.title
+              }</strong><br><span style="font-size:0.7rem; color:var(--text-light);">SKU: ${
+            p.sku || "N/A"
+          }</span></td>
+              <td style="text-align: right; white-space: nowrap;">
+                <button class="btn-icon-only" onclick="moveSequence(${idx}, -1)">▲</button>
+                <button class="btn-icon-only" onclick="moveSequence(${idx}, 1)" style="margin: 0 5px;">▼</button>
+                <button class="btn-icon-only" onclick="removeFromSequence(${idx})" style="color: var(--danger);">${closeSVG}</button>
+              </td></tr>`;
+        });
+      };
+
+      window.addToSequence = () => {
+        const id = document.getElementById("seq-add-select").value;
+        if (!id) return showToast("Select a product first", true);
+        shopSequence.push(id);
+        renderSequencer();
+        showToast("Added to Sequence");
+      };
+
+      window.moveSequence = (idx, dir) => {
+        const newIdx = idx + dir;
+        if (newIdx < 0 || newIdx >= shopSequence.length) return;
+        const temp = shopSequence[idx];
+        shopSequence[idx] = shopSequence[newIdx];
+        shopSequence[newIdx] = temp;
+        renderSequencer();
+      };
+
+      window.removeFromSequence = (idx) => {
+        shopSequence.splice(idx, 1);
+        renderSequencer();
+      };
+
+      window.saveShopSequence = async () => {
+        const btn = document.getElementById("btn-save-sequence");
+        btn.innerText = "Saving...";
+        try {
+          await setDoc(doc(db, "settings", "shop_sequence"), {
+            order: shopSequence,
+          });
+          showToast("Shop sequence updated live!");
+        } catch (err) {
+          showToast("Save Failed", true);
+        }
+        btn.innerText = "Save Global Sequence";
+      };
+      window.removeBuilderSlot = (type, index) => {
+        if (type === "latest") layoutDB.latest.splice(index, 1);
+        if (type === "curated") layoutDB.curated.splice(index, 1);
+        renderBuilder();
+      };
+
       window.saveHomepageLayout = async () => {
         const btn = document.getElementById("btn-save-layout");
         btn.innerText = "Publishing...";
