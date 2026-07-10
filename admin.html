@@ -6019,12 +6019,33 @@
         }
         btn.innerText = "Save Global Sequence";
       };
+      window.addBuilderSlot = (type) => {
+        // Capture current selections so they don't disappear
+        layoutDB.latest = Array.from(
+          document.querySelectorAll(".latest-sel"),
+        ).map((s) => s.value);
+        layoutDB.curated = Array.from(
+          document.querySelectorAll(".curated-sel"),
+        ).map((s) => s.value);
+
+        if (type === "latest") layoutDB.latest.push("");
+        if (type === "curated") layoutDB.curated.push("");
+        renderBuilder();
+      };
+
       window.removeBuilderSlot = (type, index) => {
+        // Capture current selections so they don't disappear
+        layoutDB.latest = Array.from(
+          document.querySelectorAll(".latest-sel"),
+        ).map((s) => s.value);
+        layoutDB.curated = Array.from(
+          document.querySelectorAll(".curated-sel"),
+        ).map((s) => s.value);
+
         if (type === "latest") layoutDB.latest.splice(index, 1);
         if (type === "curated") layoutDB.curated.splice(index, 1);
         renderBuilder();
       };
-
       window.saveHomepageLayout = async () => {
         const btn = document.getElementById("btn-save-layout");
         btn.innerText = "Publishing...";
