@@ -2443,14 +2443,23 @@
           if (attrSnap.exists()) {
             globalAttributes = attrSnap.data();
 
+            // Initialize base categories + simple Combos section
+            globalCategories = {
+              Women: [],
+              Men: [],
+              Kids: [],
+              Accessories: [],
+              Combos: [
+                {
+                  name: "Combo Sets",
+                  img:
+                    "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=400",
+                },
+              ],
+              Other: [],
+            };
+
             if (globalAttributes.categories) {
-              globalCategories = {
-                Women: [],
-                Men: [],
-                Kids: [],
-                Accessories: [],
-                Other: [],
-              };
               globalAttributes.categories.forEach((c) => {
                 let parent = c.parent || "Women"; // Default fallback
                 let name = typeof c === "string" ? c : c.name;
@@ -2459,9 +2468,16 @@
                   : "https://via.placeholder.com/300x400?text=" +
                     encodeURIComponent(name);
                 if (!globalCategories[parent]) globalCategories[parent] = [];
-                globalCategories[parent].push({ name: name, img: img });
+
+                // Prevent duplicate if admin manually created it
+                if (
+                  !globalCategories[parent].find((cat) => cat.name === name)
+                ) {
+                  globalCategories[parent].push({ name: name, img: img });
+                }
               });
             }
+
             renderFilterUI();
             renderNavMenus();
             // Fetch Manual Rank Sequence
@@ -2485,6 +2501,34 @@
               allProducts.push({ id: doc.id, ...data });
             }
           });
+
+          // Fetch Premium Combos / Ensembles
+          try {
+            const comboSnap = await getDocs(collection(db, "combos"));
+            comboSnap.forEach((doc) => {
+              const data = doc.data();
+              if (data.status === "active" || !data.status) {
+                let originalVal = 0;
+                if (data.items && data.items.length > 0) {
+                  data.items.forEach((ci) => {
+                    const prod = allProducts.find((p) => p.id === ci.id);
+                    originalVal +=
+                      (prod ? prod.price || ci.price : ci.price) * ci.qty;
+                  });
+                }
+                allProducts.push({
+                  id: doc.id,
+                  isCombo: true,
+                  originalVal: originalVal,
+                  category: data.category || "Combo Sets",
+                  categoryParent: data.categoryParent || "Combos", // Links directly to the new Combos filter
+                  ...data,
+                });
+              }
+            });
+          } catch (e) {
+            console.warn("Combos fetch error:", e);
+          }
 
           // Handle Advanced URLs (e.g. ?parent=Women&category=Sarees)
           const urlParams = new URLSearchParams(window.location.search);
@@ -2870,6 +2914,15 @@
       };
 
       function getBadges(p) {
+        if (p.isCombo) {
+          let badges = `<div class="store-badge" style="background:#111; color:#fff;">Combo Bundle</div>`;
+          let savings = p.originalVal - p.price;
+          if (savings > 0) {
+            badges += `<div class="store-badge urgency">Save ৳${savings.toLocaleString()}</div>`;
+          }
+          return `<div class="product-badges">${badges}</div>`;
+        }
+
         let badges = "";
         let stock = Number(p.stock) || 0;
         let alertQty = Number(p.stockAlert) || 3;
@@ -2891,6 +2944,14 @@
       }
 
       function getPriceHtml(p) {
+        if (p.isCombo) {
+          let savings = p.originalVal - p.price;
+          if (savings > 0) {
+            return `<del style="color:#aaa; margin-right:8px; font-size: 0.8rem;">৳${p.originalVal.toLocaleString()}</del> ৳${p.price.toLocaleString()}`;
+          }
+          return `৳${(p.price || 0).toLocaleString()}`;
+        }
+
         if (p.finalPrice && p.finalPrice < p.price)
           return `<del style="color:#aaa; margin-right:8px; font-size: 0.8rem;">৳${p.price.toLocaleString()}</del> ৳${p.finalPrice.toLocaleString()}`;
         return `৳${(p.price || 0).toLocaleString()}`;
@@ -2907,20 +2968,32 @@
         const pageProducts = filteredProducts.slice(start, end);
 
         pageProducts.forEach((p, index) => {
-          let imgMain =
-            p.images && p.images[0]
-              ? p.images[0]
-              : "https://via.placeholder.com/500x750?text=No+Image";
-          let imgHover = p.images && p.images[1] ? p.images[1] : imgMain;
+          let imgMain = p.isCombo
+            ? p.image || "https://via.placeholder.com/500x750?text=No+Image"
+            : p.images && p.images[0]
+            ? p.images[0]
+            : "https://via.placeholder.com/500x750?text=No+Image";
+          let imgHover = p.isCombo
+            ? imgMain
+            : p.images && p.images[1]
+            ? p.images[1]
+            : imgMain;
           let delay = index * 0.05;
+          let link = p.isCombo ? `details?combo=${p.id}` : `details?id=${p.id}`;
+
+          let actionBtnHtml = p.isCombo
+            ? `<a href="${link}" class="quick-shop-btn" style="text-align:center; display:flex; justify-content:center; align-items:center; text-decoration:none;">View Ensemble</a>`
+            : `<button class="quick-shop-btn" onclick="event.preventDefault(); window.openQuickAdd('${p.id}')">Quick Shop</button>`;
+
+          let mobileBtnHtml = p.isCombo
+            ? `<a href="${link}" class="mobile-action-btn" aria-label="View Details"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></a>`
+            : `<button class="mobile-action-btn" aria-label="Quick Add" onclick="event.preventDefault(); window.openQuickAdd('${p.id}')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>`;
 
           grid.innerHTML += `
             <div class="product-card" style="animation-delay: ${delay}s;">
               <div class="product-image-wrapper">
                 ${getBadges(p)}
-                <a href="details?id=${
-                  p.id
-                }" style="display: block; width: 100%; height: 100%;">
+                <a href="${link}" style="display: block; width: 100%; height: 100%;">
                   <img src="${imgMain}" class="img-main" loading="lazy" alt="${
             p.title
           }" />
@@ -2928,18 +3001,10 @@
             p.title
           }" />
                 </a>
-                <button class="quick-shop-btn" onclick="event.preventDefault(); window.openQuickAdd('${
-                  p.id
-                }')">Quick Shop</button>
-                <button class="mobile-action-btn" aria-label="Quick Add" onclick="event.preventDefault(); window.openQuickAdd('${
-                  p.id
-                }')">
-                  <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
+                ${actionBtnHtml}
+                ${mobileBtnHtml}
               </div>
-              <a href="details?id=${
-                p.id
-              }" style="text-decoration: none; display: block;">
+              <a href="${link}" style="text-decoration: none; display: block;">
                 <h3 class="product-title">${p.title}</h3>
                 <p class="product-price">${getPriceHtml(p)}</p>
               </a>
@@ -3087,23 +3152,24 @@
         }
 
         results.forEach((p, idx) => {
-          let imgMain =
-            p.images && p.images[0]
-              ? p.images[0]
-              : "https://via.placeholder.com/500x750?text=No+Image";
+          let imgMain = p.isCombo
+            ? p.image || "https://via.placeholder.com/500x750?text=No+Image"
+            : p.images && p.images[0]
+            ? p.images[0]
+            : "https://via.placeholder.com/500x750?text=No+Image";
+
           let delay = idx * 0.05; // stagger effect
+          let link = p.isCombo ? `details?combo=${p.id}` : `details?id=${p.id}`;
 
           searchGrid.innerHTML += `
-            <a href="details?id=${
-              p.id
-            }" class="search-card" style="animation-delay: ${delay}s;">
-              <div class="search-card-img-wrapper">
-                <img src="${imgMain}" alt="${p.title}" loading="lazy">
-              </div>
-              <h4 class="search-card-title">${p.title}</h4>
-              <p class="search-card-price">${getPriceHtml(p)}</p>
-            </a>
-          `;
+              <a href="${link}" class="search-card" style="animation-delay: ${delay}s;">
+                <div class="search-card-img-wrapper">
+                  <img src="${imgMain}" alt="${p.title}" loading="lazy">
+                </div>
+                <h4 class="search-card-title">${p.title}</h4>
+                <p class="search-card-price">${getPriceHtml(p)}</p>
+              </a>
+            `;
         });
 
         // SENIOR UPGRADE: High-Intent Search Tracking for Facebook Ads (Debounced)

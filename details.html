@@ -1554,7 +1554,73 @@
         font-size: 0.95rem;
         color: var(--text-light);
       }
-
+      /* =========================================
+         PREMIUM COMBO UI ON DETAILS PAGE
+         ========================================= */
+      .pdp-combo-badge {
+        display: inline-block;
+        background: var(--text-main);
+        color: #fff;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        padding: 6px 14px;
+        margin-bottom: 15px;
+        font-weight: 500;
+        vertical-align: middle;
+      }
+      .combo-included-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px;
+        background: #fafafa;
+        border: 1px solid var(--border-color);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+      }
+      .combo-included-card:hover {
+        background: #fff;
+        border-color: var(--text-main);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+        transform: translateY(-3px);
+        z-index: 2;
+      }
+      .combo-included-img {
+        width: 65px;
+        height: 85px;
+        object-fit: cover;
+        background: #eaeaea;
+      }
+      .combo-included-info {
+        flex: 1;
+      }
+      .combo-included-title {
+        font-family: "Jost", sans-serif;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text-main);
+        margin-bottom: 4px;
+      }
+      .combo-included-value {
+        font-size: 0.8rem;
+        color: var(--text-light);
+      }
+      .combo-savings-highlight {
+        display: inline-block;
+        background: rgba(217, 48, 37, 0.05);
+        color: var(--danger);
+        border: 1px dashed var(--danger);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 4px 12px;
+        vertical-align: middle;
+        margin-right: 15px;
+      }
       /* --- RESPONSIVE FIXES --- */
       @media (max-width: 950px) {
         .nav-left,
@@ -2938,39 +3004,82 @@
       async function initPDP() {
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get("id");
+        const comboId = urlParams.get("combo");
 
-        if (!productId) {
+        if (!productId && !comboId) {
           window.location.href = "home";
           return;
         }
 
         let p;
+        let isCombo = false;
+        let originalComboVal = 0;
+        let includedProducts = [];
+
         try {
-          const docRef = doc(db, "products", productId);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            p = { id: docSnap.id, ...docSnap.data() };
+          if (comboId) {
+            const docRef = doc(db, "combos", comboId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              p = { id: docSnap.id, ...docSnap.data() };
+              isCombo = true;
+
+              if (p.items && p.items.length > 0) {
+                for (let ci of p.items) {
+                  const prodSnap = await getDoc(doc(db, "products", ci.id));
+                  if (prodSnap.exists()) {
+                    let prodData = prodSnap.data();
+                    includedProducts.push(prodData);
+                    originalComboVal += (prodData.price || ci.price) * ci.qty;
+                  } else {
+                    originalComboVal += ci.price * ci.qty;
+                  }
+                }
+              }
+            } else {
+              window.location.href = "home";
+              return;
+            }
           } else {
-            window.location.href = "home";
-            return;
+            const docRef = doc(db, "products", productId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              p = { id: docSnap.id, ...docSnap.data() };
+            } else {
+              window.location.href = "home";
+              return;
+            }
           }
         } catch (err) {
-          console.error("Error fetching product:", err);
+          console.error("Error fetching data:", err);
           return;
         }
 
-        document.title = `${p.title} | `;
-        document.getElementById("pdp-title").innerText = p.title;
+        document.title = `${p.title} | Shinozz`;
+
+        // Premium Combo Title Banner
+        if (isCombo) {
+          document.getElementById(
+            "pdp-title",
+          ).innerHTML = `<div class="pdp-combo-badge">Curated Ensemble</div><br>${p.title}`;
+        } else {
+          document.getElementById("pdp-title").innerText = p.title;
+        }
 
         const breadcrumbText = document.querySelector(".breadcrumbs");
         if (breadcrumbText) {
           breadcrumbText.innerHTML = `<a href="home">Home</a> &nbsp;/&nbsp; <a href="#">${
-            p.category || "Shop"
+            isCombo ? "Curated Ensembles" : p.category || "Shop"
           }</a> &nbsp;/&nbsp; ${p.title}`;
         }
 
+        // Upgraded Savings Highlight for Combo
         let priceHtml = `৳ ${(p.price || 0).toLocaleString()}`;
-        if (p.finalPrice && p.finalPrice < p.price) {
+        if (isCombo && originalComboVal > p.price) {
+          priceHtml = `<del style="color:#aaa; font-size:1.1rem; margin-right: 12px;">৳ ${originalComboVal.toLocaleString()}</del> <span class="combo-savings-highlight">Save ৳${(
+            originalComboVal - p.price
+          ).toLocaleString()}</span> ৳ ${p.price.toLocaleString()}`;
+        } else if (!isCombo && p.finalPrice && p.finalPrice < p.price) {
           priceHtml = `<del style="color:#aaa; font-size:1rem; margin-right: 10px;">৳ ${(
             p.price || 0
           ).toLocaleString()}</del> ৳ ${p.finalPrice.toLocaleString()}`;
@@ -2978,13 +3087,13 @@
         document.getElementById("pdp-price").innerHTML = priceHtml;
 
         productState.id = p.id;
-        productState.title = p.title;
-        productState.price = p.finalPrice || p.price;
-        productState.maxStock = Number(p.stock) || 0;
-        productState.category = p.category || "Shop";
+        productState.title = isCombo ? p.title + " (Curated Set)" : p.title;
+        productState.price = isCombo ? p.price : p.finalPrice || p.price;
+        productState.maxStock = isCombo ? 99 : Number(p.stock) || 0;
+        productState.category = isCombo ? "Ensembles" : p.category || "Shop";
+        productState.isCombo = isCombo;
 
         // --- DYNAMIC SEO & SCHEMA UPDATER ---
-        // Updates Google & Facebook Link Previews Instantly when product loads
         document.getElementById("meta-description").content = p.desc
           ? p.desc.replace(/(<([^>]+)>)/gi, "").substring(0, 160)
           : `Buy ${p.title} exclusively at Shinozz.`;
@@ -2994,6 +3103,8 @@
           : `Shop the luxurious ${p.title} at Shinozz.`;
         if (p.images && p.images.length > 0)
           document.getElementById("og-image").content = p.images[0];
+        else if (isCombo && p.image)
+          document.getElementById("og-image").content = p.image;
         document.getElementById("og-price").content = productState.price;
 
         const schemaEl = document.getElementById("product-schema");
@@ -3012,11 +3123,9 @@
           schemaEl.innerHTML = JSON.stringify(schemaData);
         }
 
-        // ADVANCED PIXEL: VIEW CONTENT (CRITICAL FOR DPA RETARGETING)
-        // This fires Facebook's exact required data format for Retargeting Ads
         if (typeof fbq !== "undefined") {
           fbq("track", "ViewContent", {
-            content_type: "product",
+            content_type: isCombo ? "product_group" : "product",
             content_ids: [productState.id],
             content_name: productState.title,
             content_category: productState.category,
@@ -3031,75 +3140,132 @@
           p.shipping ||
           "<p><strong>Domestic Delivery:</strong> 3-5 business days.</p><p><strong>International Shipping:</strong> Available via DHL Express (7-10 business days).</p>";
 
-        pdpImages =
-          p.images && p.images.length > 0
-            ? p.images
-            : ["https://via.placeholder.com/500x750?text=No+Image"];
-
-        allHotspots = p.hotspots || []; // Fetching hotspots array
-
-        initGallery(); // This calls setMainImage(0), rendering hotspots
-
-        // --- VARIANTS RENDER LOGIC ---
-        const colorContainer = document.querySelectorAll(".variant-options")[0];
-        const colorsArr = p.colors || [];
-        colorContainer.innerHTML = "";
-        if (colorsArr.length > 0) {
-          colorsArr.forEach((c, idx) => {
-            const btn = document.createElement("div");
-            btn.className = `color-btn ${idx === 0 ? "active" : ""}`;
-            btn.style.background = c.hex;
-            btn.setAttribute("data-val", c.name);
-            btn.setAttribute("data-index", idx);
-            btn.addEventListener("click", function () {
-              document
-                .querySelectorAll(".color-btn")
-                .forEach((b) => b.classList.remove("active"));
-              this.classList.add("active");
-              document.getElementById(
-                "color-label",
-              ).innerText = this.getAttribute("data-val");
-              productState.color = this.getAttribute("data-val");
-            });
-            colorContainer.appendChild(btn);
+        if (isCombo) {
+          pdpImages = p.image ? [p.image] : [];
+          includedProducts.forEach((prod) => {
+            if (prod.images && prod.images.length > 0)
+              pdpImages.push(prod.images[0]);
           });
-          document.getElementById("color-label").innerText = colorsArr[0].name;
-          productState.color = colorsArr[0].name;
+          if (pdpImages.length === 0)
+            pdpImages = ["https://via.placeholder.com/500x750?text=No+Image"];
         } else {
-          colorContainer.innerHTML =
-            '<span style="font-size:0.85rem; color:var(--text-light);">Standard Edition</span>';
-          document.getElementById("color-label").innerText = "Standard";
-          productState.color = "Standard";
+          pdpImages =
+            p.images && p.images.length > 0
+              ? p.images
+              : ["https://via.placeholder.com/500x750?text=No+Image"];
         }
 
+        allHotspots = p.hotspots || [];
+        initGallery();
+
+        // --- VARIANTS & COMBO BREAKDOWN RENDER LOGIC ---
+        const colorContainer = document.querySelectorAll(".variant-options")[0];
         const sizeContainer = document.querySelectorAll(".variant-options")[1];
-        const sizesArr = p.sizes
-          ? p.sizes
-              .split(",")
-              .map((s) => s.trim())
-              .filter((s) => s)
-          : [];
-        sizeContainer.innerHTML = "";
-        if (sizesArr.length > 0) {
-          sizesArr.forEach((s, idx) => {
-            const btn = document.createElement("button");
-            btn.className = `size-btn ${idx === 0 ? "active" : ""}`;
-            btn.setAttribute("data-val", s);
-            btn.innerText = s;
-            btn.addEventListener("click", function () {
-              document
-                .querySelectorAll(".size-btn")
-                .forEach((b) => b.classList.remove("active"));
-              this.classList.add("active");
-              productState.size = this.getAttribute("data-val");
-            });
-            sizeContainer.appendChild(btn);
-          });
-          productState.size = sizesArr[0];
+
+        if (isCombo) {
+          // Change UI specifically for Combos
+          document.querySelectorAll(
+            ".variant-label",
+          )[0].innerHTML = `<span style="font-family:'Playfair Display', serif; font-size:1.6rem; text-transform:none; letter-spacing:0; color:var(--text-main); font-weight:400; margin-bottom: 5px;">The Ensemble Includes</span>`;
+          document.querySelectorAll(".variant-label")[1].style.display = "none";
+          sizeContainer.style.display = "none";
+
+          // Override Button Texts
+          addBtn.innerText = "Add Ensemble to Bag";
+          buyBtn.innerText = "Secure Ensemble";
+
+          let includedHtml = includedProducts
+            .map(
+              (prod) => `
+             <a href="details?id=${
+               prod.id
+             }" target="_blank" class="combo-included-card">
+                <img src="${
+                  prod.images && prod.images[0]
+                    ? prod.images[0]
+                    : "https://via.placeholder.com/60"
+                }" class="combo-included-img">
+                <div class="combo-included-info">
+                   <div class="combo-included-title">${prod.title}</div>
+                   <div class="combo-included-value">Individual Value: ৳${(
+                     prod.finalPrice || prod.price
+                   ).toLocaleString()}</div>
+                </div>
+                <svg viewBox="0 0 24 24" width="20" height="20" style="stroke:var(--text-light); fill:none; margin-right:5px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+             </a>
+           `,
+            )
+            .join("");
+
+          if (includedProducts.length === 0)
+            includedHtml =
+              "<p style='font-size:0.85rem; color:#888;'>Set details are predefined.</p>";
+
+          colorContainer.innerHTML = `<div style="display:flex; flex-direction:column; gap:12px; width:100%; margin-bottom:10px;">${includedHtml}</div>`;
+
+          productState.color = "Ensemble Edition";
+          productState.size = "Complete Set";
         } else {
-          sizeContainer.innerHTML =
-            '<span style="font-size:0.85rem; color:var(--text-light);">Universal / One Size</span>';
-          productState.size = "Universal";
+          // Standard Products
+          const colorsArr = p.colors || [];
+          colorContainer.innerHTML = "";
+          if (colorsArr.length > 0) {
+            colorsArr.forEach((c, idx) => {
+              const btn = document.createElement("div");
+              btn.className = `color-btn ${idx === 0 ? "active" : ""}`;
+              btn.style.background = c.hex;
+              btn.setAttribute("data-val", c.name);
+              btn.setAttribute("data-index", idx);
+              btn.addEventListener("click", function () {
+                document
+                  .querySelectorAll(".color-btn")
+                  .forEach((b) => b.classList.remove("active"));
+                this.classList.add("active");
+                document.getElementById(
+                  "color-label",
+                ).innerText = this.getAttribute("data-val");
+                productState.color = this.getAttribute("data-val");
+              });
+              colorContainer.appendChild(btn);
+            });
+            document.getElementById("color-label").innerText =
+              colorsArr[0].name;
+            productState.color = colorsArr[0].name;
+          } else {
+            colorContainer.innerHTML =
+              '<span style="font-size:0.85rem; color:var(--text-light);">Standard Edition</span>';
+            document.getElementById("color-label").innerText = "Standard";
+            productState.color = "Standard";
+          }
+
+          const sizesArr = p.sizes
+            ? p.sizes
+                .split(",")
+                .map((s) => s.trim())
+                .filter((s) => s)
+            : [];
+          sizeContainer.innerHTML = "";
+          if (sizesArr.length > 0) {
+            sizesArr.forEach((s, idx) => {
+              const btn = document.createElement("button");
+              btn.className = `size-btn ${idx === 0 ? "active" : ""}`;
+              btn.setAttribute("data-val", s);
+              btn.innerText = s;
+              btn.addEventListener("click", function () {
+                document
+                  .querySelectorAll(".size-btn")
+                  .forEach((b) => b.classList.remove("active"));
+                this.classList.add("active");
+                productState.size = this.getAttribute("data-val");
+              });
+              sizeContainer.appendChild(btn);
+            });
+            productState.size = sizesArr[0];
+          } else {
+            sizeContainer.innerHTML =
+              '<span style="font-size:0.85rem; color:var(--text-light);">Universal / One Size</span>';
+            productState.size = "Universal";
+          }
         }
 
         if (productState.maxStock <= 0) {
@@ -3111,7 +3277,6 @@
           buyBtn.style.opacity = "0.5";
         }
 
-        // Initialize Dynamic Recommendation Engines
         fetchAndRenderRelated(p);
       }
 

@@ -1047,7 +1047,195 @@
         opacity: 1;
         transform: translateY(0);
       }
-      /* --- GENDER SPLIT CATEGORY SECTION --- */
+      /* =========================================
+         PREMIUM ENSEMBLES (COMBO PACKS) ENGINE
+         ========================================= */
+      .combo-section-wrapper {
+        background: #030303;
+        color: #ffffff;
+        padding-top: 100px;
+        padding-bottom: 100px;
+        position: relative;
+      }
+      .combo-header {
+        text-align: center;
+        margin-bottom: 50px;
+      }
+      .combo-header h2 {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        font-weight: 400;
+        color: #ffffff;
+        margin-bottom: 15px;
+      }
+      .combo-header p {
+        color: #888;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+      }
+      .combo-grid {
+        display: flex;
+        gap: 30px;
+        padding: 0;
+        scroll-padding-left: 5%;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      .combo-grid::-webkit-scrollbar {
+        display: none;
+      }
+      .combo-card {
+        flex: 0 0 28%; /* Perfect regular card size, matches Curated Edit */
+        flex-shrink: 0;
+        scroll-snap-align: start;
+        display: block;
+        position: relative;
+        text-decoration: none;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .combo-card:first-child {
+        margin-left: 5%;
+      }
+      .combo-card:last-child {
+        margin-right: 5%;
+      }
+      .combo-card:hover {
+        transform: translateY(-10px);
+      }
+      .combo-img-wrap {
+        width: 100%;
+        aspect-ratio: 3/4; /* Regular portrait format */
+        position: relative;
+        overflow: hidden;
+        background: #111;
+        margin-bottom: 20px;
+      }
+      .combo-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .combo-card:hover .combo-img-wrap img {
+        transform: scale(1.05);
+      }
+      .combo-badge-group {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 2;
+      }
+      .combo-badge {
+        background: #ffffff;
+        color: #000000;
+        padding: 6px 14px;
+        font-size: 0.65rem;
+        font-family: "Jost", sans-serif;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        width: max-content;
+      }
+      .combo-badge.urgency {
+        background: var(--danger);
+        color: #ffffff;
+      }
+
+      /* Psychological Trigger: Larger Circle Previews */
+      .combo-included-preview {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        display: flex;
+        align-items: center;
+        z-index: 3;
+      }
+      .combo-included-preview img {
+        width: 60px; /* Made the circles noticeably larger */
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid #030303;
+        object-fit: cover;
+        margin-left: -20px; /* Stronger overlap effect */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      }
+      .combo-included-preview img:first-child {
+        margin-left: 0;
+      }
+      .combo-included-preview span {
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(5px);
+        color: #fff;
+        font-size: 0.75rem;
+        padding: 8px 16px;
+        border-radius: 30px;
+        margin-left: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 500;
+        border: 1px solid #333;
+      }
+
+      .combo-info {
+        text-align: center;
+      }
+      .combo-title {
+        font-family: "Playfair Display", serif;
+        font-style: italic;
+        font-size: 1.5rem;
+        color: #ffffff;
+        margin-bottom: 8px;
+      }
+      .combo-price-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 15px;
+      }
+      .combo-original-price {
+        color: #666;
+        text-decoration: line-through;
+        font-size: 0.95rem;
+      }
+      .combo-final-price {
+        color: #ffffff;
+        font-size: 1.2rem;
+        font-weight: 500;
+      }
+      .combo-action-btn {
+        display: inline-block;
+        padding: 12px 30px;
+        background: transparent;
+        color: #ffffff;
+        font-family: "Jost", sans-serif;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border: 1px solid #555;
+        transition: all 0.4s ease;
+      }
+      .combo-card:hover .combo-action-btn {
+        background: #ffffff;
+        color: #000000;
+        border-color: #ffffff;
+      }
+
+      @media (max-width: 950px) {
+        .combo-card {
+          flex: 0 0 75%;
+        }
+        .combo-header p {
+          margin-bottom: 30px;
+        }
+      }
       .category-split-section {
         padding-top: 50px;
         background: var(--bg-color);
@@ -2740,6 +2928,23 @@
       </div>
     </section>
 
+    <!-- CURATED ENSEMBLES (DYNAMIC COMBO PACKS) -->
+    <section
+      class="combo-section-wrapper"
+      id="combo-section-wrapper"
+      style="display: none;"
+    >
+      <div class="combo-header reveal">
+        <h2 class="section-title" style="color: #ffffff;">
+          Curated <i>Ensembles</i>
+        </h2>
+        <p>Exceptional Value. Uncompromised Style.</p>
+      </div>
+      <div class="combo-grid" id="combo-grid">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
     <!-- CURATED FOR YOU (DYNAMIC FROM FIREBASE) -->
     <section class="horizontal-scroll-section">
       <div class="scroll-header reveal">
@@ -3067,6 +3272,7 @@
       setupSlider("video-track", "video-prev", "video-next");
 
       let productsDB = [];
+      let combosDB = [];
       let layoutConfig = { latest: [], curated: [], categories: [] };
       let globalCategories = {}; // Now an object to hold the hierarchy
 
@@ -3078,6 +3284,17 @@
             if (data.status === "active" || !data.status)
               productsDB.push({ id: doc.id, ...data });
           });
+
+          try {
+            const comboSnap = await getDocs(collection(db, "combos"));
+            comboSnap.forEach((doc) => {
+              const data = doc.data();
+              if (data.status === "active" || !data.status)
+                combosDB.push({ id: doc.id, ...data });
+            });
+          } catch (e) {
+            console.warn("Combos fetch error:", e);
+          }
 
           const layoutSnap = await getDoc(doc(db, "settings", "layout"));
           if (layoutSnap.exists()) layoutConfig = layoutSnap.data();
@@ -3115,12 +3332,138 @@
           // renderCategories(); // Keeping hidden per recent edits
           renderLatestArrivals();
           renderCuratedList();
+          renderCombos();
           setupSlider("curated-track", "curated-prev", "curated-next");
           observeElements();
         } catch (e) {
           console.error("Storefront Sync Error:", e);
         }
       }
+      function renderCombos() {
+        const container = document.getElementById("combo-grid");
+        const wrapper = document.getElementById("combo-section-wrapper");
+        if (!container || !wrapper) return;
+
+        if (combosDB.length === 0) {
+          wrapper.style.display = "none";
+          return;
+        }
+
+        wrapper.style.display = "block";
+        container.innerHTML = "";
+
+        combosDB.forEach((c) => {
+          let originalVal = 0;
+          let includedImages = [];
+
+          if (c.items && c.items.length > 0) {
+            c.items.forEach((ci) => {
+              const p = productsDB.find((prod) => prod.id === ci.id);
+              originalVal += (p ? p.price || ci.price : ci.price) * ci.qty;
+
+              // Grab up to 3 item images for the overlapping psychological preview
+              if (p && p.images && p.images[0] && includedImages.length < 3) {
+                includedImages.push(p.images[0]);
+              } else if (ci.img && includedImages.length < 3) {
+                includedImages.push(ci.img);
+              }
+            });
+          }
+
+          const savings = originalVal - c.price;
+          // Minimal Psychological triggers
+          const savingsBadge =
+            savings > 0
+              ? `<div class="combo-badge urgency">Save ৳${savings.toLocaleString()}</div>`
+              : "";
+
+          // Generate the overlapping image HTML
+          let includedHtml = includedImages
+            .map(
+              (img) =>
+                `<img src="${img}" alt="Included Item" loading="lazy" />`,
+            )
+            .join("");
+          let extraCount =
+            c.items.length > 3
+              ? `<span>+${c.items.length - 3}</span>`
+              : `<span>Set</span>`;
+
+          container.innerHTML += `
+            <a href="details?combo=${c.id}" class="combo-card reveal">
+              <div class="combo-img-wrap">
+                <div class="combo-badge-group">
+                  <div class="combo-badge">Combo Bundle</div>
+                  ${savingsBadge}
+                </div>
+                <img src="${
+                  c.image || "https://via.placeholder.com/500x750"
+                }" alt="${c.title}" loading="lazy" />
+                <div class="combo-included-preview">
+                  ${includedHtml}
+                  ${extraCount}
+                </div>
+              </div>
+              <div class="combo-info">
+                <h3 class="combo-title">${c.title}</h3>
+                <div class="combo-price-wrap">
+                  ${
+                    savings > 0
+                      ? `<span class="combo-original-price">৳${originalVal.toLocaleString()}</span>`
+                      : ""
+                  }
+                  <span class="combo-final-price">৳${c.price.toLocaleString()}</span>
+                </div>
+                <span class="combo-action-btn">View Details</span>
+              </div>
+            </a>
+          `;
+        });
+
+        // Ensure the reveal animations trigger for the newly injected cards
+        setTimeout(observeElements, 100);
+      }
+      window.addComboToCart = function (comboId) {
+        const c = combosDB.find((x) => x.id === comboId);
+        if (!c) return;
+
+        let uniqueId = `combo-${c.id}`;
+        let existingItem = cartState.items.find(
+          (item) => item.cartId === uniqueId,
+        );
+
+        if (existingItem) {
+          existingItem.qty += 1;
+        } else {
+          cartState.items.push({
+            id: c.id,
+            cartId: uniqueId,
+            title: c.title + " (Curated Set)",
+            price: c.price,
+            img: c.image || "https://via.placeholder.com/150",
+            size: "Ensemble",
+            color: "N/A",
+            qty: 1,
+            maxStock: 99,
+            isCombo: true,
+          });
+        }
+
+        // Facebook Pixel Event optimized for Bundles
+        if (typeof fbq === "function") {
+          fbq("track", "AddToCart", {
+            content_name: c.title + " (Curated Set)",
+            content_ids: [c.id],
+            content_type: "product_group",
+            value: c.price,
+            currency: "BDT",
+          });
+        }
+
+        saveCart();
+        updateCartUI();
+        toggleCart(true);
+      };
 
       function getBadges(p) {
         let badges = "";
@@ -3241,10 +3584,10 @@
           mobileNavContainer.innerHTML = mobileHtml;
         }
       }
-   function renderLatestArrivals() {
+      function renderLatestArrivals() {
         const container = document.getElementById("latest-arrivals-grid");
         container.innerHTML = "";
-        
+
         // Follow Admin Selections instead of automatic sorting
         const latestIds = layoutConfig.latest || [];
 
@@ -3253,7 +3596,10 @@
           const p = productsDB.find((x) => x.id === id);
           if (!p) return;
 
-          let imgMain = p.images && p.images[0] ? p.images[0] : "https://via.placeholder.com/500x750?text=No+Image";
+          let imgMain =
+            p.images && p.images[0]
+              ? p.images[0]
+              : "https://via.placeholder.com/500x750?text=No+Image";
           let imgHover = p.images && p.images[1] ? p.images[1] : imgMain;
           let delay = idx * 0.1;
 
@@ -3261,16 +3607,28 @@
             <div class="product-card reveal" style="transition-delay: ${delay}s;">
               <div class="product-image-wrapper">
                 ${getBadges(p)}
-                <a href="details?id=${p.id}" style="display: block; width: 100%; height: 100%;">
-                  <img src="${imgMain}" class="img-main" loading="lazy" alt="${p.title}" />
-                  <img src="${imgHover}" class="img-hover" loading="lazy" alt="${p.title}" />
+                <a href="details?id=${
+                  p.id
+                }" style="display: block; width: 100%; height: 100%;">
+                  <img src="${imgMain}" class="img-main" loading="lazy" alt="${
+            p.title
+          }" />
+                  <img src="${imgHover}" class="img-hover" loading="lazy" alt="${
+            p.title
+          }" />
                 </a>
-                <button class="quick-shop-btn" onclick="event.preventDefault(); window.openQuickAdd('${p.id}')">Quick Shop</button>
-                <button class="mobile-action-btn" aria-label="Quick Add" onclick="event.preventDefault(); window.openQuickAdd('${p.id}')">
+                <button class="quick-shop-btn" onclick="event.preventDefault(); window.openQuickAdd('${
+                  p.id
+                }')">Quick Shop</button>
+                <button class="mobile-action-btn" aria-label="Quick Add" onclick="event.preventDefault(); window.openQuickAdd('${
+                  p.id
+                }')">
                   <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
               </div>
-              <a href="details?id=${p.id}" style="text-decoration: none; display: block;">
+              <a href="details?id=${
+                p.id
+              }" style="text-decoration: none; display: block;">
                 <h3 class="product-title">${p.title}</h3>
                 <p class="product-price">${getPriceHtml(p)}</p>
               </a>

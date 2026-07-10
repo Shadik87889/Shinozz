@@ -1885,6 +1885,13 @@
             <line x1="7" y1="7" x2="7.01" y2="7"></line></svg
           >Master Catalog
         </li>
+        <li class="nav-item" data-target="view-combos">
+          <svg viewBox="0 0 24 24">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline></svg
+          >Combo Engine
+        </li>
         <li class="nav-item" data-target="view-customers">
           <svg viewBox="0 0 24 24">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -2321,6 +2328,276 @@
               </table>
               <div class="pagination" id="product-pagination"></div>
             </div>
+          </div>
+        </section>
+
+        <!-- COMBO PACK ENGINE -->
+        <section id="view-combos" class="view-section">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Combo Pack Engine</div>
+              <button class="btn btn-dark" onclick="openComboEditor()">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  fill="none"
+                  style="margin-right: 8px;"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Create Combo Pack
+              </button>
+            </div>
+            <div class="table-container">
+              <table id="combos-table">
+                <thead>
+                  <tr>
+                    <th>Visual</th>
+                    <th>Combo Name & Context</th>
+                    <th>Pricing Dynamics</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Operations</th>
+                  </tr>
+                </thead>
+                <tbody id="combos-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- COMBO PACK EDITOR -->
+        <section id="view-combo-editor" class="view-section">
+          <button
+            class="btn btn-outline btn-small"
+            style="margin-bottom: 20px;"
+            onclick="switchView('view-combos')"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill="none"
+              style="margin-right: 8px;"
+            >
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Return to Combo List
+          </button>
+          <div class="card" style="max-width: 1200px;">
+            <div class="card-header" style="margin-bottom: 30px;">
+              <div class="card-title" id="combo-editor-title">
+                Create Combo Pack
+              </div>
+              <select
+                id="combo-status"
+                class="filter-select"
+                style="font-weight: 600; min-width: 130px;"
+              >
+                <option value="active">🟢 Active (Live)</option>
+                <option value="draft">🟠 Draft (Hidden)</option>
+              </select>
+            </div>
+            <form id="combo-form" onsubmit="saveCombo(event)">
+              <input type="hidden" id="combo-id" />
+              <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+                <!-- Left: Combo Core Info -->
+                <div style="flex: 1; min-width: 300px;">
+                  <h4
+                    style="
+                      margin-bottom: 20px;
+                      font-family: 'Playfair Display';
+                      font-size: 1.4rem;
+                      color: var(--accent);
+                    "
+                  >
+                    Combo Constitution
+                  </h4>
+                  <div class="form-group">
+                    <label>Combo Title *</label>
+                    <input
+                      type="text"
+                      id="combo-title"
+                      required
+                      placeholder="e.g. Summer Elegance Duo"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Combo SKU</label>
+                    <input
+                      type="text"
+                      id="combo-sku"
+                      placeholder="e.g. CMB-SUM-001"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Final Combo Price (৳) *</label>
+                    <input
+                      type="number"
+                      id="combo-price"
+                      required
+                      placeholder="15000"
+                      oninput="calculateComboValue()"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Cover Image URL *</label>
+                    <input
+                      type="url"
+                      id="combo-image"
+                      required
+                      placeholder="Paste image URL here"
+                      oninput="document.getElementById('combo-img-preview').src = this.value || 'https://via.placeholder.com/150?text=Preview'"
+                    />
+                    <img
+                      id="combo-img-preview"
+                      src="https://via.placeholder.com/150?text=Preview"
+                      style="
+                        width: 100px;
+                        height: 130px;
+                        object-fit: cover;
+                        margin-top: 15px;
+                        border-radius: 6px;
+                        border: 1px dashed var(--border-color);
+                      "
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Narrative / Description</label>
+                    <textarea
+                      id="combo-desc"
+                      placeholder="Describe the exclusive value of this bundle..."
+                    ></textarea>
+                  </div>
+                </div>
+                <!-- Right: Product Selection -->
+                <div
+                  style="
+                    flex: 1.5;
+                    min-width: 400px;
+                    background: var(--bg-main);
+                    padding: 35px;
+                    border-radius: var(--radius);
+                    border: 1px solid var(--border-color);
+                  "
+                >
+                  <h4
+                    style="
+                      margin-bottom: 5px;
+                      font-family: 'Playfair Display';
+                      font-size: 1.4rem;
+                      color: var(--accent);
+                    "
+                  >
+                    Bundle Components
+                  </h4>
+                  <p
+                    style="
+                      font-size: 0.75rem;
+                      color: var(--text-light);
+                      text-transform: uppercase;
+                      letter-spacing: 1px;
+                      margin-bottom: 20px;
+                    "
+                  >
+                    Add master catalog products to this combo.
+                  </p>
+
+                  <div
+                    class="search-bar"
+                    style="width: 100%; margin-bottom: 15px;"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input
+                      type="text"
+                      id="combo-prod-search"
+                      placeholder="Search product by title or SKU..."
+                      oninput="searchComboProducts()"
+                    />
+                  </div>
+                  <div
+                    id="combo-search-results"
+                    style="
+                      max-height: 200px;
+                      overflow-y: auto;
+                      background: #fff;
+                      border-radius: 6px;
+                      border: 1px solid var(--border-color);
+                      margin-bottom: 20px;
+                      display: none;
+                      box-shadow: var(--shadow-md);
+                    "
+                  ></div>
+
+                  <div
+                    id="combo-items-list"
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      gap: 12px;
+                      margin-bottom: 30px;
+                    "
+                  ></div>
+
+                  <div style="border-top: 2px dashed #ccc; padding-top: 25px;">
+                    <div
+                      style="
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 8px;
+                        font-size: 1rem;
+                      "
+                    >
+                      <span style="color: var(--text-light);"
+                        >Individual Value Total:</span
+                      >
+                      <strong id="combo-total-value">৳0</strong>
+                    </div>
+                    <div
+                      style="
+                        display: flex;
+                        justify-content: space-between;
+                        color: var(--success);
+                        font-weight: bold;
+                        font-size: 1.3rem;
+                      "
+                    >
+                      <span>Client Savings:</span>
+                      <strong id="combo-savings">৳0</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="
+                  margin-top: 40px;
+                  display: flex;
+                  justify-content: flex-end;
+                  border-top: 1px solid var(--border-color);
+                  padding-top: 30px;
+                "
+              >
+                <button type="submit" class="btn btn-dark" id="btn-save-combo">
+                  Commit Combo to Database
+                </button>
+              </div>
+            </form>
           </div>
         </section>
 
@@ -3481,6 +3758,8 @@
 
       let productsDB = [];
       let filteredDB = [];
+      let combosDB = [];
+      let currentComboItems = [];
       let customersDB = [];
       let ordersDB = [];
       let filteredOrdersDB = [];
@@ -3776,6 +4055,8 @@
           "view-sequence": "Shop Priority Sequencer",
           "view-editor": "Product Intelligence Engine",
           "view-settings": "System Config",
+          "view-combos": "Combo Pack Engine",
+          "view-combo-editor": "Combo Pack Builder",
         };
         document.getElementById("topbar-title").innerText =
           titles[viewId] || "Overview";
@@ -3805,6 +4086,16 @@
             productsDB.push({ id: doc.id, ...doc.data() }),
           );
           filteredDB = [...productsDB];
+
+          try {
+            combosDB = [];
+            const comboSnap = await getDocs(collection(db, "combos"));
+            comboSnap.forEach((doc) =>
+              combosDB.push({ id: doc.id, ...doc.data() }),
+            );
+          } catch (e) {
+            console.warn("Combos collection may not exist yet, ignoring.");
+          }
 
           const layoutSnap = await getDoc(doc(db, "settings", "layout"));
           if (layoutSnap.exists()) {
@@ -5762,6 +6053,339 @@
         }
         btn.innerText = "Publish Storefront Live";
         btn.disabled = false;
+      };
+
+      // ==========================================
+      // COMBO PACK ENGINE LOGIC
+      // ==========================================
+
+      window.renderCombos = () => {
+        const tbody = document.getElementById("combos-table-body");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        if (combosDB.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-light);">No combo packs orchestrated yet.</td></tr>`;
+          return;
+        }
+        combosDB.forEach((c) => {
+          const img = c.image || "https://via.placeholder.com/60x80?text=NA";
+          let totalVal = 0;
+          c.items.forEach((item) => {
+            const p = productsDB.find((x) => x.id === item.id);
+            if (p) totalVal += (p.finalPrice || p.price) * item.qty;
+            else totalVal += item.price * item.qty; // fallback if deleted
+          });
+          const savings = totalVal - c.price;
+          const savingsHtml =
+            savings > 0
+              ? `<br><span style="color:var(--success); font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:1px;">Saves ৳${savings.toLocaleString()}</span>`
+              : "";
+
+          tbody.innerHTML += `<tr>
+            <td><img src="${img}" class="prod-img-mini" loading="lazy"></td>
+            <td><strong style="font-size:1.1rem; font-family:'Playfair Display';">${
+              c.title
+            }</strong><br><span style="font-size:0.7rem; color:var(--text-light); letter-spacing:1px; text-transform:uppercase;">SKU: ${
+            c.sku || "N/A"
+          } | ${c.items.length} Products Inside</span></td>
+            <td><strong style="font-size:1.1rem; color:var(--accent);">৳${c.price.toLocaleString()}</strong> <del style="color:#aaa; font-size:0.8rem; margin-left:8px;">৳${totalVal.toLocaleString()}</del>${savingsHtml}</td>
+            <td><span class="state-badge ${c.status || "active"}">${
+            c.status || "active"
+          }</span></td>
+            <td style="text-align: right; white-space: nowrap;">
+              <button class="btn-icon-only" title="Edit" onclick="editCombo('${
+                c.id
+              }')"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>
+              <button class="btn-icon-only" title="Delete" onclick="deleteCombo('${
+                c.id
+              }')" style="margin-left: 5px; color: var(--danger); border-color: rgba(217,48,37,0.3);"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+            </td>
+          </tr>`;
+        });
+      };
+
+      // Override switchView dynamically to hook combo renders
+      const originalSwitchView = window.switchView;
+      window.switchView = (viewId) => {
+        originalSwitchView(viewId);
+        if (viewId === "view-combos") window.renderCombos();
+      };
+
+      window.openComboEditor = () => {
+        document.getElementById("combo-form").reset();
+        document.getElementById("combo-id").value = "";
+        document.getElementById("combo-editor-title").innerText =
+          "Create Combo Pack";
+        document.getElementById("combo-img-preview").src =
+          "https://via.placeholder.com/150?text=Preview";
+        document.getElementById("combo-search-results").style.display = "none";
+        currentComboItems = [];
+        window.renderComboItems();
+        window.switchView("view-combo-editor");
+      };
+
+      window.editCombo = (id) => {
+        const c = combosDB.find((x) => x.id === id);
+        if (!c) return;
+        document.getElementById("combo-id").value = c.id;
+        document.getElementById("combo-status").value = c.status || "active";
+        document.getElementById("combo-title").value = c.title;
+        document.getElementById("combo-sku").value = c.sku || "";
+        document.getElementById("combo-price").value = c.price;
+        document.getElementById("combo-image").value = c.image || "";
+        document.getElementById("combo-img-preview").src =
+          c.image || "https://via.placeholder.com/150?text=Preview";
+        document.getElementById("combo-desc").value = c.desc || "";
+        document.getElementById("combo-search-results").style.display = "none";
+
+        currentComboItems = c.items.map((i) => {
+          const p = productsDB.find((x) => x.id === i.id);
+          return {
+            id: i.id,
+            title: p ? p.title : "Unknown Product",
+            price: p ? p.finalPrice || p.price : i.price || 0,
+            img:
+              p && p.images && p.images[0]
+                ? p.images[0]
+                : "https://via.placeholder.com/40",
+            qty: i.qty,
+          };
+        });
+
+        document.getElementById("combo-editor-title").innerText =
+          "Configure Combo: " + c.title;
+        window.renderComboItems();
+        window.switchView("view-combo-editor");
+      };
+
+      window.searchComboProducts = () => {
+        const q = document
+          .getElementById("combo-prod-search")
+          .value.toLowerCase();
+        const resBox = document.getElementById("combo-search-results");
+        if (!q) {
+          resBox.style.display = "none";
+          return;
+        }
+
+        const matches = productsDB
+          .filter(
+            (p) =>
+              p.title.toLowerCase().includes(q) ||
+              (p.sku && p.sku.toLowerCase().includes(q)),
+          )
+          .slice(0, 8);
+
+        if (matches.length === 0) {
+          resBox.innerHTML = `<div style="padding: 15px; font-size: 0.8rem; color: var(--text-light); text-align: center;">No catalog products found.</div>`;
+        } else {
+          resBox.innerHTML = matches
+            .map(
+              (p) => `
+            <div style="padding: 12px 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-main)'" onmouseout="this.style.background='transparent'" onclick="addProdToCombo('${
+              p.id
+            }')">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="${
+                  p.images && p.images[0]
+                    ? p.images[0]
+                    : "https://via.placeholder.com/40"
+                }" style="width: 35px; height: 45px; object-fit: cover; border-radius: 4px; border: 1px solid #eee;" />
+                <div>
+                  <div style="font-weight: 600; font-size: 0.85rem;">${
+                    p.title
+                  }</div>
+                  <div style="font-size: 0.7rem; color: var(--text-light);">৳${
+                    p.finalPrice || p.price
+                  } | SKU: ${p.sku || "N/A"}</div>
+                </div>
+              </div>
+              <button type="button" class="btn-action-sm" style="pointer-events: none;">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </button>
+            </div>
+          `,
+            )
+            .join("");
+        }
+        resBox.style.display = "block";
+      };
+
+      window.addProdToCombo = (id) => {
+        const p = productsDB.find((x) => x.id === id);
+        if (!p) return;
+        const existing = currentComboItems.find((x) => x.id === id);
+        if (existing) {
+          existing.qty += 1;
+        } else {
+          currentComboItems.push({
+            id: p.id,
+            title: p.title,
+            price: p.finalPrice || p.price,
+            img:
+              p.images && p.images[0]
+                ? p.images[0]
+                : "https://via.placeholder.com/40",
+            qty: 1,
+          });
+        }
+        document.getElementById("combo-prod-search").value = "";
+        document.getElementById("combo-search-results").style.display = "none";
+        window.renderComboItems();
+      };
+
+      window.updateComboItemQty = (id, delta) => {
+        const item = currentComboItems.find((x) => x.id === id);
+        if (!item) return;
+        item.qty += delta;
+        if (item.qty <= 0) {
+          currentComboItems = currentComboItems.filter((x) => x.id !== id);
+        }
+        window.renderComboItems();
+      };
+
+      window.renderComboItems = () => {
+        const list = document.getElementById("combo-items-list");
+        list.innerHTML = "";
+        let totalVal = 0;
+
+        if (currentComboItems.length === 0) {
+          list.innerHTML = `<div style="text-align: center; padding: 30px 20px; font-size: 0.8rem; color: var(--text-light); border: 1px dashed var(--border-color); border-radius: 6px; background: #fff;">Search above and add products to construct this combo.</div>`;
+        } else {
+          currentComboItems.forEach((item) => {
+            totalVal += item.price * item.qty;
+            list.innerHTML += `
+              <div style="display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 6px; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                  <img src="${
+                    item.img
+                  }" style="width: 45px; height: 55px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);" />
+                  <div>
+                    <div style="font-weight: 600; font-size: 0.9rem; font-family:'Playfair Display';">${
+                      item.title
+                    }</div>
+                    <div style="font-size: 0.75rem; color: var(--text-light);">Unit: ৳${item.price.toLocaleString()}</div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                  <div style="display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden;">
+                    <button type="button" style="width: 28px; height: 28px; background: var(--bg-main); border: none; cursor: pointer; border-right: 1px solid var(--border-color);" onclick="updateComboItemQty('${
+                      item.id
+                    }', -1)">-</button>
+                    <div style="width: 35px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 600; background: #fff;">${
+                      item.qty
+                    }</div>
+                    <button type="button" style="width: 28px; height: 28px; background: var(--bg-main); border: none; cursor: pointer; border-left: 1px solid var(--border-color);" onclick="updateComboItemQty('${
+                      item.id
+                    }', 1)">+</button>
+                  </div>
+                  <strong style="width: 80px; text-align: right; font-size: 1rem; color: var(--accent);">৳${(
+                    item.price * item.qty
+                  ).toLocaleString()}</strong>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        document.getElementById(
+          "combo-total-value",
+        ).innerText = `৳${totalVal.toLocaleString()}`;
+        window.calculateComboValue(totalVal);
+      };
+
+      window.calculateComboValue = (overrideTotal) => {
+        let totalVal = overrideTotal;
+        if (totalVal === undefined) {
+          totalVal = 0;
+          currentComboItems.forEach(
+            (item) => (totalVal += item.price * item.qty),
+          );
+        }
+        const price =
+          parseFloat(document.getElementById("combo-price").value) || 0;
+        const savings = totalVal - price;
+        const saveEl = document.getElementById("combo-savings");
+        if (savings > 0) {
+          saveEl.innerText = `৳${savings.toLocaleString()}`;
+          saveEl.style.color = "var(--success)";
+        } else if (savings < 0) {
+          saveEl.innerText = `Loss: ৳${Math.abs(savings).toLocaleString()}`;
+          saveEl.style.color = "var(--danger)";
+        } else {
+          saveEl.innerText = `৳0`;
+          saveEl.style.color = "var(--text-main)";
+        }
+      };
+
+      window.saveCombo = async (e) => {
+        e.preventDefault();
+        if (currentComboItems.length === 0) {
+          return showToast(
+            "A combo pack must contain at least one catalog item.",
+            true,
+          );
+        }
+
+        const btn = document.getElementById("btn-save-combo");
+        btn.innerText = "Synchronizing Combo...";
+        btn.disabled = true;
+
+        const idField = document.getElementById("combo-id").value;
+        const newId = idField || "combo_" + Date.now().toString();
+
+        const comboData = {
+          status: document.getElementById("combo-status").value,
+          title: document.getElementById("combo-title").value,
+          sku: document.getElementById("combo-sku").value,
+          price: Number(document.getElementById("combo-price").value) || 0,
+          image: document.getElementById("combo-image").value,
+          desc: document.getElementById("combo-desc").value,
+          items: currentComboItems.map((i) => ({
+            id: i.id,
+            qty: i.qty,
+            price: i.price,
+          })),
+          updatedAt: new Date().toISOString(),
+        };
+
+        try {
+          await setDoc(doc(db, "combos", newId), comboData);
+          const index = combosDB.findIndex((x) => x.id === newId);
+          if (index === -1) combosDB.unshift({ id: newId, ...comboData });
+          else combosDB[index] = { id: newId, ...comboData };
+
+          showToast("Combo Pack Engineered & Synced");
+          window.renderCombos();
+          window.switchView("view-combos");
+        } catch (err) {
+          showToast("Error saving combo.", true);
+        }
+
+        btn.innerText = "Commit Combo to Database";
+        btn.disabled = false;
+      };
+
+      window.deleteCombo = async (id) => {
+        if (
+          await customConfirm(
+            "Eradicate this combo pack permanently?",
+            "Eradicate Bundle",
+            "Eradicate",
+            true,
+          )
+        ) {
+          showLoader();
+          try {
+            await deleteDoc(doc(db, "combos", id));
+            combosDB = combosDB.filter((x) => x.id !== id);
+            window.renderCombos();
+            showToast("Combo Pack Eradicated");
+          } catch (error) {
+            showToast("Deletion Failed", true);
+          }
+          hideLoader();
+        }
       };
     </script>
   </body>
