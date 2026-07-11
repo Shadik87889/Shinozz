@@ -2532,8 +2532,19 @@
 
           // Handle Advanced URLs (e.g. ?parent=Women&category=Sarees)
           const urlParams = new URLSearchParams(window.location.search);
-          const urlParent = urlParams.get("parent");
-          const urlCategory = urlParams.get("category");
+          let urlParent = urlParams.get("parent");
+          let urlCategory = urlParams.get("category");
+
+          // SMART FALLBACK: If the URL uses ?category=Women/Men instead of ?parent, fix it dynamically
+          if (
+            urlCategory &&
+            (urlCategory === "Women" ||
+              urlCategory === "Men" ||
+              urlCategory === "Kids")
+          ) {
+            if (!urlParent) urlParent = urlCategory;
+            urlCategory = null;
+          }
 
           // FIX: Only apply the 'All Parent' filter if NO specific category is clicked
           if (urlParent && !urlCategory) filterState.parents.push(urlParent);
