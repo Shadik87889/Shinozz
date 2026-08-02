@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Hyped - Premium Awwards Experience</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #F6F4EE;
+            --text-main: #111111;
+            --btn-pink: #F9CBFE;
+            --card-blue: #138EFF;
+            --card-green: #2FD58F;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ================= HEADER & NAV ================= */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 40px;
+            position: relative;
+            z-index: 50;
+        }
+
+        .logo {
+            font-family: 'Oswald', sans-serif;
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: #000;
+            -webkit-text-stroke: 1.5px #fff;
+            filter: drop-shadow(4px 4px 0px #000);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .logo span {
+            font-family: inherit;
+        }
+
+        nav {
+            background-color: var(--white);
+            padding: 12px 32px;
+            border-radius: 100px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 28px;
+        }
+
+        .nav-link {
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            flex-direction: column;
+            height: 20px;
+        }
+
+        .nav-link .link-text {
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        .nav-link .link-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 100%;
+            left: 0;
+            color: #666;
+        }
+
+        .nav-link:hover .link-text {
+            transform: translateY(-100%);
+        }
+
+        .cta-wrapper {
+            perspective: 1000px;
+            display: inline-block;
+        }
+
+        .cta-btn {
+            background-color: var(--btn-pink);
+            border: none;
+            padding: 8px 8px 8px 24px;
+            border-radius: 100px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 15px;
+            color: #4A0054;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(249, 203, 254, 0.4);
+            transform-style: preserve-3d;
+        }
+
+        .cta-btn .icon-circle {
+            background-color: var(--white);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        /* ================= HERO TEXT ================= */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-top: 3vh;
+        }
+
+        .hero-text {
+            padding: 0 40px;
+            max-width: 1200px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .line-wrap {
+            overflow: hidden;
+            padding-bottom: 5px;
+        }
+
+        .hero-text h1 {
+            font-size: 110px;
+            font-weight: 800;
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+            margin-bottom: 30px;
+        }
+
+        .hero-text p {
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        /* ================= AWWARDS CARDS SECTION ================= */
+        .cards-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 60vh;
+            margin-top: 3vh;
+            padding: 0 2vw;
+        }
+
+        .card-wrap {
+            width: 25vw;
+            height: 55vh;
+            max-height: 550px;
+            min-height: 420px;
+            position: relative;
+            perspective: 1500px; /* Essential for 3D hover pop */
+            /* We handle the static overlap and rotation here on the wrapper */
+        }
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 40px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            transform-style: preserve-3d; /* Crucial for inner element pop */
+            box-shadow: 0 25px 50px rgba(0,0,0,0.12);
+            will-change: transform;
+            overflow: hidden; /* For Glare */
+        }
+
+        /* Static overlapping logic matching the image exactly */
+        .card-1 { 
+            z-index: 3; 
+            transform: rotate(-7deg) translateY(15px); 
+        }
+        .card-2 { 
+            z-index: 1; 
+            transform: rotate(4deg) translateY(-5px); 
+            margin-left: -5vw; 
+        }
+        .card-3 { 
+            z-index: 4; 
+            transform: rotate(-4deg) translateY(10px); 
+            margin-left: -5vw; 
+        }
+        .card-4 { 
+            z-index: 2; 
+            transform: rotate(6deg) translateY(-15px); 
+            margin-left: -5vw; 
+        }
+
+        .bg-blue { background-color: var(--card-blue); }
+        .bg-green { background-color: var(--card-green); }
+        .bg-img-1 { background-image: url('https://images.unsplash.com/photo-1551041777-ed277b8dd348?q=80&w=800&auto=format&fit=crop'); } /* Placeholder for blur motion image */
+        .bg-img-2 { background-image: url('https://images.unsplash.com/photo-1596502206456-42d4f23b2b73?q=80&w=800&auto=format&fit=crop'); } /* Placeholder for car image */
+
+        /* Inner Content layout based on new images */
+        .card-content {
+            padding: 40px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none; /* Let hover hit the inner box */
+            /* Awwards Trick: This pulls the text out towards the user during 3D tilt */
+            transform: translateZ(50px) scale(0.95); 
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .card-wrap:hover .card-content {
+            transform: translateZ(80px) scale(1);
+        }
+
+        .card-number {
+            font-size: 80px;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+
+        .card-bottom-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-bottom-text h3 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+        }
+
+        .card-bottom-text hr {
+            border: none;
+            height: 2px;
+            background-color: var(--text-main);
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .card-bottom-text p {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Dynamic Glare effect */
+        .glare {
+            position: absolute;
+            top: 0; left: 0; width: 200%; height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 60%);
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        /* ================= FLOATING CHAT WIDGET ================= */
+        .widget-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 15px;
+            pointer-events: none; 
+        }
+
+        .tooltip {
+            background: var(--white);
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            line-height: 1.5;
+            max-width: 300px;
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+            pointer-events: auto;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 32px;
+            width: 12px;
+            height: 12px;
+            background: var(--white);
+            transform: rotate(45deg);
+        }
+
+        .tooltip a {
+            color: #138EFF;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .chat-btn {
+            width: 64px;
+            height: 64px;
+            background-color: #5768FF;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 12px 30px rgba(87, 104, 255, 0.4);
+            pointer-events: auto;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .chat-btn:hover {
+            transform: scale(1.1) translateY(-5px);
+        }
+
+        .chat-btn svg {
+            width: 34px;
+            height: 34px;
+            fill: var(--white);
+        }
+
+        .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #FF3B30;
+            color: var(--white);
+            font-size: 12px;
+            font-weight: 700;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid var(--bg-color);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="gsap-nav">
+        <div class="logo">GET<span>HYPED</span></div>
+        <nav>
+            <ul>
+                <li class="nav-link" data-text="Expertises"><span class="link-text" data-text="Expertises">Expertises</span></li>
+                <li class="nav-link" data-text="Work"><span class="link-text" data-text="Work">Work</span></li>
+                <li class="nav-link" data-text="About"><span class="link-text" data-text="About">About</span></li>
+                <li class="nav-link" data-text="Contact"><span class="link-text" data-text="Contact">Contact</span></li>
+                <li class="nav-link" data-text="Vacatures"><span class="link-text" data-text="Vacatures">Vacatures</span></li>
+            </ul>
+        </nav>
+        <div class="cta-wrapper">
+            <button class="cta-btn magnetic-btn">
+                <span class="btn-text">Get Results</span>
+                <span class="icon-circle btn-icon">🔥</span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-text">
+            <h1>
+                <div class="line-wrap"><div class="gsap-line">Get Hyped. Get</div></div>
+                <div class="line-wrap"><div class="gsap-line">Noticed. Get Results.</div></div>
+            </h1>
+            <p>
+                <div class="line-wrap"><div class="gsap-line">Klaar met gokken op content</div></div>
+                <div class="line-wrap"><div class="gsap-line">die niets oplevert?</div></div>
+            </p>
+        </section>
+
+        <section class="cards-section">
+            
+            <div class="card-wrap card-1 gsap-card">
+                <div class="card-inner bg-blue">
+                    <div class="glare"></div>
+                    <div class="card-content">
+                        <span class="card-number">10M+</span>
+                        <div class="card-bottom-text">
+                            <h3>Organische views</h3>
+                            <hr>
+                            <p>Groei door slimme content</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-wrap card-2 gsap-card">
+                <div class="card-inner bg-img-1">
+                    <div class="glare"></div>
+                </div>
+            </div>
+
+            <div class="card-wrap card-3 gsap-card">
+                <div class="card-inner bg-green">
+                    <div class="glare"></div>
+                    <div class="card-content">
+                        <span class="card-number">30+</span>
+                        <div class="card-bottom-text">
+                            <h3>Merken geholpen</h3>
+                            <hr>
+                            <p>Van start-up tot multinational</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-wrap card-4 gsap-card">
+                <div class="card-inner bg-img-2">
+                    <div class="glare"></div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <div class="widget-container gsap-widget">
+        <div class="tooltip">
+            Wil jij ook gratis meer Leads ontvangen<br>via je website? Ga naar: <a href="#">www.futy.io</a> 🚀
+        </div>
+        <div class="chat-btn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM17.15 16.14C16.94 16.73 15.93 17.22 15.34 17.29C14.86 17.34 14.2 17.42 11.59 16.34C8.25 14.95 6.1 11.55 5.94 11.34C5.78 11.13 4.6 9.56 4.6 7.93C4.6 6.3 5.43 5.51 5.76 5.17C6.03 4.89 6.46 4.75 6.88 4.75C7.02 4.75 7.14 4.76 7.25 4.76C7.57 4.76 7.73 4.78 7.94 5.29C8.19 5.89 8.81 7.39 8.88 7.55C8.96 7.71 9.04 7.92 8.93 8.13C8.83 8.35 8.73 8.45 8.57 8.64C8.41 8.83 8.24 8.98 8.09 9.17C7.94 9.35 7.77 9.55 7.96 9.87C8.14 10.19 8.79 11.26 9.75 12.12C10.99 13.23 12.01 13.58 12.35 13.72C12.69 13.86 12.92 13.83 13.12 13.62C13.34 13.39 13.62 12.96 13.92 12.53C14.15 12.19 14.45 12.15 14.77 12.27C15.09 12.39 16.77 13.22 17.1 13.39C17.43 13.55 17.65 13.63 17.73 13.77C17.81 13.91 17.81 14.59 17.15 16.14Z"/>
+            </svg>
+            <div class="badge">1</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+    
+    <script>
+        // 1. Lenis Smooth Scrolling Initialization
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smooth: true,
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // 2. Entrance Animations 
+        document.addEventListener("DOMContentLoaded", () => {
+            const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+
+            tl.from(".gsap-nav", { y: -30, opacity: 0, duration: 1.2 })
+              .from(".gsap-line", { y: "110%", rotationZ: 2, duration: 1.2, stagger: 0.1, ease: "power4.out" }, "-=0.8")
+              .from(".gsap-card", { y: "80vh", rotationX: 45, opacity: 0, duration: 1.5, stagger: 0.1, ease: "elastic.out(1, 0.6)" }, "-=1")
+              .from(".gsap-widget", { scale: 0.5, opacity: 0, y: 50, duration: 1, ease: "back.out(1.5)" }, "-=1.2");
+        });
+
+        // 3. Magnetic Button Logic for Nav
+        const magneticBtn = document.querySelector('.magnetic-btn');
+        const btnText = magneticBtn.querySelector('.btn-text');
+        const btnIcon = magneticBtn.querySelector('.btn-icon');
+
+        magneticBtn.addEventListener('mousemove', (e) => {
+            const rect = magneticBtn.getBoundingClientRect();
+            const x = (e.clientX - rect.left) - rect.width / 2;
+            const y = (e.clientY - rect.top) - rect.height / 2;
+            
+            gsap.to(magneticBtn, { x: x * 0.4, y: y * 0.4, duration: 0.4, ease: "power2.out" });
+            gsap.to(btnText, { x: x * 0.2, y: y * 0.2, duration: 0.4, ease: "power2.out" });
+            gsap.to(btnIcon, { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: "power2.out" });
+        });
+
+        magneticBtn.addEventListener('mouseleave', () => {
+            gsap.to([magneticBtn, btnText, btnIcon], { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.4)" });
+        });
+
+        // 4. Ultimate 3D Parallax Card Hovers via GSAP quickTo (ZERO Z-Index Glitching)
+        const cards = document.querySelectorAll('.card-wrap');
+
+        cards.forEach(card => {
+            const inner = card.querySelector('.card-inner');
+            const glare = card.querySelector('.glare');
+            
+            // Setting up quickTo for butter-smooth latency-free tracking
+            const rotateXTo = gsap.quickTo(inner, "rotateX", {duration: 0.4, ease: "power3"});
+            const rotateYTo = gsap.quickTo(inner, "rotateY", {duration: 0.4, ease: "power3"});
+            const scaleTo = gsap.quickTo(inner, "scale", {duration: 0.4, ease: "power3"});
+            const glareXTo = gsap.quickTo(glare, "x", {duration: 0.2});
+            const glareYTo = gsap.quickTo(glare, "y", {duration: 0.2});
+            const glareOpacTo = gsap.quickTo(glare, "opacity", {duration: 0.4});
+
+            let bounds;
+
+            card.addEventListener('mouseenter', () => {
+                bounds = card.getBoundingClientRect();
+                scaleTo(1.05); // Smooth scaling of inner frame without messing wrapper position
+                glareOpacTo(1);
+            });
+
+            card.addEventListener('mousemove', (e) => {
+                const mouseX = e.clientX;
+                const mouseY = e.clientY;
+                const leftX = mouseX - bounds.x;
+                const topY = mouseY - bounds.y;
+                
+                const percentX = (leftX / bounds.width) - 0.5; // -0.5 to 0.5
+                const percentY = (topY / bounds.height) - 0.5;
+
+                const maxRotation = 12; // degrees of tilt
+
+                // Calculate tilt strictly on inner element 
+                rotateXTo(percentY * -maxRotation);
+                rotateYTo(percentX * maxRotation);
+
+                // Move Glare center to mouse position
+                glareXTo(leftX);
+                glareYTo(topY);
+            });
+
+            card.addEventListener('mouseleave', () => {
+                // Spring back completely
+                rotateXTo(0);
+                rotateYTo(0);
+                scaleTo(1);
+                glareOpacTo(0);
+                
+                // Add a bouncy elasticity on leave
+                gsap.to(inner, { rotateX: 0, rotateY: 0, scale: 1, duration: 1, ease: "elastic.out(1, 0.4)" });
+            });
+        });
+    </script>
+</body>
+</html>
